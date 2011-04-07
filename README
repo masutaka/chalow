@@ -4,7 +4,7 @@ ChangeLog を HTML に変換するツール
 
 README
 
-$Id: README,v 1.32 2004/12/24 07:50:53 yto Exp $
+$Id: README,v 1.33 2005/08/10 02:31:46 yto Exp $
 
 ----------------------------------------------------------------------
 インストール
@@ -68,6 +68,7 @@ usage: chalow [options] <file> [file]...
     -s, --stop-date             date to stop processing
     -u, --update-by-size        overwrite only if sizes are different
     -C, --css=FILE              css file
+    -8, --utf8                  utf8 mode
     -q, --quiet                 quiet mode
 
 -n で、「インデックスページ」に最近の何日分を載せるか指定できる。
@@ -78,6 +79,7 @@ usage: chalow [options] <file> [file]...
    未指定なら最後まで処理する。 (例: --stop-date "2002-01-01")
 -C で、chalow: CSS ファイルをコマンドラインから指定できる。
 -u を指定すると、出力先ファイルとサイズが異なる場合のみ上書き出力する。
+-8 を指定すると、UTF8での出力になる。ChangeLog, cl.conf はUTF8を仮定。
 -q を指定すると、変換作業進捗情報を標準出力に出力しなくなる。
 
 
@@ -232,6 +234,13 @@ ChangeLog の特殊な記法
   以下のように記述します。
 	||項目1-1||項目1-2||項目1-3
 	||項目2-1||項目2-2||項目2-3
+
+
+- 「続きを読む」の表記
+
+  '====' と記述すると「Read More...」というリンクができ item page へ
+  ジャンプします。 
+  item page を出すようにしたとき($page_mode=2)のみ機能します。
 
 
 - プラグイン機能

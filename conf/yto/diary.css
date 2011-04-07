@@ -274,34 +274,15 @@ div .itemauthor span {
   color: #606060;
 }
 
+
 #content {
-  position:relative;
-  margin-left: 230px;
-/*  margin-right: 180px;*/
-  padding: 0px;	
+  float: left;
+  width: 70%;
 }
-
 #links {
-  position:absolute;
-  top:8.5em;
-  left:5px;
-  width: 225px;	
-/*  float: left;
-  margin-right: 5px;*/
-  margin: 0px;
-  padding: 0px;	
-}
-
-#linksright {
-  position:absolute;
-  top:8.5em;	
-  right:5px;
-  width: 175px;	
-/*  float: right;
-  margin-left: 5px;*/
-  margin: 0px;
-  padding: 0px;	
-  background-color: white;
+  float: right;
+  width: 225px;
+  text-align: left;
 }
 
 #footer {
@@ -323,3 +304,11 @@ div .itemauthor span {
 
 .section table {border-collapse: collapse;}
 .section td {border: solid 1px gray; padding: 3px;}
+
+
+.datetitle {
+padding:10px;
+border-color: #ff80ff;
+border-style: solid;
+border-width: 1px 0px 0px 5px;
+}

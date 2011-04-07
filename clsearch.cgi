@@ -1,5 +1,5 @@
-#!/usr/bin/env perl
-# $Id: clsearch.cgi,v 1.21 2004/08/18 12:34:25 yto Exp $
+#!/usr/bin/perl
+# $Id: clsearch.cgi,v 1.22 2005/01/13 00:34:28 yto Exp $
 # clsearch.cgi - chalow により HTML 化された ChangeLog を検索する CGI
 use strict;
 

@@ -1,15 +1,23 @@
 package ChangeLogReader;
 use strict;
-use vars qw(@ISA @EXPORT $VERSION $OLD_CODE);
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT = qw(store_changelog store_entry debug_print);
-$VERSION = '0.1';
+#use vars qw(@ISA @EXPORT $VERSION $OLD_CODE);
+#require Exporter;
+#@ISA = qw(Exporter);
+#@EXPORT = qw(store_changelog store_entry store_entry2 debug_print);
+#$VERSION = '0.1';
+
+sub new {
+    my $class = shift;
+    my $self = {};
+    my %param = @_;
+    for (keys %param) { $self->{lc($_)} = $param{$_} } 
+    return bless $self, $class;
+}
 
 sub debug_print {
-    my ($hashp) = @_;    
-    foreach my $ymd (reverse sort keys %{$hashp}) {
-	my $ent = $hashp->{$ymd};
+    my ($self) = @_;    
+    foreach my $ymd (reverse sort keys %{$self->{all}}) {
+	my $ent = $self->{all}->{$ymd};
 	print "=" x 60, "\n";
 	print "ENTRY ID: $ymd\n";
 	print "message-top:",$ent->{'message-top'},"\n"
@@ -28,32 +36,40 @@ sub debug_print {
     }
 }
 
-sub store_changelog {
-    my ($hashp, $linesp) = @_;
+
+sub store_changelog_file {
+    my ($self, $fname) = @_;
+
+    open(F, $fname) || die "file open error $fname : $!";
+    binmode(F);
     my @entlines;
-    foreach (@$linesp) {
+    while (<F>) {
 	if (/^(\d{4}-\d\d-\d\d)/) {
-	    store_entry($hashp, \@entlines) if (@entlines > 0);
+	    $self->store_entry(\@entlines) if (@entlines > 0);
 	    @entlines = ();
-	} elsif (/^__DATA__.*$/) {
+	} elsif (/^\t?__DATA__.*$/) {
 	    last;
 	}
 	push @entlines, $_;    
     }
-    store_entry($hashp, \@entlines) if (@entlines > 0);
+    $self->store_entry(\@entlines) if (@entlines > 0);
+    close F;
 }
 
+
 sub store_entry {
-    my ($hashp, $linesp) = @_;
+    my ($self, $linesp) = @_;
 
     # Processing entry header
     my $eh = shift @$linesp;
 
+    return unless ($eh =~ /^\d{4}-\d\d-\d\d/);
+
     my ($ymd, $y, $m, $d, $user) 
         = ($eh =~ /^((\d\d\d\d)-(\d\d)-(\d\d))(?:.*?\s\s)(.+)?/);
 
-    $hashp->{$ymd}->{eh} = $ymd;
-    my $entp = $hashp->{$ymd};
+    $self->{all}->{$ymd}->{eh} = $ymd;
+    my $entp = $self->{all}->{$ymd};
 
     $user =~ s/</&lt;/g;
     $user =~ s/>/&gt;/g;
@@ -73,19 +89,43 @@ sub store_entry {
     push @items, [@ilines] if (@ilines > 0 and $ilines[0] !~ /^\s*$/);
 
     foreach (reverse @items) {
-	store_item($entp, $_, $ymd, $user);
+	$self->store_item($entp, $_, $ymd, $user);
     }
 
     if ($entp->{curid} == 0) {
 	# If the entry doesn't have any item, delete it.
 	# It will be happend when all items in the entry are private items.
 	# Notice: pragma items are ignored.
-	delete $hashp->{$ymd};
+	delete $self->{all}->{$ymd};
+	return;
+    }
+
+    my $ent = $self->{all}->{$ymd};
+    for (my $i = $ent->{curid}; $i >= 1; $i--) {
+	if (defined $ent->{$i}->{cat}) {
+	    map {$self->{CAT}->{$_}++} @{$ent->{$i}->{cat}};
+	}
+    }
+
+    $self->{STAT}->{ym}{$y."-".$m}++; # for month_page_list
+    $self->{STAT}->{md}{$m."-".$d}{$y} = 1; # for SameDateJump
+    # {"ym"} : 各年月に含まれている日付エントリ数
+    # {"md"} : 同じ月日を持つ年 for same date jump
+
+    if ($self->{stop_date} != 0) {
+	my $cdate = $y * 10000 + $m * 100 + $d;
+	if ($self->{stop_date} > $cdate) {
+	    delete $self->{all}->{$ymd};
+	}
     }
 }
 
+
+# 文字コードを euc にしておく???????
 sub store_item {
-    my ($entp, $linesp, $ymd, $user) = @_;
+    my ($self, $entp, $linesp, $ymd, $user) = @_;
+#    $entp = $self->{all}->{$ymd};
+
     my $ih = shift @$linesp;
     # item header - case 1: "* AAA: \n"
     # item header - case 2: "* AAA:\n"

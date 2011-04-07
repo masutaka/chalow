@@ -1,3 +1,118 @@
+2005-08-10  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* version 1.0rc5[リリース]:
+	公開。
+
+	今回の主な変更点は以下：
+
+	'''「続きを読む」機能''': 
+	'[esc]====[/esc]' と記入するとそれ以下の記述が省略され item page へ
+	ジャンプするリンクが表示されます。
+	item page を出すようにしたとき($page_mode=2)のみ機能します。
+	なお、cl.conf の $item_template に以下のような記述を追加する必要が
+	あります。
+	[src]
+	<TMPL_IF name=readmore>
+	《<a href="<TMPL_VAR name=url>">続きを読む</a>》
+	</TMPL_IF>
+	[/src]
+
+	'''utf8 mode''': 
+	chalow をコマンドラインオプション --utf8 で実行。ChangeLog 本体も 
+	cl.conf も文字コードが utf8 になっている必要あり。 
+	cl.conf は conf/utf8/cl.conf を参考にどうぞ。
+
+	* README: 
+	mod.
+
+	* ChangeLogReader.pm: 
+	新しいのに置き換えた。（これまでは別ファイル名でテストしてた）
+
+	* 要望:
+	- カテゴリ一覧をネスト
+
+2005-06-23  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* chalow: 
+	> my $readmore_tag = "[esc]====[/esc]";
+	デフォルトを :::: から [esc]====[/esc] に変更。はてな記法に準拠。
+
+2005-04-12 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* chalow (okikae,make_item_html): 
+	readmoreの処理を追加。
+
+	* 「続きを読む」機能[ReadMore]: 
+	仕様：item page を出すようにしたとき($page_mode=2)のみ機能する。
+	item pageでは全部読める。
+	他のページでは指定したところまで表示し、「read more」等のリンク
+	でitem pageへ飛ぶ。
+	====
+	okikaeでreadmore記法の箇所とitemの最後に class 付きタグを入れる。
+
+	> んんん
+	> ::::
+	> あああ
+	↓
+	> んんん
+	> <div class="readmore">あああ</div>
+
+	make_item_html() - for other pages
+	(1) name=content には、readmoreのdivを消したものを入れる。
+	(2) $item_template で新変数 name=readmore が使えるようになる。
+	
+	make_item_page() - for item pages
+	そのまま。
+
+
+	> # Read More mode (0:OFF, 1:ON)
+	> $readmore_mode = 1;
+
+	readmore記法('::::')は変更できる。
+	> # Read More tag
+	> $readmore_tag = "::::";
+
+	* conf/utf8/cl.conf: 
+	New.  設定ファイル for utf8
+
+	* chalow (to_utf8_cl): 
+	New.  modularized for i18n
+
+	* utf8 mode[i18n]: 
+	目的：国際化(UTF8)のために文字コード変換まわりを局所化する。
+	仕様：文字コード変換をせずにそのまま通す。
+
+	> # UTF8 mode (0:OFF, 1:ON)
+	> my $utf8_mode = 0;
+
+	コマンドラインオプション --utf8
+
+	ToDo(chalow)
+	●ソース中のデフォルトテンプレートを日本語なし(ascii)に
+	●ユーザ設定読み込み後のEUC-JPへの変換をやめる
+	●write_rss_file: rss出力時のUTF8への変換切替->func
+	●get_category_filename: カテゴリファイル名作成時のUTF8変換切替->func
+
+	!!!
+	〇clsearch.cgi
+
+	* 作業再開: 
+	作業を再開しました。
+
+2005-01-25 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* chalow (write_rss_file): 
+	旧：$ymd."T23:59:59+9:00";
+	新：$ymd."T23:59:59+09:00";
+
+2005-01-19 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* chalow: 
+	tmplが空なら月ページ、日ページを作らない仕様にした。
+
+	* chalow: 
+	pmに手をいれ大掛かりな改造。
+
 2004-12-24  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 1.0rc4[リリース]:
