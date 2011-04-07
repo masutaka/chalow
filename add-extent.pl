@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: add-extent.pl,v 1.2 2003/08/03 04:01:10 yto Exp $
+# $Id: add-extent.pl,v 1.3 2003/08/25 11:50:33 yto Exp $
 # HTML の img タグに width と height を足す
 
 use strict;
@@ -63,7 +63,7 @@ USAGE
 		my $imgfn = $1;
 
 		# identify で width と height を取得
-		die unless (-e $imgfn);
+		next unless (-e $imgfn);
 		my ($w, $h);
 		if (defined $file_info{$imgfn}) {
 		    ($w, $h) = @{$file_info{$imgfn}};

@@ -233,3 +233,33 @@ p {
         margin-right: 1.0em;
         margin-left: 1.0em;
 }
+
+
+/*
+for chalow: Referrer by 日付リンク
+*/
+div .referer { 
+  font-size: x-small;
+  color: #808080;
+  background-color: #fff0ff;
+  margin-top: 0.5em;
+  padding: 0.2em;
+}
+div .referer a:link {color: #404040;}
+div .referer a:visited {color: #606060;}
+
+/*
+for chalow: author of item
+*/
+div .itemauthor { 
+  text-align: right;
+  padding: 0.3em 0 0 0;
+}
+div .itemauthor span {
+  font-size: small;
+  border-color: #ffb0ff;
+  border-style: solid;
+  border-width: 0px 5px 1px 0px;
+  color: #606060;
+}
+

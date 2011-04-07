@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
-# $Id: clsearch.cgi,v 1.8 2003/06/22 03:04:09 yto Exp $
-# clsearch.cgi - HTML 化された ChangeLog (by chalow) を検索するCGI
+# $Id: clsearch.cgi,v 1.12 2003/08/29 15:22:44 yto Exp $
+# clsearch.cgi - chalow により HTML 化された ChangeLog を検索する CGI
 use strict;
 
 ### User Setting from here
@@ -11,11 +11,7 @@ my $numnum = 20; # 一度に表示できる数
 my $css_file = "diary.css";
 ### to here
 
-# nkf 自動設定 --- 日本語コードで悩まされないために...
-my $NKF = `which nkf`;
-chomp $NKF;
-die "NO NKF!" if ($NKF !~ /nkf$/); 
-
+use Jcode;
 use CGI;
 my $q = new CGI;
 
@@ -40,13 +36,13 @@ my $cnt = 0;
 if (defined $key) {
     my @fl = reverse sort <[0-9][0-9][0-9][0-9]-[0-9][0-9].html>;
     for my $fn (@fl) {
-	open(F, "$NKF -ed $fn |") or die "file open error: $fn\n";
+	open(F, "< $fn") or die "Can't open $fn : $!\n";
 	my $all = join('', <F>);
+	$all = Jcode->new($all)->euc;
 	close(F);
 
 	my $date = "";
-	while ($all =~ m!(<div\sclass=("day">.+?</h2>
-				       |"section">.+?</div>))!gsmx) {
+	while ($all =~ m%(<div\sclass=("day">.+?</h2>|"section">.+?<!--eos-->))%gsmx) {
 	    my $item = $1;
 	    if ($2 =~ /^"day"/) {
 		$date = $item;
@@ -64,12 +60,10 @@ if (defined $key) {
 		# タグ中の文字列はハイライトしない
 		my @tmp = split(/(<.+?>)/, $item);
 		foreach my $ii (@tmp) {
-		    $ii =~ s|($key)|<strong 
-			style="background-color:yellow">$1</strong>|gix
-			    if ($ii !~ /^</);
+		    $ii =~ s|($key)|<strong style="background-color:yellow">$1</strong>|gix if ($ii !~ /^</);
 		    $ostr .= $ii;
 		}
-		$outstr .= $ostr."</div>\n";
+		$outstr .= $ostr."</div>\n"; # <div class="day"> の閉じ
 	    }
 	}
     }
@@ -110,7 +104,7 @@ if ($cnt == 0) {
     print "<p>$cnt 件 見つかりました。</p>\n";
 }
 
-print qq(<p>$navip $bar $navin</p><pre>$outstr</pre><p>$navip $bar $navin</p>
+print qq(<p>$navip $bar $navin</p><div class="body">$outstr</div><p>$navip $bar $navin</p>
 <a href="index.html">ChangeLog INDEX</a>
  / <a href="$home_page_url">$home_page_name</a>
 <div style="text-align:right">Powered by 

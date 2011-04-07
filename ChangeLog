@@ -1,17 +1,200 @@
-2003-08-03  YAMASHITA Tatsuo  <yto@nais.to>
+2003-08-30 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* p:TODO:
-	- 日本語コードの選択
-	- # ではじまる行は消す
-	- 日付ごとだけでなく、アイテムごとに「くっつき BBS」
-	- chalowlib?
-	- くっつき BBS との連携まわりをすっきりさせる
-	- ページ単位だけど、リンク元表示
-	  参考: <http://www.ijn-jp.net/user8/report/svchat13.html>
-	  要調査: JavaScript で #2003... も取れるか?
-	- RSS
-	- トラックバック
-	- 自分の日記内だけでのトラックバック[2002-06-28-2]
+	* version 0.19: 
+	公開
+
+	* 変更点のまとめ: 
+
+	- プラグイン機能
+	  例：(記号は全角で表記していますが、実際は半角)
+	  ｛｛google_seach('海老名 映画館')｝｝ → {{google_seach('海老名 映画館')}}
+
+	- 自分の日記内だけでのリファラー機能
+	  ref. <http://nais.to/~yto/clog/2002-06.html#2002-06-28-2>
+
+	- Hiki の記法を==パクる==採用
+	  任意の URL へのリンク、文字修飾、水平線
+	  例：(記号は全角で表記していますが、実際は半角)
+	  ［［Yahoo!|http://www.yahoo.co.jp/］］ → [[Yahoo!|http://www.yahoo.co.jp/]]
+	  ＝＝ABC＝＝     → ==ABC==
+	  ’’ABC’’     → ''ABC''
+	  ’’’ABC’’’ → '''ABC'''
+
+	- 各アイテムに記述者名を表示する機能 (for 複数人で ChangeLog)
+
+	- nkf はやめて、Jcode.pm を使うようにした
+
+	- RSS に <dc:date> も足すようにした
+
+        * p:TODO:
+        - 日本語コードの選択
+        - # ではじまる行は消す
+        - 日付ごとだけでなく、アイテムごとに「くっつき BBS」
+        - chalowlib?
+        - くっつき BBS との連携まわりをすっきりさせる
+        - ページ単位だけど、リンク元表示
+          参考: <http://www.ijn-jp.net/user8/report/svchat13.html>
+          要調査: JavaScript で #2003... も取れるか?
+        - トラックバック
+
+	* README:
+	mod.
+
+	* chalow (parse_entry): 
+	$descending_order_item_num 廃止。アイテムの ID は降順で固定。
+
+	* {clseach.cgi,chalow}: 
+	検索がしやすいように、各 item (section) の終わりをあらわすマーク 
+	＜!--eos--> を入れる方針にした。最初からこうすれば良かった...。
+
+2003-08-29 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow:
+	プラグイン機能が登場!
+	「{」２つと「}」２つで囲むとプラグイン (関数) を呼び出すことができ
+	ます。あんまり多くのことはできませんが...。
+
+	例：(記号は全角で表記していますが、実際は半角)
+	> ｛｛google_seach('海老名 映画館')｝｝ → {{google_seach('海老名 映画館')}}
+
+	プラグインは cl.conf に足して置けば使えます。
+
+	in cl.conf
+	> # -------------------------------------------------------------
+	> # 以下、プラグイン
+	> sub google_seach {
+	>     my ($k) = @_;
+	>     my $o = $k;
+	>     $k =~ s/([^0-9a-z_ ])/'%'.unpack('H2', $1)/gei;
+	>     $k =~ s/\s/+/g;
+	>     my $c = "ie=EUC-JP&oe=EUC-JP&";
+	>     return qq(<a href="http://www.google.co.jp/search?${c}q=$k">$o</a>);
+	> }
+
+	* chalow: 
+	日付リンクによるリファラー、つまり、自分の日記内だけでのリファラー
+	機能を実装。
+	ref. <http://nais.to/~yto/clog/2002-06.html#2002-06-28-2>
+
+	<div class="referer"><span> </span></div> で囲む。
+	sample/diary.css にそのクラスを追加した。
+
+	テスト: [2003-06-26-2] [2003-06-26-1] [2003-06-26]
+	
+	* gazou.png: 
+	New! これ↓ cvs add -kb した。
+	[[画像|image/gazou.png]]
+
+	* chalow: (get_link_str):
+	New for Hiki 記法。そして、 get_img_str() を廃止。
+	* p:[IMG:image/gazou.png] [IMG:image/gazou.png http://nais.to/~yto/]
+
+	* chalow (okikae): 
+	Hiki の記法を==パクる==採用。
+
+	■任意の URL へのリンク
+
+	「単語|URL」を 2 つの半角カギカッコで囲むとを任意の URL へのリンク
+	になります。
+
+	例：(記号は全角で表記していますが、実際は半角)
+	> ［［Yahoo!|http://www.yahoo.co.jp/］］ → [[Yahoo!|http://www.yahoo.co.jp/]]
+	
+	このとき URL の末尾が jpg,jpeg,png,gif だと IMG タグに展開されます。
+	（指定した単語がALTに設定される）
+
+	例：(記号は全角で表記していますが、実際は半角)
+	> ↓ ［［図|image/gazou.png］］
+	[[図|image/gazou.png]]
+	
+	「単語」の末尾が jpg,jpeg,png,gif だとクリック可能な IMG タグに展
+	開されます。IMG が URL へのリンクになります。
+	
+	例：(記号は全角で表記していますが、実際は半角)
+	> ↓ ［［image/gazou.png|http://nais.to/~yto/］］
+	[[image/gazou.png|http://nais.to/~yto/]]
+
+	また、URL っぽいものがあると勝手にリンクがはられます。
+
+	例：
+	> http://www.yahoo.co.jp/
+
+	■文字修飾の記法
+
+	「'」2個ではさんだ部分は強調されます。「'」3個ではさんだ部分はさら
+	に強調されます。「=」2個ではさんだ部分は取消線になります。
+
+	例：(記号は全角で表記していますが、実際は半角)
+	> ＝＝ABC＝＝ → ==ABC== (<s>ABC</s>)
+	> ’’ABC’’ → ''ABC'' (<em>ABC</em>)
+	> ’’’ABC’’’ → '''ABC''' (<strong>ABC</strong>)
+
+	■水平線の記法
+
+	マイナス記号「-」を行の先頭のタブの後から 4 つ書くと水平線になりま
+	す。
+
+	例：(記号は全角で表記していますが、実際は半角)
+	>         あはは
+	>         −−−−
+	>         いひひ
+	あはは
+	----
+	いひひ
+
+2003-08-25  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow:
+        日付だけでなく記述者も考慮するようにしなくちゃ本来の ChangeLog (複
+	数の人々が開発に用いるという状況) で使えない。普及の壁??? そこで、
+	記述者が複数いる ChangeLog ファイル用に、各アイテムに記述者名を表
+	示するモードを作った。
+	
+        in cl.conf:
+        > # 各アイテムに記述者名を表示するか (1:YES, 0:NO)
+        > $show_author_name = 0;
+
+	<div class="itemauthor"><span>名前</span></div>
+	
+        「author name」
+        ref. <http://www.jurta.org/emacs/ee/text/changelog.en.html>
+
+2003-08-16  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* README: 
+	mod.  nkf が必要、との記述を削除。
+
+	* clsearch.cgi: 
+	検索で日付が出て来なくなっていたのを修正。
+
+2003-08-11 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* clsearch.cgi:
+	nkf はやめて、Jcode.pm を使うようにした。
+
+	* chalow: 
+	nkf を呼ぶのはやめて、Jcode.pm を使うようにした。
+	(write_rss_file): utf-8 への文字コード変換に Jcode を使うようにし
+	た。ゆえに、chalow 0.18 から必要となった「nkf 2.0 以降」は不要。
+
+	- 他の場所でも nkf 使うのやめた。
+	- FileHandle も使うのやめた。
+
+	- memo: Cygwin へ Jcode.pm 
+	<http://nais.to/~yto/w3buf/clog/2003-08.html#2003-08-12-1>
+
+2003-08-09  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* clsearch.cgi:
+	CSS がらみでちょっと修正。
+
+2003-08-08 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (write_rss_file):
+	RSS に <dc:date> も足すようにした。日付だけで、時間はなし。
+	例: <dc:date>2003-08-03</dc:date>
+
+2003-08-03  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.18: 
 	公開
@@ -180,7 +363,7 @@
 	
 	* chalow (parse_entry): item header の処理のところのロジック変更。
 
-	* {chalow,cl.cong}:
+	* {chalow,cl.conf}:
 	新たな設定項目を追加
 	> # item header の先頭の記号の指定
 	> my $item_header_mark = "*";
@@ -300,7 +483,7 @@
 	CSS ファイルをコマンドラインから指定できるようにした。
 	いろいろなテーマが簡単に試せる。Ex: --css=hoge.css
 
-	* {sample/diary.css,cl.cong,chalow}: 
+	* {sample/diary.css,cl.conf,chalow}: 
 	- tDiary の CSS と共通にする作戦: h1 はページタイトルっていうのは
 	  決め打ちでも良いと思うが、h2 を日記の各日付のタイトルと決め打ち
 	  されていたのでちょっと困った。で、従うことにする。修正。
