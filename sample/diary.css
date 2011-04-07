@@ -238,12 +238,13 @@ div.commentbody {
 img {
 	margin: 2px;
 }
+/*
 .section a img {
 	margin: 2px;
 	border-style: solid;
         border-width: 1px;
 }
-
+*/
 
 /*
 for chalow: Referrer by 日付リンク
@@ -275,7 +276,7 @@ div .itemauthor span {
 
 #content {
   position:relative;
-  margin-left: 190px;
+  margin-left: 180px;
   margin-right: 180px;
   padding: 0px;	
 }
@@ -284,7 +285,7 @@ div .itemauthor span {
   position:absolute;
   top:8.5em;
   left:5px;
-  width: 185px;	
+  width: 175px;	
 /*  float: left;
   margin-right: 5px;*/
   margin: 0px;
@@ -320,5 +321,5 @@ div .itemauthor span {
       line-height: 120%;
 }
 
-.day table {border-collapse: collapse;}
-.day td {border: solid 1px gray; padding: 3px;}
+.section table {border-collapse: collapse;}
+.section td {border: solid 1px gray; padding: 3px;}

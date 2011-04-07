@@ -1,3 +1,145 @@
+2004-11-07  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* version 1.0rc3[リリース]:
+	公開。
+
+2004-10-25  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* chalow (write_rss_file): 
+	RSS の各 item の dc:date について。
+	今まではすべて日付のみであった。
+	> <dc:date>2004-10-25</dc/date>
+	方針を変更。今日のものだけ時間まで入れることにした。
+	> <dc:date>2004-10-25T23:00:00+9:00</dc/date>
+	追加したロジック：
+	> my $item_dcdate = ($dcdate =~ /^$ymd/) ? $dcdate : $ymd;
+
+2004-10-07 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* chalow で差分更新を行なう方法: 
+	chalow では --stop-date オプションによる差分更新ができるのだが、
+	カテゴリファイルは差分更新されない。そこでカテゴリ別表示を 
+	clsearch.cgi で行なうようにすると良い。手順は以下の通り：cl.conf 
+	の $output_cat_pages を 0 にする。必要ならば $cat_page_cgi の 
+	clsearch.cgi へのパスを環境にあわせて変更する。
+
+	* chalow (parse_entry): 
+	ごめんなさい!
+	複数人利用のときの item ID 付与方針を変更しました。
+	1,2,3,4 と普通につきます。
+	今までは、authorがかわるごとに +100 されてました。
+	1,2,3,101,102,...という風に。
+
+	しかし、この前ロジックを大きく変更してから
+	これが動いていないようです。同じ日付エントリがあると、
+	マージされないで上書きされてたみたいです。
+	修整するために上記のように仕様を「自然なもの」に変更しました。
+
+	変な仕様にしたのが間違いのもとでした。
+	ごめんなさい、ごめんなさい、ごめんなさい。
+
+	$enthashp->{curid} というのを導入して、item ID を entry ごとに
+	管理するようにしました。最初からこれで行けばよかったんだよなあ。
+	猛省。
+
+2004-08-18 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* chalow (write_itemlist_file): 
+	--stop-date 2004-08-01 すると、 cl.itemlist の 2004-07-31-* らへん
+	がおかしくなる。clsearch.cgiでの検索で発見したバグ。
+	ロジックがおかしかったので修整した。
+
+2004-07-31 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (write_itemlist_file): 
+	--stop-date のとき、 cl.itemlist を差分更新するようにした。
+
+	* chalow: 
+	クリーニング直後のおかしなロジックを直した。
+	category_count をクリーニングの直後に入れた。
+	しかし、これは効率的ではない。再考が必要。
+
+	* chalow (write_js_file): 
+	分割した。
+	(write_category_list_file): カテゴリ一覧
+	(write_latest_item_list_file): 最近の記事
+
+	* chalow (write_*_page): 
+	latest_item_list, category_list
+	> $t->param(latest_item_list => $latest_item_list);
+	> $t->param(category_list => $category_list);
+
+	使い方 (cl.conf)：
+	<td><script language="JavaScript" src="cl.js"></script></td>
+	↓↓↓↓↓
+	<td><TMPL_VAR name=latest_item_list></td>
+	ただし、updateされるたびに全ファイルの更新が必要になる。
+
+	* chalow (write_js_file): 
+	JSだけでなくHTMLの文字列をグルーバル変数 $latest_item_list,
+	にキープして HTML::Template で使うことにした。
+
+	* chalow (urlencode):
+	New. いまさら。
+
+	* chalow: 
+	「HTML 生成のためのループ」のところで、
+	カテゴリ別item表示をCGIにするときの処理を書く。
+	(write_js_file): ここでも同様の処理を。
+
+	* cl.conf: 
+	新設定項目 see ↓
+
+	* chalow: 
+	新設定項目。および、整理。
+	>>
+	# カテゴリページを作るか (0:NO, 1:YES)
+	my $output_cat_pages = 1;
+	# カテゴリページ中のエントリ数の上限
+	# ($output_cat_pages = 1 のときのみ有効)
+	my $cat_page_entry_max = 10;
+	# カテゴリ別item表示のためのCGIを指定する（カテゴリ名は %%CAT%% で
+	置き換え）
+	# ($output_cat_pages = 0 のときのみ有効)
+	my $cat_page_cgi = "clsearch.cgi?cat=%%CAT%%";
+	<<
+
+	* clsearch.cgi: 
+	clsearch.cgiで、カテゴリ指定 (cat:Music, cat:日常生活)、日付指定 
+	(date:2004, date:2004-07, date:2004-07-01)、が使えるようにした。
+
+	list modeというのを作った。パラメータで mode=2。マッチしたitemの
+	itemリンクとitem headerの一覧を表示する。全部表示する。from指定な
+	どは無効。date:2004-07 と組み合わせて使うとその月のタイトル一覧が
+	出せる。
+
+	また、dateパラメータを指定すると内部で mode=2 になる。
+	例： clsearch.cgi?date=2004
+
+	また、catパラメータを指定すると内部で mode=1 になる。
+	例： clsearch.cgi?cat=Life
+
+	* chalow (write_itemlist_file): 
+	cl.itemlistのフォーマットを変更！！！！！
+	cl.itemlistにカテゴリ情報も追加。カテゴリ別表示をCGIでもできるよう
+	にするため。
+	item headerとitem contentの間をスペースからタブにした。CGIであつか
+	いやすいように。
+
+	* chalow (okikae): 
+	昔の画像貼り付け記法への対応を止める（ソースから削除）。
+	[IMG:image/hogehoge.jpg]など。
+	>>
+	### 画像張り付け
+	# image : [IMG:image/2000-06-20-08-32-57.m.jpg]
+	s!\[IMG:([^\]\s]+)\]!get_link_str("画像", $1);die!ge;
+	### リンク付き画像張り付け
+	# サムネイルと拡大画像などに
+	# image : [IMG:image/hello-s.jpg image/hello.jpg]
+	# image : [IMG:image/hello-s.jpg http://example.com/hoge.html]
+	s!\[IMG:([^\]\s]+)\s+([^\]\s]+)\]!get_link_str($1, $2);die!gesm;
+	<<
+
 2004-07-26 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 1.0rc2[リリース]:

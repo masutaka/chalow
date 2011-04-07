@@ -1,22 +1,35 @@
 #!/usr/bin/env perl
-# $Id: clsearch.cgi,v 1.19 2004/06/04 13:08:30 yto Exp $
+# $Id: clsearch.cgi,v 1.21 2004/08/18 12:34:25 yto Exp $
 # clsearch.cgi - chalow により HTML 化された ChangeLog を検索する CGI
 use strict;
 
 ### User Setting from here
 # お好みにあわせて変えて下さい
 
-my $numnum = 20;		# 一度に表示できる数
+my $numnum = 10;		# 一度に表示できる数
 my $css_file = "diary.css";
 
 # for simple mode
-my $simple_template = << "__ITEM_TEMPLATE"
+my $simple_template = << "_TEMPLATE"
 <div class="section">%%CNT%%. %%DATE%%  %%CONT%%</div>
-__ITEM_TEMPLATE
+_TEMPLATE
     ;
 
 # for item mode
-my $item_template = "%%CONT%%";
+my $item_template = << "_TEMPLATE"
+%%CONT%%
+_TEMPLATE
+    ;
+
+# for list mode
+my $list_template = << "_TEMPLATE"
+%%DATE%%  %%CONT%%<br/>
+_TEMPLATE
+    ;
+
+# simple mode でマッチした文字列をはさむタグ
+my ($open_tag, $close_tag) = 
+    (qq(<em style="background-color:yellow">), "</em>");
 
 ### to here
 
@@ -27,7 +40,24 @@ my $myself = $q->url();		# このCGIのURL
 my $key = $q->param('key');
 my $from = $q->param('from') || 0;
 my $clen = $q->param('context_length') || 200;
-my $mode = $q->param('mode');	# 0:simple mode, 1:item mode
+my $mode = $q->param('mode');	# 0:simple mode, 1:item mode, 2:list mode
+
+if (defined $q->param('date')) {
+    $mode = 2;
+    $key = "date:".$q->param('date');
+}
+
+if ($mode == 2) {		# リストモードのときは全部一気に出す
+    $numnum = 100000000;
+    $from = 0;
+}
+
+if (defined $q->param('cat')) {
+    $mode = 1;
+    $key = "cat:".$q->param('cat');
+    $key =~ s/^(.+)$/"$1"/ if ($key =~ / /);
+}
+
 
 # ■■■ HTML head 出力 ■■■
 print "Content-type: text/html; charset=euc-jp\n\n";
@@ -37,68 +67,82 @@ print "Content-type: text/html; charset=euc-jp\n\n";
 my $outstr = "";
 my $cnt = 0;
 
+
+sub clean {
+    local ($_) = @_;
+#    s/^"(.+)"$/$1/;
+    s/(.)/'\x'.unpack("H2", $1)/gie;
+    return $_;
+}
+
 if (defined $key and $key !~ /^\s*$/) {
     $key =~ s/\xa1\xa1/ /g;	# ad hoc
     $key =~ s/\s+$//;
     $key =~ s/^\s+//;
 
     my @keys = ($key =~ /(".+?"|\S+)/g);
-    @keys = map {s/^"(.+)"$/$1/; s/(.)/'\x'.unpack("H2", $1)/gie; $_;} @keys;
+#    @keys = map {s/^"(.+)"$/$1/; s/(.)/'\x'.unpack("H2", $1)/gie; $_;} @keys;
+    @keys = map {s/^"(.+)"$/$1/; $_;} @keys;
 
     my $fn = "cl.itemlist";
     open(F, "< $fn") or die "Can't open $fn : $!\n";
     binmode(F);
     while (<F>) {
 	my ($date, $c) = (/^(.+?)\t(.+)$/);
+	my @regular_keys;
 
-	if ($c =~ m|$keys[0]|i) {
+	my $match_num = 0;
+	foreach my $k (@keys) {	# 毎回やるのは無駄。あとで直すべし。
+	    if ($k =~ /^date:(.+)$/) {
+		my $tmp = clean($1);
+		$match_num++ if ($date =~ /\[$tmp/);
+	    } elsif ($k =~ /^cat:(.+)$/) {
+		my $tmp = clean($1);
+		$match_num++ if ($c =~ /^.+\[$tmp\].*\t.*$/);
+ 	    } else {
+		my $tmp = clean($k);
+		$match_num++ if ($c =~ m|$tmp|i);
+		push @regular_keys, $tmp;
+	    }
+	}
+	my $pkey = $regular_keys[0] if (@regular_keys > 0); # 代表キー
 
-	    next if (@keys != grep {$c =~ m|$_|i} @keys);
-	    # ↑高速化の余地
-	    
+#print @keys,"<br>\n";
+	
+	if ($match_num == @keys) {
+#	if ($c =~ m|$pkey|i) {
 	    $cnt++;
-
 	    #next if ($cnt < $from + 1);last if ($cnt >= $from + 1 + $numnum);
 	    next if ($cnt < $from + 1 or $cnt >= $from + 1 + $numnum);
 	    # ↑高速化の余地
 
-	    my $tmp_tmpl;
-	    if ($c =~ m|^.*?(.{0,$clen})($keys[0])(.{0,$clen}).*?$|i) {
-
-		if ($mode == 0) { # シンプルモード
+	    my $tmp_tmpl = $simple_template;
+	    if ($mode == 0) { # シンプルモード
+		if (defined $pkey and 
+		    $c =~ m|^.*?(.{0,$clen})($pkey)(.{0,$clen}).*?$|i) {
 		    my ($pre, $k, $pos) = ($1, $2, $3);
-		#print join(",",map {unpack("H*",$_)} split("",$post))"<br>\n";
 		    # 80-ff が奇数だったら 1 バイト削除 (要ブラッシュ up)
 		    $pre =~ s!^[\x80-\xff](([\x80-\xff]{2})*[\x00-\x7f])!$1!;
 		    $pre =~ s!^[\x80-\xff](([\x80-\xff]{2})*)$!$1!;
 		    $pos =~ s!^(.*?[\x00-\x7f]([\x80-\xff]{2})*?)[\x80-\xff]$!$1!;
 		    $pos =~ s!^(([\x80-\xff]{2})*?)[\x80-\xff]$!$1!;
-
 		    $c = qq($pre$k$pos);
-
-		    my $p = join('|', @keys);
-		    $c =~ s!($p)!<em style="background-color:yellow">$1</em>!gi;
-
-		    $tmp_tmpl = $simple_template;
-		} else {	# アイテムモード
-		    my ($file, $id) =
-			($date =~ /^<a href="(.*?.html).*?">\[(.+?)\]/);
-#		    $c = "($file, $id)<p>";
-		    $c = get_item($file, $id);
-
-		    $tmp_tmpl = $item_template;
+		    my $p = join('|', @regular_keys);
+		    $c =~ s!($p)!$open_tag$1$close_tag!gi;
 		}
-
-	    } else {
-		die;
+	    } elsif ($mode == 1) { # アイテムモード
+		my ($file, $id) = ($date =~ /href="(.*?.html).*?">\[(.+?)\]/);
+		$c = get_item($file, $id);
+		$tmp_tmpl = $item_template;
+	    } elsif ($mode == 2) { # リストモード
+		$c =~ s/\t.*$//;
+		$tmp_tmpl = $list_template;
 	    }
-
-#	    $outstr .= qq(<div class="section">$cnt. $date  $c</div>\n);
+	    
 	    $tmp_tmpl =~ s/%%CNT%%/$cnt/g;
 	    $tmp_tmpl =~ s/%%DATE%%/$date/g;
 	    $tmp_tmpl =~ s/%%CONT%%/$c/g;
 	    $outstr .= $tmp_tmpl;
-
 	}
     }
     close(F);
@@ -106,11 +150,11 @@ if (defined $key and $key !~ /^\s*$/) {
 
 
 
-my $page_max = int(($cnt - 1) / $numnum);
-
-my ($qkey) = ($q->query_string =~ /(key=[^&]+)/);
-
 # ■■■ 過去記事表示のための選択棒 ■■■
+my $page_max = int(($cnt - 1) / $numnum);
+my ($qkey) = ($q->query_string =~ /(key=[^&]+)/);
+($qkey) = ($q->query_string =~ /(cat=[^&]+)/) if ($qkey eq "");
+
 my $bar = "";
 my ($navip, $navin);
 if ($page_max != 0) {		# 1ページのみのときは選択棒なし
@@ -141,7 +185,7 @@ if ($cnt == 0) {
 }
 
 
-my $template = << "__TEMPLE"
+my $page_template = << "__TEMPLE"
 
 <html><head><title>CHALOW Search</title>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-JP">
@@ -150,8 +194,13 @@ my $template = << "__TEMPLE"
 
 <form method="get" action="clsearch.cgi" 
     enctype="application/x-www-form-urlencoded">
-<input type="text" name="key" value="$key" />
+<input type="text" name="key" value="@{[$q->escapeHTML($key)]}" />
 <input type="checkbox" name="mode" value="1" @{[($mode)? "checked":""]}/>
+<!--
+<input type="radio" name="mode" value="0" @{[($mode==0)? "checked":""]}/>
+<input type="radio" name="mode" value="1" @{[($mode==1)? "checked":""]}/>
+<input type="radio" name="mode" value="2" @{[($mode==2)? "checked":""]}/>
+-->
 <input type="submit">
 </form>
 
@@ -167,7 +216,7 @@ __TEMPLE
     ;
 
 #print $q->Dump();
-print $template;
+print $page_template;
 
 exit;
 

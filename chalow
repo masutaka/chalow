@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.85 2004/07/26 11:13:15 yto Exp $
+# $Id: chalow,v 1.89 2004/11/01 16:12:21 yto Exp $
 #
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
@@ -14,7 +14,7 @@ use Jcode;
 use Time::Local;		# for 曜日
 use HTML::Template;
 
-my $version = '1.0rc2';
+my $version = '1.0rc3';
 
 # 現在時刻の獲得
 my $what_time_is_it_now = strftime "%Y-%m-%d %H:%M", localtime;
@@ -207,8 +207,15 @@ my $latest_titles_num = 10;
 # 日ごとにページを作るか (0:NO, 1:YES)
 my $day_page_mode = 0;
 
+# カテゴリページを作るか (0:NO, 1:YES)
+my $output_cat_pages = 1;
 # カテゴリページ中のエントリ数の上限
+# ($output_cat_pages = 1 のときのみ有効)
 my $cat_page_entry_max = 10;
+# カテゴリ別item表示のためのCGIを指定する（カテゴリ名は %%CAT%% で置き換え）
+# ($output_cat_pages = 0 のときのみ有効)
+my $cat_page_cgi = "clsearch.cgi?cat=%%CAT%%";
+#my $cat_page_cgi = "";
 
 # ファイルの最初に出てくる「<!-- ReplaceOnce -->」を置き換える文字列
 my $replace_once = "";
@@ -266,6 +273,10 @@ $css_file = $opt_css_file if (defined $opt_css_file);
 # に使うから。
 $stop_date =~ s/-//g;
 
+my $latest_item_list;
+my $category_list;
+my %category_count;
+
 my $clog_url_pref = $clog_url;
 $clog_url_pref =~ s!/[^/]+html?$!/!;
 $clog_url_pref .= "/" unless ($clog_url_pref =~ m!/$!);
@@ -284,13 +295,13 @@ my %entry_statistics;
 # {"md"} : 同じ月日を持つ年 for same date jump
 
 my %all_entries;		# 全エントリを格納
-# {XXXX-XX-X}{"eh"} - エントリヘッダ
-# {XXXX-XX-X}{1,2,3,...}{"h"} - アイテムヘッダ
-# {XXXX-XX-X}{1,2,3,...}{"c"} - 中味
-# {XXXX-XX-X}{1,2,3,...}{"cat"} - カテゴリ
-# {XXXX-XX-X}{1,2,3,...}{"a"} - 書いた人
-# {XXXX-XX-X}{1,2,3,...}{"message-top"} - pragma
-# {XXXX-XX-X}{1,2,3,...}{"message-bottom"} - pragma
+# {XXXX-XX-XX}{"eh"} - エントリヘッダ
+# {XXXX-XX-XX}{1,2,3,...}{"h"} - アイテムヘッダ
+# {XXXX-XX-XX}{1,2,3,...}{"c"} - 中味
+# {XXXX-XX-XX}{1,2,3,...}{"cat"} - カテゴリ
+# {XXXX-XX-XX}{1,2,3,...}{"a"} - 書いた人
+# {XXXX-XX-XX}{"message-top"} - pragma
+# {XXXX-XX-XX}{"message-bottom"} - pragma
 
 
 my $all;
@@ -313,30 +324,30 @@ for my $fname (@ARGV) {
 $all = Jcode->new($all)->euc; # 文字コードを euc にしておく
 my @lines;
 clean_changelog(\@lines, \$all); # ChangeLog をあらかじめクリーニング
-foreach (@lines) {
-    next if (/^$/);
-    my ($ymd, $y, $m, $d) = (/^((\d+)-(\d+)-(\d+))/);
-    $entry_statistics{ymd}{$ymd}++;
-    $entry_statistics{ym}{$y."-".$m}++;
-    $entry_statistics{md}{$m."-".$d}{$y} = 1;
-}
 
-# 月別一覧を作成しておく
-my $month_page_list = make_month_page_list(\%{$entry_statistics{ym}}); 
-
-# 今月の日付一覧を作成しておく
-my $current_day_list = make_day_list_str($current_ym);
+print "cleaned\n" if (!defined $quiet_mode);
 
 ### クリーニングされたChangeLogを処理
 {   
     foreach (@lines) {
 	next if (/^$/);
-	my ($day) = (/^(\d+-\d+-\d+)/);
+	my ($ymd, $y, $m, $d) = (/^((\d+)-(\d+)-(\d+))/);
+	$entry_statistics{ymd}{$ymd}++;	# for 複数人利用
+	$entry_statistics{ym}{$y."-".$m}++; # for month_page_list
+	$entry_statistics{md}{$m."-".$d}{$y} = 1; # for SameDateJump
+
+	while (/^\* [^:]*?((\[.+?\])+):/mg) { # 無駄。遅いのでは？
+	    my $tmp = $1;
+	    while ($tmp =~ /\[(.+?)\]/g) {
+		$category_count{$1}++;
+	    }
+	}
 
 	### stop date
-	# 月別一覧などに影響がでる。DEBUG 用ですな。
+	# - 過去のentry,itemからのリファラ、SameDateJump がダメ
+	# - カテゴリ別ページもダメ
 	if ($stop_date != 0) {
-	    $day =~ (/^(\d+)-(\d+)-(\d+)/);
+	    $ymd =~ (/^(\d+)-(\d+)-(\d+)/);
 	    my $cdate = $1 * 10000 + $2 * 100 + $3;
 	    if ($stop_date > $cdate) {
 		next;
@@ -344,9 +355,23 @@ my $current_day_list = make_day_list_str($current_ym);
 	}
 
 	# エントリをパーズして、文字列置き換え、格納
-	parse_entry($_, \%{$all_entries{$day}});
+	parse_entry($_, \%{$all_entries{$ymd}});
     }
 }
+
+print "parsed\n" if (!defined $quiet_mode);
+
+# 月別一覧を作成しておく
+my $month_page_list = make_month_page_list(\%{$entry_statistics{ym}}); 
+
+# 今月の日付一覧を作成しておく
+my $current_day_list = make_day_list_str($current_ym);
+
+write_rss_file() if ($output_rss); # RSS ファイルを作る
+write_itemlist_file() if ($output_itemlist); # 検索用ファイル(itemlist)を作る 
+write_latest_item_list_file();	# 最近の話題一覧を作る
+write_category_list_file();	# カテゴリ一覧を作る
+
 
 ### HTML 生成のためのループ
 foreach my $ymd (sort keys %all_entries) {
@@ -364,10 +389,22 @@ foreach my $ymd (sort keys %all_entries) {
 	### カテゴリ
 	my $catp = $all_entries{$ymd}{$i}{cat};
 	if (defined $catp) {
-	    $ih .= " ".
-		join("", map 
-		     {qq([<a href="@{[get_category_filename($_)]}">$_</a>])} 
-		     @$catp);
+
+	    if ($output_cat_pages) {
+		$ih .= " ".
+		    join("", map 
+			 {"[<a href=\"".get_category_filename($_)."\">$_</a>]"}
+			 @$catp);
+	    } elsif ($cat_page_cgi eq "") {
+		$ih .= " ". join("", map {"[".$_."]"} @$catp);
+	    } else {
+		$ih .= " ".
+		    join("", map 
+			 {my $tmp = $cat_page_cgi;
+			  $tmp =~ s/%%CAT%%/urlencode($_)/ge;
+			  "[<a href=\"$tmp\">$_</a>]"}
+			 @$catp);
+	    }
 	}
 
 	### 日付リンクによるリファラー
@@ -453,11 +490,7 @@ write_index_page();
 write_month_page();
 write_day_page() if ($day_page_mode);
 #write_item_page() if ($item_page_mode);
-write_category_page();
-
-write_rss_file() if ($output_rss); # RSS ファイルを作る
-write_itemlist_file() if ($output_itemlist); # 検索用ファイル(itemlist)を作る 
-write_js_file();		# JavaScript ファイル を作る
+write_category_page() if ($output_cat_pages);
 
 print "done.\n" if (!defined $quiet_mode);
 
@@ -487,9 +520,9 @@ sub parse_entry {
 	unshift @itemlist, $1;
     }
 
-    my $iid = 0;		# Item ID
-    $entry_statistics{ymd}{$ymd}--;
-    $iid += $entry_statistics{ymd}{$ymd} * 100; # for 複数人利用
+    my $iid = $enthashp->{curid} || 0;	       # item ID
+#    $entry_statistics{ymd}{$ymd}--;
+#    $iid += $entry_statistics{ymd}{$ymd} * 100; # for 複数人利用
     for (my $i = 0; $i < @itemlist; $i++) {
 	my $item = $itemlist[$i];
 
@@ -531,7 +564,9 @@ sub parse_entry {
 	$enthashp->{$iid}{c} = okikae($c);
 	$enthashp->{$iid}{a} = $user if (defined $user);
 	@{$enthashp->{$iid}{cat}} = @cat if (defined @cat);
+#	foreach (@cat) { $category_count{$_}++;	}
     }
+    $enthashp->{curid} = $iid;
 
     return;
 }
@@ -578,17 +613,6 @@ sub okikae {
 	    $a =~ s{^(\||>)\s?}{}gm, $a).'</blockquote>'!gme;
     } else {
 	s!((^((\||>)[^\n]*)\n)+)!<blockquote>$1</blockquote>!gmx;
-    }
-
-    {				# 昔の画像貼り付け記法 (しばらく残す)
-	### 画像張り付け
-	# image : [IMG:image/2000-06-20-08-32-57.m.jpg]
-	s!\[IMG:([^\]\s]+)\]!get_link_str("画像", $1);die!ge;
-	### リンク付き画像張り付け
-	# サムネイルと拡大画像などに
-	# image : [IMG:image/hello-s.jpg image/hello.jpg]
-	# image : [IMG:image/hello-s.jpg http://example.com/hoge.html]
-	s!\[IMG:([^\]\s]+)\s+([^\]\s]+)\]!get_link_str($1, $2);die!gesm;
     }
 
     ### 日付で参照リンク
@@ -662,6 +686,8 @@ sub write_category_page {
             $t->param(cat_name => $catname);
             $t->param(ym => $current_ym);
             $t->param(day_list => $current_day_list);
+            $t->param(latest_item_list => $latest_item_list);
+            $t->param(category_list => $category_list);
             $t->param(entries => [grep /^.+$/, @ents[$i*$n...($i+1)*$n-1]]);
 
             my @page_list;
@@ -708,9 +734,6 @@ sub write_day_page {
 	# 日へのリンク (日付一覧)
 	my $day_list = make_day_list_str($ym);
 
-#	my $content = $month_page{$ym}{$ymd};
-#	$content =~ s|<h2>.+?</h2>||sm;
-
 	### ページの組み上げ
 	my $t = HTML::Template->new(scalarref => \$day_page_template,
 				    loop_context_vars => 1,
@@ -724,6 +747,8 @@ sub write_day_page {
 	$t->param(ym => $ym);
 	$t->param(day_list => $day_list);
 	$t->param(month_page_list => $month_page_list);
+	$t->param(latest_item_list => $latest_item_list);
+	$t->param(category_list => $category_list);
 	$t->param(back => $day_before);
 	$t->param(next => $day_after);
 	$t->param(content => $month_page{$ym}{$ymd}{str});
@@ -770,6 +795,8 @@ sub write_month_page {
 	$t->param(ym => $ym);
 	$t->param(day_list => $day_list);
 	$t->param(month_page_list => $month_page_list);
+	$t->param(latest_item_list => $latest_item_list);
+	$t->param(category_list => $category_list);
 	$t->param(back => $m_before);
 	$t->param(next => $m_after);
 	$t->param(entries => \@contlist);
@@ -813,6 +840,8 @@ sub write_index_page {
     $t->param(ndays => $opt_topn);
     $t->param(day_list => $day_list);
     $t->param(month_page_list => $month_page_list);
+    $t->param(latest_item_list => $latest_item_list);
+    $t->param(category_list => $category_list);
     $t->param(entries => \@top_n_entries);
 
     my $ostr = $t->output();
@@ -862,8 +891,8 @@ sub make_day_list {
     return $daylist{$ym} if (defined $daylist{$ym}); # cache
     for (my $d = 1; $d <= $lday; $d++) {
 	my $day = ($d < 10) ? "0".$d : $d;
-#	if (defined $all_entries{$ym."-".$day}) {
-	if (defined $entry_statistics{ymd}{$ym."-".$day}) {
+	if (defined $all_entries{$ym."-".$day}) {
+#	if (defined $entry_statistics{ymd}{$ym."-".$day}) {
 	    my $day_url = datestr2url($ym."-".$day);
 	    push @{$daylist{$ym}}, qq(<a href="$day_url">$day</a>);
 	} else {
@@ -965,13 +994,14 @@ sub write_rss_file {
 		$co =~ s/&[^;]*$//g; # &gt...$ でXMLパーズエラー。アフォかと 
 		$co .= "...";
 	    }
+	    my $item_dcdate = ($dcdate =~ /^$ymd/) ? $dcdate : $ymd;
 
 	    $rdfitem .= qq(
 <item rdf:about="$permlink">
  <title>$ih</title>
  <link>$permlink</link>
  <description>$co</description>
- <dc:date>$ymd</dc:date>
+ <dc:date>$item_dcdate</dc:date>
 </item>);
 	    $rdfseq .= qq(<rdf:li resource="$permlink"/>\n);
 	}
@@ -1019,10 +1049,10 @@ sub html2xmlstr {
 
 
 ### JavaScript feed ファイルを出力する
-sub write_js_file {
-    my $ostr;
+sub write_latest_item_list_file {
 
     ### 最近の記事
+    my @lines;
     my $date;
     my $ctr = $latest_titles_num;
     foreach my $ymd (sort {$b cmp $a} keys %all_entries) {
@@ -1037,28 +1067,57 @@ sub write_js_file {
 	    $c =~ s/\s*$//;
             $c =~ s/<.+?>//g;
 	    $c =~ s/^\*\s+//;
-	    $c =~ s/\'/&\#x27;/g;
+
+#	    $c =~ s/\'/&\#x27;/g;
+
 	    if ($date ne $ymd) {
-		$ostr .= "document.writeln('<a href=\"".
-		    $clog_url_pref.datestr2url("$ymd")."\">$ymd</a><br>');\n";
+#		$ostr .= "document.writeln('<a href=\"".
+#		    $clog_url_pref.datestr2url("$ymd")."\">$ymd</a><br>');\n";
+		push @lines, "<a href=\"".
+		    $clog_url_pref.datestr2url("$ymd")."\">$ymd</a><br>";
 		$date = $ymd;
 	    }
-	    $ostr .= "document.writeln('- <a href=\"".
-		$clog_url_pref.datestr2url("$ymd-$i")."\">$c</a><br>');\n";
+#	    $ostr .= "document.writeln('- <a href=\"".
+#		$clog_url_pref.datestr2url("$ymd-$i")."\">$c</a><br>');\n";
+	    push @lines, "- <a href=\"".
+		$clog_url_pref.datestr2url("$ymd-$i")."\">$c</a><br>";
 	}
     }
+
+    my $ostr = join("\n", map {s/\'/&\#x27;/g; "document.writeln('".$_."');"}
+		    @lines);
     output_to_file("$outputdir/cl.js", \$ostr);
 
+    $latest_item_list = join("\n", @lines);
+
+}
+
+
+sub write_category_list_file {
     ### カテゴリ一覧
-    $ostr = "";
-    foreach my $cat (sort keys %category_item) {
-	my $n = scalar(@{$category_item{$cat}});
-	my $url = get_category_filename($cat);
-	$cat =~ s/\'/&\#x27;/g;
-	my $u = $clog_url_pref.$url;
-	$ostr .= "document.writeln('- <a href=\"$u\">$cat</a> ($n)<br>');\n";
+    return if ($output_cat_pages == 0 and $cat_page_cgi eq "");
+    my @lines = ();
+    foreach my $cat (sort keys %category_count) {
+	my $n = $category_count{$cat};
+#    foreach my $cat (sort keys %category_item) {
+#	my $n = scalar(@{$category_item{$cat}});
+	my $url;
+	if ($output_cat_pages) {
+	    $url = get_category_filename($cat);
+	    $url = $clog_url_pref.$url;
+	} else {
+	    $url = $cat_page_cgi;
+	    $url =~ s/%%CAT%%/urlencode($cat)/ge;
+	    $url = $clog_url_pref.$url if ($url !~ /^http/);
+	}
+	push @lines, "- <a href=\"$url\">$cat</a> ($n)<br>";
     }
+
+    my $ostr = join("\n", map {s/\'/&\#x27;/g; "document.writeln('".$_."');"}
+		 @lines);
     output_to_file("$outputdir/cl-cat.js", \$ostr);
+
+    $category_list = join("\n", @lines);
 }
 
 
@@ -1070,15 +1129,35 @@ sub write_itemlist_file {
 	foreach my $i (sort {$b <=> $a} keys %{$all_entries{$ymd}}) {
 	    next if ($i !~ /^\d/);
 	    my ($ym) = ($ymd =~ /^(\d{4}-\d\d)-\d\d/);
-	    my $c = $all_entries{$ymd}{$i}{h}." ".$all_entries{$ymd}{$i}{c};
+	    my $h = $all_entries{$ymd}{$i}{h}.
+		((defined $all_entries{$ymd}{$i}{"cat"}) ?
+		 join('', map {"[$_]"} @{$all_entries{$ymd}{$i}{"cat"}}) : "");
+	    my $c = $h."\x01".$all_entries{$ymd}{$i}{c};
 	    $c =~ s|<img.+?alt="(.*?)".*?>|[$1]|gosm;
             $c =~ s/[\t\n]//g;
 	    $c =~ s/&nbsp;/ /g;
 	    $c =~ s/\s\s+/ /g;
             $c =~ s/<.+?>//g;
+	    $c =~ s/\x01/\t/;	# 超 ad hoc。やば
 	    $ostr .= datestr2anchor("[$ymd-$i]")."\t$c\n";
 	}
     }
+
+    if (-e "$outputdir/cl.itemlist" and $stop_date != 0) { # 差分更新
+	open(F, "$outputdir/cl.itemlist") or die;
+	my $flag = 0;
+	while (<F>) {
+	    if ($flag == 0) {
+		(/\[(\d+)-(\d+)-(\d+)-/);
+		my $cdate = $1 * 10000 + $2 * 100 + $3;
+		$flag = 1 if ($stop_date > $cdate);
+	    }
+	    $ostr .= $_ if ($flag);
+	}
+	close F;
+	print "update ";
+    }
+
     output_to_file("$outputdir/cl.itemlist", \$ostr);
 }
 
@@ -1259,5 +1338,13 @@ sub output_to_file {
     binmode(F);
     print F $$contp;
     close(F);
+}
+
+### URL ENCODE
+sub urlencode {
+    local ($_) = @_;
+    s/([^ \n\.\*\-_A-Z0-9])/sprintf("%%%02lX",unpack("C",$1))/gie;
+    s/ /+/g;
+    return $_;
 }
 
