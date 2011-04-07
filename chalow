@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: chalow,v 1.102 2005/08/10 02:31:46 yto Exp $
+# $Id: chalow,v 1.103 2005/08/21 05:35:31 yto Exp $
 #
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
@@ -14,7 +14,7 @@ use Time::Local;		# for 曜日
 use HTML::Template;
 use ChangeLogReader;
 
-my $version = '1.0rc5';
+my $version = '1.0rc6';
 
 # 現在時刻の獲得
 my $what_time_is_it_now = strftime "%Y-%m-%d %H:%M", localtime;
@@ -34,9 +34,16 @@ my $home_page_name = "chalow home page";
 # 日記の名前
 my $changelog_name = "ChangeLog";
 # 自動文字列置換
-my $auto_replace = '';
+my $auto_replace = '
+s!(<blockquote>)!</p>$1<p>!g;
+s!(</blockquote>)!</p>$1<p>!g;
+';
 # CSS ファイル
 my $css_file;
+# RSSファイル名
+my $rss_filename = "cl.rdf";
+# RSSに最近何日分表示するか(0の場合は $opt_topn と同じ)
+my $rss_topn = 0;
 # インデックスページ(index.html)で最近何日分を表示するか
 my $opt_topn = 5;
 # 日付の後に曜日(Mon, Tue, ...)を表示するか (1:yes or 0:no)
@@ -51,10 +58,11 @@ my $index_page_template = << "___INDEX_PAGE_TEMPLATE"
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
-<link rel="alternate" type="application/rss+xml" title="RSS" href="cl.rdf">
+<link rel="alternate" type="application/rss+xml" title="RSS"
+ href="<TMPL_VAR name=rss_file>">
 <title><TMPL_VAR name=cl_name></title>
 </head><body>
-<a href="cl.rdf">RSS</a>
+<a href="<TMPL_VAR name=rss_file>">RSS</a>
 <h1><a href="index.html"><TMPL_VAR name=cl_name></a></h1>
 <p class="calendar"><TMPL_VAR name=ym> / <TMPL_VAR name=day_list></p>
 <p>last update: <TMPL_VAR name=lastupdate></p>
@@ -73,7 +81,8 @@ my $month_page_template = << "___MONTH_PAGE_TEMPLATE"
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
-<link rel="alternate" type="application/rss+xml" title="RSS" href="cl.rdf">
+<link rel="alternate" type="application/rss+xml" title="RSS"
+ href="<TMPL_VAR name=rss_file>">
 <title><TMPL_VAR name=cl_name> / <TMPL_VAR name=ym></title>
 </head><body>
 <TMPL_IF name=back><a href="<TMPL_VAR name=back>.html">Prev Month</a></TMPL_IF>
@@ -95,7 +104,8 @@ my $day_page_template = << "___DAY_PAGE_TEMPLATE"
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
-<link rel="alternate" type="application/rss+xml" title="RSS" href="cl.rdf">
+<link rel="alternate" type="application/rss+xml" title="RSS"
+ href="<TMPL_VAR name=rss_file>">
 <title><TMPL_VAR name=cl_name> / <TMPL_VAR name=ymd></title>
 </head><body>
 <TMPL_IF name=back><a href="<TMPL_VAR name=back>.html">Prev Day</a></TMPL_IF>
@@ -118,7 +128,8 @@ my $item_page_template = << "___PAGE_TEMPLATE"
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
-<link rel="alternate" type="application/rss+xml" title="RSS" href="cl.rdf">
+<link rel="alternate" type="application/rss+xml" title="RSS"
+ href="<TMPL_VAR name=rss_file>">
 <title><TMPL_VAR name=header_text></title>
 </head><body>
 <TMPL_IF name=back><a href="<TMPL_VAR name=back>.html">Prev</a></TMPL_IF>
@@ -152,7 +163,8 @@ my $cat_page_template = << "TMPL"
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
-<link rel="alternate" type="application/rss+xml" title="RSS" href="cl.rdf">
+<link rel="alternate" type="application/rss+xml" title="RSS"
+ href="<TMPL_VAR name=rss_file>">
 <title><TMPL_VAR name=cat_name> / <TMPL_VAR name=cl_name></title>
 </head><body>
 <TMPL_IF name=page_list><TMPL_VAR name=page_list></TMPL_IF>
@@ -212,7 +224,7 @@ my $rss_template = << "RDFSTR"
  xmlns:content="http://purl.org/rss/1.0/modules/content/"
  xmlns:admin="http://webns.net/mvcb/"
  xml:lang="ja">
-<channel rdf:about="<TMPL_VAR name=clog_url_pref>cl.rdf">
+<channel rdf:about="<TMPL_VAR name=clog_url_pref><TMPL_VAR name=rss_file>">
  <title><TMPL_VAR name=changelog_name></title>
  <link><TMPL_VAR name=clog_url></link>
  <description><TMPL_VAR name=changelog_description></description>
@@ -330,7 +342,7 @@ if (@ARGV == 0 or $gor == 0) {
 usage: chalow [options] <file> [file]...
     -n, --top-n=NUM             write NUM days to "index.html"
     -o, --output-dir=DIR        directory to output
-    -c, --configure-file=FILE   configure file (default "cl.conf")
+    -c, --configure-file=FILE   configure file
     -s, --stop-date=DATE        date to stop processing
     -u, --update-by-size        overwrite only if sizes are different
     -C, --css=FILE              css file
@@ -579,6 +591,7 @@ sub make_item_html {
     $t->param(id => $item_id);
     $t->param(ymdi => $item_ymdi);
     $t->param(url => $item_url);
+    $t->param(rss_file => $rss_filename); # 050821
     my $this_item = $t->output();
 
     if ($output_cat_pages == 1) { # カテゴリ別ページを出すときの処理
@@ -631,6 +644,7 @@ sub make_entry_html {
     $t->param(id => $entry_id);
     $t->param(ymd => $entry_ymd);
     $t->param(url => $entry_url);
+    $t->param(rss_file => $rss_filename); # 050821
     $t->param(content => @{[join('', @{$itemsp})]});
     return $t->output();
 }
@@ -670,6 +684,7 @@ sub write_category_page {
             $t->param(day_list => $current_day_list);
             $t->param(latest_item_list => $latest_item_list);
             $t->param(category_list => $category_list);
+	    $t->param(rss_file => $rss_filename); # 050821
             $t->param(entries => [grep /^.+$/, @ents[$i*$n...($i+1)*$n-1]]);
 
             my @page_list;
@@ -768,6 +783,7 @@ sub write_item_page {
 	    $t->param(id => $item_id); # 200101011
 	    $t->param(ymdi => $item_ymdi); # 2001-01-01-1
 	    $t->param(url => $item_url); # 2001-01-01-1.html
+	    $t->param(rss_file => $rss_filename); # 050821
 	    
 	    my $ostr = $t->output();
 
@@ -810,6 +826,7 @@ sub write_day_page {
 	$t->param(month_page_list => $month_page_list);
 	$t->param(latest_item_list => $latest_item_list);
 	$t->param(category_list => $category_list);
+	$t->param(rss_file => $rss_filename); # 050821
 	$t->param(back => $day_before);
 	$t->param(next => $day_after);
 	$t->param(content => $month_page{$ym}{$ymd}{str});
@@ -860,6 +877,7 @@ sub write_month_page {
 	$t->param(month_page_list => $month_page_list);
 	$t->param(latest_item_list => $latest_item_list);
 	$t->param(category_list => $category_list);
+	$t->param(rss_file => $rss_filename); # 050821
 	$t->param(back => $m_before);
 	$t->param(next => $m_after);
 	$t->param(entries => \@contlist);
@@ -905,6 +923,7 @@ sub write_index_page {
     $t->param(month_page_list => $month_page_list);
     $t->param(latest_item_list => $latest_item_list);
     $t->param(category_list => $category_list);
+    $t->param(rss_file => $rss_filename); # 050821
     $t->param(entries => \@top_n_entries);
 
     my $ostr = $t->output();
@@ -1040,7 +1059,7 @@ sub get_last_day_of_month {
 sub write_rss_file {
     my $rdfseq;
     my $rdfitem;
-    my $ctr = ($opt_topn > 7) ? 7 : $opt_topn;
+    my $ctr = ($rss_topn > 0) ? $rss_topn : (($opt_topn > 7) ? 7 : $opt_topn);
 
     my @items;
 
@@ -1086,10 +1105,11 @@ sub write_rss_file {
     $t->param(changelog_description => $changelog_description);
     $t->param(clog_url => $clog_url);
     $t->param(clog_url_pref => $clog_url_pref);
+    $t->param(rss_file => $rss_filename); # 050821
     $t->param(generatoragent=>"http://nais.to/~yto/tools/chalow/?v=$version");
     my $ostr = $t->output();
     to_utf8_cl(\$ostr) if (not $utf8_mode);
-    output_to_file("$outputdir/cl.rdf", \$ostr);
+    output_to_file("$outputdir/$rss_filename", \$ostr);
 }
 
 
@@ -1388,6 +1408,11 @@ sub output_to_file {
     if ($update_by_size == 1 and -s $fname == length($$contp)) {
 	return;
     }
+
+    if ($utf8_mode) {		# ad hoc 050821
+	$$contp =~ s/;charset=EUC-JP">/;charset=UTF-8">/;
+    }
+
     print "output to \"$fname\"\n" if (!defined $quiet_mode);
     open(F, "> $fname") || die "$fname: $!\n";
     binmode(F);

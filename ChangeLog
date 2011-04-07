@@ -1,3 +1,61 @@
+2005-08-21  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* version 1.0rc6[リリース]:
+	公開。
+
+	* chalow: 
+	RSSに最近何日分表示するかを指定できるようにした。
+	0の場合は $opt_topn と同じになる。
+	[src]
+	# RSSに最近何日分表示するか(0の場合は $opt_topn と同じ)
+	$rss_topn = 0;
+	[/src]
+	(write_rss_file): ←上記のためにこの関数いじった。
+
+	* conf/utf8/cl.conf: 
+	御指摘頂いたものを修正しました。ありがとうございました。
+	●文字化け修正。
+
+	* chalow (output_to_file): 
+	御指摘頂いたものを修正しました。ありがとうございました。
+
+	●utf8 modeのとき、chalowスクリプト内のテンプレートの、charset 指定を 
+	デフォルトの EUC-JP ではなく UTF-8 にするようにした。ad hoc。
+	[src]
+	if ($utf8_mode) {
+	  $$contp =~ s/;charset=EUC-JP">/;charset=UTF-8">/;
+	}
+	[/src]
+
+	* chalow: 
+	御指摘頂いたものを修正しました。ありがとうございました。
+	
+	●usageメッセージで、-cオプションのところの「(default "cl.conf")」
+	は昔の仕様なので削除。
+
+	●blockquoteの前後のpタグの問題。定義のところでデフォルトで以下を
+	入れておくことにした。
+	[src]
+	my $auto_replace = '
+	s!(<blockquote>)!</p>$1<p>!g;
+	s!(</blockquote>)!</p>$1<p>!g;
+	';
+	[/src]
+
+	●RSSのファイル名として、cl.rdf以外も使えるようにしました。
+	cl.conf で設定できます。デフォルトは "cl.rdf" です。
+	[src]
+	# RSSファイル名
+	$rss_filename = "cl.rdf";
+	[/src]
+	- cl.rdf 以外のファイル名にしたい人が過去の cl.conf を編集して使う
+	場合の手順：
+	cl.conf に $rss_filename を追加（上記）し変更。
+	そして、cl.conf 中の各種テンプレートファイル（
+	$index_template, $month_page_template, $day_page_template,
+	$item_page_template, $cat_page_template, $rss_template）中の 
+	"cl.rdf" を <TMPL_VAR name=rss_file> に置き換えて下さい。
+
 2005-08-10  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 1.0rc5[リリース]:
