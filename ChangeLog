@@ -1,3 +1,36 @@
+2002-10-18  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (okikae): "&" を "&amp;" に置き換えるようにした。
+	IEで「&region」が「(R)ion」になってしまったから。
+
+	→でも、やっぱやめた。「;」もないのにエンティティ変換しちゃうのに
+	まで対応するのは馬鹿らしい。ハートを出したいときの「&hearts;」とか
+	も使えなくなっちゃうし。変になったらその都度「&amp;region」みたい
+	にして下さい。
+
+2002-10-01  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* README: 月ページのヘッダとフッタについての記述を追加。
+
+	* cl.conf, sample/cl-sample.conf:
+	- 日付の後に曜日(Mon, Tue, ...)を表示するか (1:yes or 0:no)。 
+	  $show_day_of_week = 1;
+	- 月ページのヘッダ、フッタのデフォルト変更
+
+	* chalow (write_month_page): 月ページ移動ナビ (前後の月ページへの
+	リンク) を表示できるようにした。
+
+	* chalow: 日付文字列の後に曜日(Mon, Tue, ...)を追加するようにした。
+	また、日付の後に曜日(Mon, Tue, ...)を表示するか否かの切り替えの仕
+	組みを追加 (デフォルトは表示する)。
+
+	* chalow (get_day_of_week): New. 年月日を入力とし曜日を出力する関
+	数
+
+2002-08-09  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* README: はずかしい間違いをこっそり修正。その他追加。
+
 2002-06-29  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.8: 公開

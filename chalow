@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.18 2002/06/29 03:37:25 yto Exp $
+# $Id: chalow,v 1.21 2002/10/19 10:56:22 yto Exp $
 #
 # chalow - CHAngeLog On The Web - convert ChangeLog to HTML files
 #
@@ -40,9 +40,9 @@ my $index_page_header = "<a href=\"$home_page_url\">$home_page_name</a>
 <h1>$changelog_name</h1>最終更新時刻: $what_time_is_it_now<br>\n";
 my $index_page_footer = "<a href=\"$home_page_url\">$home_page_name</a>\n";
 # 月ページのヘッダ、フッタ
-my $month_page_header = "<a href=\"index.html\">$changelog_name Index Page</a>
-\n";
-my $month_page_footer = "<a href=\"index.html\">$changelog_name Index Page</a>
+my $month_page_header = "CLNAVI <a href=\"index.html\">Index</a>
+\n<h1>$changelog_name YEARMONTH</h1>\n";
+my $month_page_footer = "CLNAVI <a href=\"index.html\">Index</a>
  / <a href=\"$home_page_url\">$home_page_name</a>\n";
 # 自動文字列置換
 my $auto_replace = '';
@@ -52,6 +52,8 @@ my $css_file;
 my $opt_topn = 5;
 # 作成された HTML ファイルの出力先ディレクトリ ("-o" でも指定できます)
 my $opt_odir = ".";
+# 日付の後に曜日(Mon, Tue, ...)を表示するか (1:yes or 0:no)
+my $show_day_of_week = 1;
 
 ### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
 my $signature = 
@@ -130,9 +132,17 @@ USAGE
 	    if (/^\d/) { # 日付行
 		$top_n_ctr--;
 		($day, $month) = (/^((\d+-\d+)-\d+)/);
-		### 日付の後ろの名前などを削除
-		# "2000-10-19  Hoge Hoi  <hh@hhh.com>" --> "2000-10-19"
-		s/\s\s.+//;
+		### 日付の後ろをどうするか
+		if ($show_day_of_week == 1) {
+		    # 曜日(Mon, Tue, ...)を追加;
+		    # "2000-10-19  Ho Hi  <hh@hh.jp>" --> "2000-10-19  Thu"
+		    my $dow = get_day_of_week($_);
+		    s/\s\s.+/  $dow/;
+		} else {
+		    # 日付の後ろの名前などを削除
+		    # "2000-10-19  Hoge Hoi  <hh@hhh.com>" --> "2000-10-19"
+		    s/\s\s.+//;
+		}
 	    }
 	    # 秘密の項目を外に出さないように削除
 	    # 例: * p:秘密メモ: YTがまたやらかした。しょうもないやつだ。
@@ -157,6 +167,9 @@ exit;
 sub okikae {
     ### "<" は置き換える。ただし、コメントに関わる場合は無視
     s/<([^!])/&lt;$1/g;
+
+    ### "&" --> "&amp;" : IEで「&region」が「(R)ion」になってしまったから
+    #s/&/&amp;/g;		# ←やめた see [ChangeLog:2002-10-18]
 
     ### 自動文字列置換適用
     eval $auto_replace;
@@ -189,7 +202,17 @@ sub okikae {
 ### 月ページ(ex: 2001-01.html)を作る。
 sub write_month_page {
     my ($month_page) = @_;
-    for my $i (reverse sort keys %$month_page) {
+    my @month_list = reverse sort keys %$month_page;
+    for (my $idx = 0; $idx < @month_list; $idx++) {
+
+	# 月ページ移動ナビ (前後の月ページへのリンク)
+	my $navi = "";
+	$navi .= qq(<a href="$month_list[$idx + 1].html">&lt;&lt;&lt;</a> )
+	    if ($idx < @month_list - 1);
+	$navi .= qq(<a href="$month_list[$idx - 1].html">&gt;&gt;&gt;</a> )
+	    if ($idx > 0);
+
+	my $i = $month_list[$idx];
 	print "output to \"$opt_odir/$i.html\"\n" if (!defined $quiet_mode);
 	my $fname = "| $NKF -e > $opt_odir/$i.html";
 	my $fh = new FileHandle;
@@ -201,15 +224,21 @@ sub write_month_page {
 	    if defined $css_file;
 	print $fh "</head><body>\n";
 
-	# ad hoc でいやだなあ... (6/23)
+	# ad hoc でいやだなあ... 020623 → まあいいや(開き直り) 021001
 	my $tmp = $month_page_header;
 	$tmp =~ s!YEARMONTH!$i!g;
+	$tmp =~ s!CLNAVI!$navi!g; # added 021001
         print $fh $tmp;
 
         print $fh "<pre>\n";
         print $fh $$month_page{$i};
         print $fh "</pre>\n";
-        print $fh $month_page_footer;
+
+	$tmp = $month_page_footer;
+	$tmp =~ s!YEARMONTH!$i!g;
+	$tmp =~ s!CLNAVI!$navi!g;
+        print $fh $tmp;
+
         print $fh "$signature</body></html>\n";
     }
 }
@@ -278,3 +307,16 @@ sub get_img_str {
     return $rv.">";	
 }
 
+
+### 年月日を入力とし曜日を出力する関数 since 021001
+# RETURN VALUES
+#     the text name of the day of the week.  Mon, Tue, Wed, ...
+# EXAMPLES
+#     get_day_of_week(1, 12, 2002), get_day_of_week("2002-12-01")
+use Time::Local;
+sub get_day_of_week {
+    my ($d, $m, $y) = @_;
+    ($y, $m, $d) = split("-", $d) unless (defined $m);
+    my $WEEKDAY = (localtime timelocal(0, 0, 0, $d, $m - 1, $y))[6];
+    return ("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")[$WEEKDAY];
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: clsearch.cgi,v 1.1 2002/06/29 03:37:25 yto Exp $
+# $Id: clsearch.cgi,v 1.2 2002/10/01 00:49:03 yto Exp $
 # clsearch.cgi - HTML 化された ChangeLog (by chalow) を検索するCGI
 use strict;
 
@@ -25,14 +25,11 @@ my $from = $q->param('from') || 0;
 
 # ■■■ HTML head 出力 ■■■
 print $q->header();
-print "<html><head><title>CHALOW Search</title>\n";
-print "<meta http-equiv=\"Content-Type\"
-                   content=\"text/html;charset=EUC-JP\">\n";
+print qq(<html><head><title>CHALOW Search</title>
+<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">);
 print qq(<link rel=stylesheet href="$css_file" media=all>\n)
     if defined $css_file;
-print "</head><body>\n";
-
-print qq(<a href="index.html">ChangeLog INDEX</a>
+print qq(</head><body><a href="index.html">ChangeLog INDEX</a>
  / <a href="$home_page_url">$home_page_name</a>\n);
 print $q->startform, $q->textfield('key'), $q->submit, $q->endform, "\n";
 
@@ -115,13 +112,7 @@ if ($cnt == 0) {
     print "$cnt 件 見つかりました。\n";
 }
 
-print $bar;
-print "<hr>\n";
-print "\n<pre>",$outstr,"</pre>\n";
-print $bar;
-print "<hr>\n";
-
-print qq(
+print qq($bar<hr><pre>$outstr</pre>$bar<hr>
 <a href="index.html">ChangeLog INDEX</a>
  / <a href="$home_page_url">$home_page_name</a>
 <div align="right">Powered by 
