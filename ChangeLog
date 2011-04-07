@@ -1,12 +1,29 @@
+2002-10-26  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.10: 公開
+
+2002-10-25  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (okikae): バックスラッシュを用いたURL中での改行に対応。
+	例:
+	<http://www.city.kiryu.gunma.jp/web/home.nsf/42fed222e9b38157492\
+	568fd002b273a/85a282c6b8dd8ea349256a22002b079b?OpenDocument>
+
+	URL 用正規表現も修正。
+
+2002-10-19  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.9: 公開
+
 2002-10-18  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* chalow (okikae): "&" を "&amp;" に置き換えるようにした。
-	IEで「&region」が「(R)ion」になってしまったから。
+	* chalow (okikae): "&" を "&amp;amp;" に置き換えるようにした。
+	IEで「&amp;region」が「(R)ion」になってしまったから。
 
 	→でも、やっぱやめた。「;」もないのにエンティティ変換しちゃうのに
-	まで対応するのは馬鹿らしい。ハートを出したいときの「&hearts;」とか
-	も使えなくなっちゃうし。変になったらその都度「&amp;region」みたい
-	にして下さい。
+	まで対応するのは馬鹿らしい。ハートを出したいときの「&amp;hearts;」
+	とかも使えなくなっちゃうし。変になったらその都度「&amp;amp;region」
+	みたいにして下さい。
 
 2002-10-01  YAMASHITA Tatsuo  <yto@nais.to>
 

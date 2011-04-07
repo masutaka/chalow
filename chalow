@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.21 2002/10/19 10:56:22 yto Exp $
+# $Id: chalow,v 1.22 2002/10/26 09:06:07 yto Exp $
 #
 # chalow - CHAngeLog On The Web - convert ChangeLog to HTML files
 #
@@ -181,9 +181,15 @@ sub okikae {
     ### URL表記を href で
     # URL : http://....
     # 正規表現は http://www.din.or.jp/~ohzaki/perl.htm#httpURL より。
-    # 直前が "," だったら画像リンクなのでここでは処理しない
-    s|([^,"])(s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#,]+)
-     |$1<a href="$2">$2</a>|gx; # "])|;
+    #  ([廃止] 直前が "," だったら画像リンクなのでここでは処理しない)
+    # バックスラッシュを用いたURL中での改行に対応 021025
+    my $URLCHARS = "[-_.!~*'()a-zA-Z0-9;/?:@&=+,%\#\$]";
+    my $URLDELIM = "\\\\\\n[\\t ]+";
+    s{([^,"])(s?https?://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
+     {$1.'<a href="'.join('', split(/$URLDELIM/, $2)).'">'.
+      join('', split(/\\/, $2)).'</a>'}gem; #"])}
+#    s|([^,"])(s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#,]+)
+#     |$1<a href="$2">$2</a>|gx; # "])|;
 
     ### 画像張り付け
     # image : [IMG:image/2000-06-20-08-32-57.m.jpg]
