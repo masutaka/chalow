@@ -1,187 +1,206 @@
+2002-12-27  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.11: ¸ø³«
+
+	* chalow (write_month_page_list): ·îÊÌ°ìÍ÷É½¼¨¤ò²þÂ¤¡£µ­½Ò¤ÎÌµ¤¤·î
+	¤â°ìÍ÷¤ËÉ½¼¨¤¹¤ë¤è¤¦¤Ë¤·¤¿¡£
+
+	- ²þÂ¤¤Î¤­¤Ã¤«¤±¤Ï 12/17 ¤Î¹âµ×¤µ¤ó¤«¤é¤Î¥Ð¥°Êó¹ð¥á¡¼¥ë¡£12 ·î¤Îµ­
+	  ½Ò¤¬¤Ê¤¤¤È¼¡¤ÎÇ¯¤¬²þ¹Ô¤µ¤ì¤º¤Ë¤Ä¤Å¤¯¤È¤¤¤¦¥Ð¥°¡£
+
+2002-11-24  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* sample/diary.css: ¤Á¤ç¤Ã¤È½¤Àµ¡£¹Ô´Ö¤ò¤¢¤±¤¿¤ê¡£
+
+2002-10-29  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* README: 
+	URL ²þ¹Ô¤Ë¤Ä¤¤¤Æ¤Î²òÀâ¤ò½ñ¤­Ëº¤ì¤Æ¤¤¤¿¤Î¤Ç½ñ¤¯¡£
+
 2002-10-26  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.10: $B8x3+(B
+	* version 0.10: ¸ø³«
 
 2002-10-25  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* chalow (okikae): $B%P%C%/%9%i%C%7%e$rMQ$$$?(BURL$BCf$G$N2~9T$KBP1~!#(B
-	$BNc(B:
+	* chalow (okikae): ¥Ð¥Ã¥¯¥¹¥é¥Ã¥·¥å¤òÍÑ¤¤¤¿URLÃæ¤Ç¤Î²þ¹Ô¤ËÂÐ±þ¡£
+	Îã:
 	<http://www.city.kiryu.gunma.jp/web/home.nsf/42fed222e9b38157492\
 	568fd002b273a/85a282c6b8dd8ea349256a22002b079b?OpenDocument>
 
-	URL $BMQ@55,I=8=$b=$@5!#(B
+	URL ÍÑÀµµ¬É½¸½¤â½¤Àµ¡£
 
 2002-10-19  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.9: $B8x3+(B
+	* version 0.9: ¸ø³«
 
 2002-10-18  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* chalow (okikae): "&" $B$r(B "&amp;amp;" $B$KCV$-49$($k$h$&$K$7$?!#(B
-	IE$B$G!V(B&amp;region$B!W$,!V(B(R)ion$B!W$K$J$C$F$7$^$C$?$+$i!#(B
+	* chalow (okikae): "&" ¤ò "&amp;amp;" ¤ËÃÖ¤­´¹¤¨¤ë¤è¤¦¤Ë¤·¤¿¡£
+	IE¤Ç¡Ö&amp;region¡×¤¬¡Ö(R)ion¡×¤Ë¤Ê¤Ã¤Æ¤·¤Þ¤Ã¤¿¤«¤é¡£
 
-	$B"*$G$b!"$d$C$Q$d$a$?!#!V(B;$B!W$b$J$$$N$K%(%s%F%#%F%#JQ49$7$A$c$&$N$K(B
-	$B$^$GBP1~$9$k$N$OGO</$i$7$$!#%O!<%H$r=P$7$?$$$H$-$N!V(B&amp;hearts;$B!W(B
-	$B$H$+$b;H$($J$/$J$C$A$c$&$7!#JQ$K$J$C$?$i$=$NETEY!V(B&amp;amp;region$B!W(B
-	$B$_$?$$$K$7$F2<$5$$!#(B
+	¢ª¤Ç¤â¡¢¤ä¤Ã¤Ñ¤ä¤á¤¿¡£¡Ö;¡×¤â¤Ê¤¤¤Î¤Ë¥¨¥ó¥Æ¥£¥Æ¥£ÊÑ´¹¤·¤Á¤ã¤¦¤Î¤Ë
+	¤Þ¤ÇÂÐ±þ¤¹¤ë¤Î¤ÏÇÏ¼¯¤é¤·¤¤¡£¥Ï¡¼¥È¤ò½Ð¤·¤¿¤¤¤È¤­¤Î¡Ö&amp;hearts;¡×
+	¤È¤«¤â»È¤¨¤Ê¤¯¤Ê¤Ã¤Á¤ã¤¦¤·¡£ÊÑ¤Ë¤Ê¤Ã¤¿¤é¤½¤ÎÅÔÅÙ¡Ö&amp;amp;region¡×
+	¤ß¤¿¤¤¤Ë¤·¤Æ²¼¤µ¤¤¡£
 
 2002-10-01  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* README: $B7n%Z!<%8$N%X%C%@$H%U%C%?$K$D$$$F$N5-=R$rDI2C!#(B
+	* README: ·î¥Ú¡¼¥¸¤Î¥Ø¥Ã¥À¤È¥Õ¥Ã¥¿¤Ë¤Ä¤¤¤Æ¤Îµ­½Ò¤òÄÉ²Ã¡£
 
 	* cl.conf, sample/cl-sample.conf:
-	- $BF|IU$N8e$KMKF|(B(Mon, Tue, ...)$B$rI=<($9$k$+(B (1:yes or 0:no)$B!#(B 
+	- ÆüÉÕ¤Î¸å¤ËÍËÆü(Mon, Tue, ...)¤òÉ½¼¨¤¹¤ë¤« (1:yes or 0:no)¡£ 
 	  $show_day_of_week = 1;
-	- $B7n%Z!<%8$N%X%C%@!"%U%C%?$N%G%U%)%k%HJQ99(B
+	- ·î¥Ú¡¼¥¸¤Î¥Ø¥Ã¥À¡¢¥Õ¥Ã¥¿¤Î¥Ç¥Õ¥©¥ë¥ÈÊÑ¹¹
 
-	* chalow (write_month_page): $B7n%Z!<%80\F0%J%S(B ($BA08e$N7n%Z!<%8$X$N(B
-	$B%j%s%/(B) $B$rI=<($G$-$k$h$&$K$7$?!#(B
+	* chalow (write_month_page): ·î¥Ú¡¼¥¸°ÜÆ°¥Ê¥Ó (Á°¸å¤Î·î¥Ú¡¼¥¸¤Ø¤Î
+	¥ê¥ó¥¯) ¤òÉ½¼¨¤Ç¤­¤ë¤è¤¦¤Ë¤·¤¿¡£
 
-	* chalow: $BF|IUJ8;zNs$N8e$KMKF|(B(Mon, Tue, ...)$B$rDI2C$9$k$h$&$K$7$?!#(B
-	$B$^$?!"F|IU$N8e$KMKF|(B(Mon, Tue, ...)$B$rI=<($9$k$+H]$+$N@Z$jBX$($N;E(B
-	$BAH$_$rDI2C(B ($B%G%U%)%k%H$OI=<($9$k(B)$B!#(B
+	* chalow: ÆüÉÕÊ¸»úÎó¤Î¸å¤ËÍËÆü(Mon, Tue, ...)¤òÄÉ²Ã¤¹¤ë¤è¤¦¤Ë¤·¤¿¡£
+	¤Þ¤¿¡¢ÆüÉÕ¤Î¸å¤ËÍËÆü(Mon, Tue, ...)¤òÉ½¼¨¤¹¤ë¤«ÈÝ¤«¤ÎÀÚ¤êÂØ¤¨¤Î»Å
+	ÁÈ¤ß¤òÄÉ²Ã (¥Ç¥Õ¥©¥ë¥È¤ÏÉ½¼¨¤¹¤ë)¡£
 
-	* chalow (get_day_of_week): New. $BG/7nF|$rF~NO$H$7MKF|$r=PNO$9$k4X(B
-	$B?t(B
+	* chalow (get_day_of_week): New. Ç¯·îÆü¤òÆþÎÏ¤È¤·ÍËÆü¤ò½ÐÎÏ¤¹¤ë´Ø
+	¿ô
 
 2002-08-09  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* README: $B$O$:$+$7$$4V0c$$$r$3$C$=$j=$@5!#$=$NB>DI2C!#(B
+	* README: ¤Ï¤º¤«¤·¤¤´Ö°ã¤¤¤ò¤³¤Ã¤½¤ê½¤Àµ¡£¤½¤ÎÂ¾ÄÉ²Ã¡£
 
 2002-06-29  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.8: $B8x3+(B
+	* version 0.8: ¸ø³«
 
-	* clsearch.cgi: new. $B%Q%C%1!<%8$KDI2C$7$F$_$?!#(B
+	* clsearch.cgi: new. ¥Ñ¥Ã¥±¡¼¥¸¤ËÄÉ²Ã¤·¤Æ¤ß¤¿¡£
 
-	* chalow (okikae): URL $BMQ@55,I=8=$r=$@5!#(B
-	s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+ $B"*(B
+	* chalow (okikae): URL ÍÑÀµµ¬É½¸½¤ò½¤Àµ¡£
+	s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+ ¢ª
 	s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#,]+
 
-	$B$3$s$J(B URL $B$,$"$k$b$s$@$+$i!#(B
+	¤³¤ó¤Ê URL ¤¬¤¢¤ë¤â¤ó¤À¤«¤é¡£
 	http://k-tai.impress.co.jp/cda/article/todays_goods/0,,9722,00.html
 
 2002-06-28  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* chalow (get_img_str): add alt. $BB>$K$b$$$m$$$m5!G=%@%&%s!#(B
+	* chalow (get_img_str): add alt. Â¾¤Ë¤â¤¤¤í¤¤¤íµ¡Ç½¥À¥¦¥ó¡£
 
 2002-06-24  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* chalow (okikae): "<http://www.example.com/>" $B$H$$$C$?(B "<", ">" 
-	$B$G$/$/$C$?(B URL $BI=5-$KBP1~!#=$@5$N<j=g(B: 
-	(1) "<" $B$H(B ">" $B$r%(%9%1!<%W$7$F$$$?$N$r!"(B "<" $B$@$1$K$9$k!#(B
-	(2) URL $B$K%^%C%A$9$k@55,I=8=$rJQ99!#(B
+	* chalow (okikae): "<http://www.example.com/>" ¤È¤¤¤Ã¤¿ "<", ">" 
+	¤Ç¤¯¤¯¤Ã¤¿ URL É½µ­¤ËÂÐ±þ¡£½¤Àµ¤Î¼ê½ç: 
+	(1) "<" ¤È ">" ¤ò¥¨¥¹¥±¡¼¥×¤·¤Æ¤¤¤¿¤Î¤ò¡¢ "<" ¤À¤±¤Ë¤¹¤ë¡£
+	(2) URL ¤Ë¥Þ¥Ã¥Á¤¹¤ëÀµµ¬É½¸½¤òÊÑ¹¹¡£
 
 2002-06-23  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.7: $B8x3+(B
+	* version 0.7: ¸ø³«
 
-	* chalow (write_month_page): $month_page_header $BCf$N(B YEARMONTH $B$H(B
-	$B$$$&J8;zNs$r!"(B"$BG/(B-$B7n(B" $BJ8;zNs(B ($BNc$($P!"(B"2002-06") $B$KCV$-49$($k$h$&(B
-	$B$K$7$?!#(Bad hoc $B$G7y$J$s$@$1$I!"NI$$J}K!$,;W$$$D$+$J$$(B...$B!#(B
+	* chalow (write_month_page): $month_page_header Ãæ¤Î YEARMONTH ¤È
+	¤¤¤¦Ê¸»úÎó¤ò¡¢"Ç¯-·î" Ê¸»úÎó (Îã¤¨¤Ð¡¢"2002-06") ¤ËÃÖ¤­´¹¤¨¤ë¤è¤¦
+	¤Ë¤·¤¿¡£ad hoc ¤Ç·ù¤Ê¤ó¤À¤±¤É¡¢ÎÉ¤¤ÊýË¡¤¬»×¤¤¤Ä¤«¤Ê¤¤...¡£
 
 2002-06-22  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* diary.css: New. $B%5%s%W%k!#(Btaku-ku $B$N$r%Q%/$k!#(B
+	* diary.css: New. ¥µ¥ó¥×¥ë¡£taku-ku ¤Î¤ò¥Ñ¥¯¤ë¡£
 
-	* chalow: chalow $BIa5Z$N$?$a(B HTML $B$N0lHV2<$K(B chalow home page $B$X$N(B
-	$B%j%s%/I=<($9$k$h$&$K$7$?!#:G=i$+$i$d$C$F$*$1$P$h$+$C$?(B...
+	* chalow: chalow ÉáµÚ¤Î¤¿¤á HTML ¤Î°ìÈÖ²¼¤Ë chalow home page ¤Ø¤Î
+	¥ê¥ó¥¯É½¼¨¤¹¤ë¤è¤¦¤Ë¤·¤¿¡£ºÇ½é¤«¤é¤ä¤Ã¤Æ¤ª¤±¤Ð¤è¤«¤Ã¤¿...
 
-	* README: $B2~Dj(B
+	* README: ²þÄê
 
-	* chalow: CSS $B$KBP1~!#(B $css_file $B$G%9%?%$%k%7!<%H%U%!%$%k$r;XDj$9(B
-	$B$k!#(B
+	* chalow: CSS ¤ËÂÐ±þ¡£ $css_file ¤Ç¥¹¥¿¥¤¥ë¥·¡¼¥È¥Õ¥¡¥¤¥ë¤ò»ØÄê¤¹
+	¤ë¡£
 
-	* cvs: CVS $B$K$h$k4IM}3+;O!#(B
+	* cvs: CVS ¤Ë¤è¤ë´ÉÍý³«»Ï¡£
 
 2001-12-16  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.6: $B8x3+(B
+	* version 0.6: ¸ø³«
 
 	* chalow:
-	[2001-12-13] $B$K$d$C$?!V8+=P$7$K%^%C%A$9$k@55,I=8=!W$ND4@0$NB3$-!#(B
-	$B!V(Bs!\t\* ([^:\n]+): !\...$B!W$r!V(Bs!\t\* ([^:\n]+):(\s)!\...$B!W$KJQ99!#(B
+	[2001-12-13] ¤Ë¤ä¤Ã¤¿¡Ö¸«½Ð¤·¤Ë¥Þ¥Ã¥Á¤¹¤ëÀµµ¬É½¸½¡×¤ÎÄ´À°¤ÎÂ³¤­¡£
+	¡Ös!\t\* ([^:\n]+): !\...¡×¤ò¡Ös!\t\* ([^:\n]+):(\s)!\...¡×¤ËÊÑ¹¹¡£
 	
-	masata-y $B;a$N0U8+$K=>$C$F!"!V(B#!/usr/local/bin/perl$B!W$r(B
-	$B!V(B#!/usr/bin/env perl$B!W$KJQ99(B ($B46<U(B!)$B!#(B
+	masata-y »á¤Î°Õ¸«¤Ë½¾¤Ã¤Æ¡¢¡Ö#!/usr/local/bin/perl¡×¤ò
+	¡Ö#!/usr/bin/env perl¡×¤ËÊÑ¹¹ (´¶¼Õ!)¡£
 
 2001-12-13  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.5: $B8x3+(B
+	* version 0.5: ¸ø³«
 
-	* README: $B<jD>$7!#(B
+	* README: ¼êÄ¾¤·¡£
 
-	* chalow: $BMn$ACe$$$F9M$($?$i!"%f!<%6@_Dj%U%!%$%k$,$J$$$H;H$($J$$(B
-	[2001-12-04]$B$C$F$N$O!"$"$s$^$j$J$N$G!"%=!<%9$K%G%U%)%k%H@_Dj$rKd$a(B
-	$B9~$s$@!#%f!<%6@_Dj%U%!%$%k;XDj$J$7$@$H6K$a$F%7%s%W%k$J(B Web $B%Z!<%8(B
-	$B$KJQ49$5$l$k(B ($B$^!"$=$b$=$b%7%s%W%k$@$1$I$M(B)$B!#(B
+	* chalow: Íî¤ÁÃå¤¤¤Æ¹Í¤¨¤¿¤é¡¢¥æ¡¼¥¶ÀßÄê¥Õ¥¡¥¤¥ë¤¬¤Ê¤¤¤È»È¤¨¤Ê¤¤
+	[2001-12-04]¤Ã¤Æ¤Î¤Ï¡¢¤¢¤ó¤Þ¤ê¤Ê¤Î¤Ç¡¢¥½¡¼¥¹¤Ë¥Ç¥Õ¥©¥ë¥ÈÀßÄê¤òËä¤á
+	¹þ¤ó¤À¡£¥æ¡¼¥¶ÀßÄê¥Õ¥¡¥¤¥ë»ØÄê¤Ê¤·¤À¤È¶Ë¤á¤Æ¥·¥ó¥×¥ë¤Ê Web ¥Ú¡¼¥¸
+	¤ËÊÑ´¹¤µ¤ì¤ë (¤Þ¡¢¤½¤â¤½¤â¥·¥ó¥×¥ë¤À¤±¤É¤Í)¡£
 
-	* chalow (okikae): $B9`L\$N8+=P$7$K?'$E$1=hM}$r$A$g$C$HJQ99!#8+=P$7(B
-	$B$K%^%C%A$9$k@55,I=8=$r!V(Bs!\t\* ([^:\n]+):!\...$B!W$+$i(B
-	$B!V(Bs!\t\* ([^:\n]+): !\...$B!W$KJQ99(B ($B%3%m%s8e$K%9%Z!<%9$rDI2C(B)$B!#$3$l(B
-	$B$G!"8+=P$7$N$J$$9`L\$b0B?4!#(B
+	* chalow (okikae): ¹àÌÜ¤Î¸«½Ð¤·¤Ë¿§¤Å¤±½èÍý¤ò¤Á¤ç¤Ã¤ÈÊÑ¹¹¡£¸«½Ð¤·
+	¤Ë¥Þ¥Ã¥Á¤¹¤ëÀµµ¬É½¸½¤ò¡Ös!\t\* ([^:\n]+):!\...¡×¤«¤é
+	¡Ös!\t\* ([^:\n]+): !\...¡×¤ËÊÑ¹¹ (¥³¥í¥ó¸å¤Ë¥¹¥Ú¡¼¥¹¤òÄÉ²Ã)¡£¤³¤ì
+	¤Ç¡¢¸«½Ð¤·¤Î¤Ê¤¤¹àÌÜ¤â°Â¿´¡£
 
 2001-12-09  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.4: $B8x3+(B
+	* version 0.4: ¸ø³«
 
 2001-12-08  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* chalow: New option '-e'. expert-mode. $B%=!<%98+$F=hM}FbMF$,J,$+$k(B
-	$B?M8~$1%b!<%I!#(B[2001-12-07]$B$N(B identify $B$,$i$_$N=hM}$J$I!#(BREADME $B$K(B
-	$B$O:\$;$J$$$D$b$j!#(B
+	* chalow: New option '-e'. expert-mode. ¥½¡¼¥¹¸«¤Æ½èÍýÆâÍÆ¤¬Ê¬¤«¤ë
+	¿Í¸þ¤±¥â¡¼¥É¡£[2001-12-07]¤Î identify ¤¬¤é¤ß¤Î½èÍý¤Ê¤É¡£README ¤Ë
+	¤ÏºÜ¤»¤Ê¤¤¤Ä¤â¤ê¡£
 	(write_month_page): Add <meta> in <head>
 	(write_index_page): Add <meta> in <head>
 
 2001-12-07  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* chalow (get_img_str): $B<+J,MQ$K!"(BImageMagick $B$N(B identify $B$G!"(B
-	$B2hA|$N(B extent $B$rF@$k=hM}$rIU$12C$($?!#(Bidentify $B$,$J$1$l$P2?$b$7$J(B
-	$B$$!#(B
+	* chalow (get_img_str): ¼«Ê¬ÍÑ¤Ë¡¢ImageMagick ¤Î identify ¤Ç¡¢
+	²èÁü¤Î extent ¤òÆÀ¤ë½èÍý¤òÉÕ¤±²Ã¤¨¤¿¡£identify ¤¬¤Ê¤±¤ì¤Ð²¿¤â¤·¤Ê
+	¤¤¡£
 
-	extent $B$,I,MW$JM}M3(B: IE $B$GF|IU;2>H%j%s%/$r%/%j%C%/$9$k$H!"$-$A$s$H(B
-	$B$=$NF|IU$N$H$3$KHt$V!#$7$+$7!"$7$P$i$/$7$F2hA|$,A4ItFI$_9~$^$l$F%l(B
-	$B%$%"%&%H$7$J$*$5$l$k$H!"Ht$s$@>l=j$,$:$l$A$c$&!#7k2L$H$7$F!"@5$7$$(B
-	$BF|IU$X%8%c%s%W$G$-$J$$$3$H$,$"$k$o$1!#(B
+	extent ¤¬É¬Í×¤ÊÍýÍ³: IE ¤ÇÆüÉÕ»²¾È¥ê¥ó¥¯¤ò¥¯¥ê¥Ã¥¯¤¹¤ë¤È¡¢¤­¤Á¤ó¤È
+	¤½¤ÎÆüÉÕ¤Î¤È¤³¤ËÈô¤Ö¡£¤·¤«¤·¡¢¤·¤Ð¤é¤¯¤·¤Æ²èÁü¤¬Á´ÉôÆÉ¤ß¹þ¤Þ¤ì¤Æ¥ì
+	¥¤¥¢¥¦¥È¤·¤Ê¤ª¤µ¤ì¤ë¤È¡¢Èô¤ó¤À¾ì½ê¤¬¤º¤ì¤Á¤ã¤¦¡£·ë²Ì¤È¤·¤Æ¡¢Àµ¤·¤¤
+	ÆüÉÕ¤Ø¥¸¥ã¥ó¥×¤Ç¤­¤Ê¤¤¤³¤È¤¬¤¢¤ë¤ï¤±¡£
 
-	$BLdBjE@(B: $BJQ49=hM}$,CY$/$J$k!#$^$"!"$7$g$&$,$J$$!#$$$=$0$b$s$8$c$J$$(B
-	$B$+$i$$$$$+$J!#(B
+	ÌäÂêÅÀ: ÊÑ´¹½èÍý¤¬ÃÙ¤¯¤Ê¤ë¡£¤Þ¤¢¡¢¤·¤ç¤¦¤¬¤Ê¤¤¡£¤¤¤½¤°¤â¤ó¤¸¤ã¤Ê¤¤
+	¤«¤é¤¤¤¤¤«¤Ê¡£
 
 2001-12-04  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* chalow: $B%f!<%6@_Dj%U%!%$%kL>$,B8:_$7$J$$$H$-%(%i!<$GCf;_$9$k$h$&(B
-	$B$K$7$?!#(B
+	* chalow: ¥æ¡¼¥¶ÀßÄê¥Õ¥¡¥¤¥ëÌ¾¤¬Â¸ºß¤·¤Ê¤¤¤È¤­¥¨¥é¡¼¤ÇÃæ»ß¤¹¤ë¤è¤¦
+	¤Ë¤·¤¿¡£
 
 2001-12-02  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.3: $B8x3+(B
+	* version 0.3: ¸ø³«
 
-	* README: $B<jD>$7!#(B
+	* README: ¼êÄ¾¤·¡£
 
-	* chalow: New option '-q'. quiet mode. $BI8=`=PNO$K?JD=>pJs$r=P$9$3(B
-	$B$H$K$7$?$N$G!"(Bquiet mode $B$b:n$C$?!#(B
+	* chalow: New option '-q'. quiet mode. É¸½à½ÐÎÏ¤Ë¿ÊÄ½¾ðÊó¤ò½Ð¤¹¤³
+	¤È¤Ë¤·¤¿¤Î¤Ç¡¢quiet mode ¤âºî¤Ã¤¿¡£
 
-	* $B%U%!%$%k0\F0(B: ChangeLog-sample $B"*(B sample/ChangeLog, 
-	cl-simple.conf $B"*(B sample/cl-simple.conf
+	* ¥Õ¥¡¥¤¥ë°ÜÆ°: ChangeLog-sample ¢ª sample/ChangeLog, 
+	cl-simple.conf ¢ª sample/cl-simple.conf
 	(thanks to satoru-t)
 
-	* version 0.2: $B8x3+$7$F$_$k!#(B
+	* version 0.2: ¸ø³«¤·¤Æ¤ß¤ë¡£
 
-	* cl-simple.conf: $B%Q%C%1!<%8$KDI2C!#(BREADME $B$N<B9TNc$G;HMQ!#(B
+	* cl-simple.conf: ¥Ñ¥Ã¥±¡¼¥¸¤ËÄÉ²Ã¡£README ¤Î¼Â¹ÔÎã¤Ç»ÈÍÑ¡£
 
 	* chalow:
-	- $B%f!<%6@_Dj%U%!%$%k$r;XDj$9$k?7%*%W%7%g%s(B -c,
-	  --configure-file=FILE $B$rDI2C!#(B
-	- $B:G=i$K%U%!%$%k$rFI$_9~$`$H$-$K(B EUC $B$KJQ49$9$k$N$rK:$l$F$?$N$G=$(B
-	  $B@5!#(B(version 0.1 $B$G$O!"(BJIS $B%U%!%$%k$@$H$*$+$7$/$J$k(B)
+	- ¥æ¡¼¥¶ÀßÄê¥Õ¥¡¥¤¥ë¤ò»ØÄê¤¹¤ë¿·¥ª¥×¥·¥ç¥ó -c,
+	  --configure-file=FILE ¤òÄÉ²Ã¡£
+	- ºÇ½é¤Ë¥Õ¥¡¥¤¥ë¤òÆÉ¤ß¹þ¤à¤È¤­¤Ë EUC ¤ËÊÑ´¹¤¹¤ë¤Î¤òËº¤ì¤Æ¤¿¤Î¤Ç½¤
+	  Àµ¡£(version 0.1 ¤Ç¤Ï¡¢JIS ¥Õ¥¡¥¤¥ë¤À¤È¤ª¤«¤·¤¯¤Ê¤ë)
 
-	* README: $B8m$jD{@5!#(B
+	* README: ¸í¤êÄûÀµ¡£
 
 2001-12-01  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.1: $B8x3+$7$F$_$k!#(BWeb $B%Z!<%8$b:n$k!#(B
+	* version 0.1: ¸ø³«¤·¤Æ¤ß¤ë¡£Web ¥Ú¡¼¥¸¤âºî¤ë¡£
 	http://nais.to/~yto/tools/chalow/
 
-	* chalow: $B7Z$/<jF~$l!#(B
+	* chalow: ·Ú¤¯¼êÆþ¤ì¡£
 
-	* README: $B8x3+$K$=$J$($F(B README $B$r=q$-;O$a$k!#(B
+	* README: ¸ø³«¤Ë¤½¤Ê¤¨¤Æ README ¤ò½ñ¤­»Ï¤á¤ë¡£

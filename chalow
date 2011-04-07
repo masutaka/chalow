@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.22 2002/10/26 09:06:07 yto Exp $
+# $Id: chalow,v 1.23 2002/12/27 10:05:35 yto Exp $
 #
 # chalow - CHAngeLog On The Web - convert ChangeLog to HTML files
 #
@@ -286,15 +286,22 @@ sub write_month_page_list {
     my ($month_page, $fh) = @_;
 
     print $fh "<h2>月別一覧</h2>\n";
-    my $this_year = 0;
-    for my $i (sort keys %{$month_page}) {
-	my ($year, $month) = ($i =~ /^(\d\d\d\d)-(\d\d)/);
-	if ($year != $this_year) { # year changed!
-	    print $fh "$year : \n";
-	    $this_year = $year;
+
+    my @month_list = sort keys %{$month_page};
+    my ($start_year) = ($month_list[0] =~ /^(\d\d\d\d)/);
+    my ($end_year) = ($month_list[$#month_list] =~ /^(\d\d\d\d)/);
+
+    for (my $y = $start_year; $y <= $end_year; $y++) { # year loop
+	print $fh "$y : ";
+	for (my $m = 1; $m <= 12; $m++) { # month loop	
+	    my $m0 = sprintf "%02d", $m;
+	    if (defined $month_page->{"$y-$m0"}) {
+		print $fh "<a href=\"$y-$m0.html\">$m0</a> ";
+	    } else {
+		print $fh "$m0 ";
+	    }
 	}
-	print $fh "<a href=\"$i.html\">$month</a>\n";
-	print $fh "<br>\n" if ($month == 12);
+	print $fh "<br>\n";
     }
 }
 
