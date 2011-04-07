@@ -1,4 +1,21 @@
+2001-12-02  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.2: 公開してみる。
+
+	* cl-simple.conf: パッケージに追加。README の実行例で使用。
+
+	* chalow:
+	- ユーザ設定ファイルを指定する新オプション -c,
+	  --configure-file=FILE を追加。
+	- 最初にファイルを読み込むときに EUC に変換するのを忘れてたので修
+	  正。(version 0.1 では、JIS ファイルだとおかしくなる)
+
+	* README: 誤り訂正。
+
 2001-12-01  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.1: 公開してみる。Web ページも作る。
+	http://nais.to/~yto/tools/chalow/
 
 	* chalow: 軽く手入れ。
 

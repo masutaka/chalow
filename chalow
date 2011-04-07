@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: chalow,v 1.5 2001-12-01 22:04:39+09 yto Exp $
+# $Id: chalow,v 1.5 2001-12-01 22:04:39+09 yto Exp yto $
 #
 # chalow - CHAngeLog On The Web - convert ChangeLog to HTML files
 #
@@ -26,7 +26,7 @@ die "NO NKF!" if ($NKF !~ /nkf$/);
 ### ユーザ設定項目
 
 # ユーザ設定ファイル名
-my $conf_file = "cl.conf";
+my $conf_file = "cl.conf";	# コマンドラインオプション "-c" で変更可能
 
 # cl.conf でユーザ設定を行なって下さい。
 my $changelog_name;		# 日記の名前
@@ -45,21 +45,31 @@ my $opt_odir;
 # ↑作成された HTML ファイルの出力先ディレクトリ
 # (コマンドラインオプションでも指定できます)
 
+### コマンドライン引数
+Getopt::Long::Configure('bundling');
+my ($opt_topn_tmp, $opt_odir_tmp);
+GetOptions('n|top-n=n'   => \$opt_topn_tmp,
+	   'o|output-dir=s'   => \$opt_odir_tmp,
+	   'c|configure-file=s' => \$conf_file);
+
 # ユーザ設定ファイルの読み込み
 open(CONF, "$NKF -e $conf_file |") or die "can't open file: $conf_file\n";
 my $conf = join('', (<CONF>));
 eval $conf;
 
+# ユーザ設定ファイルよりコマンドライン指定を優先する処理
+$opt_topn = $opt_topn_tmp if (defined $opt_topn_tmp);
+$opt_odir = $opt_odir_tmp if (defined $opt_odir_tmp);
 
-### コマンドライン引数
-Getopt::Long::Configure('bundling');
-GetOptions('n|top-n=n'   => \$opt_topn,
-	   'o|output-dir=s'   => \$opt_odir);
 
 if (@ARGV == 0) {
-    print "usage: prog [options] <file> [file]...\n";
-    print "    -n, --top-n=NUM       write first NUM days to index.html.\n";
-    print "    -o, --output-dir=DIR  directory to output.\n";
+    print << "USAGE";
+usage: prog [options] <file> [file]...
+    -n, --top-n=NUM             write NUM days to "index.html"
+    -o, --output-dir=DIR        directory to output
+    -c, --configure-file=FILE   configure file (default "cl.conf")
+USAGE
+    ;
 } else {
     my $top_n_ctr = $opt_topn;
     my $top_n_str = "";
@@ -69,7 +79,7 @@ if (@ARGV == 0) {
 
 	### クリーニングのためにChangeLogファイル一気に読み込む
 	my $fh = new FileHandle;
-	$fh->open($fname) || die "$fname: $!";
+	$fh->open("$NKF -e $fname |") || die "$fname: $!";
 	my $all = join('', <$fh>);
 	$fh->close;
 
