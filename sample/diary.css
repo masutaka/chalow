@@ -27,6 +27,7 @@ a:visited {
 .adminmenu {
         text-align: left;
         margin: 0em;
+	font-size: small;
 }
 
 /*
@@ -44,11 +45,9 @@ h1 {
 1日の日記全体を囲む枠の設定 (entry)
 */
 div.day { 
-        border-style: dotted;
-        border-color: #ff80ff;
-        border-width: 1px;
-        padding: 1%;
-        margin: 1%;  
+/* border-style: dotted; border-color: #ff80ff; border-width: 1px; */
+        padding: 5px 0px 5px 0px;
+	margin: 5px 0px 5px 0px;
 }
 
 /*
@@ -56,15 +55,20 @@ div.day {
 */
 h2 {
         margin: 0.0em 0.0em 0.5em 0.0em;
+        padding: 0.5em 0.0em 0.5em 0.0em;
+        border-color: #ff80ff;
+        border-style: solid;
+        border-width: 1px 10px 1px 10px;
+	background-color: #ffd0ff;
 }
 
 /*
 日付の設定 (in enrty header)
 */
 span.date {
-        border-color: #ff80ff;
+/*        border-color: #ff80ff;
         border-style: solid;
-        border-width: 1px 0 0 5px;
+        border-width: 0px 0 0 32px;*/
         padding: 0em 0.5em 0em 0.5em;
 }
 
@@ -72,11 +76,11 @@ span.date {
 タイトルを除いた1日の日記本文全体の設定 (items)
 */
 div.body { 
-        border-style: solid;
+/*        border-style: solid;
         border-color: #ffe0ff;
-        border-width: 1px;
-        padding: 0;
-        margin: 0;
+        border-width: 1px;*/
+        padding: 0em;
+        margin: 0em;
 }
 
 /*
@@ -87,21 +91,27 @@ item header の設定
         color: red;
 	font-weight: bold;
 	background-color: #ffe8ff;
-        padding: 3px 0.5em 0px 0.5em;*/
-/*        padding: 0.1em;*/
+        padding: 3px 3px 0px 3px;
+}
+
+h3 { 
+        color: red;
+	font-weight: bold;
+	margin: 0px;
 }
 
 /*
 イメージアンカーの設定
 */
 div.day span.sanchor {
-        background-image: url(check-tr.png);
-        background-position: bottom right;
-        background-repeat: no-repeat;
+        background-image: url(dot-pink-16.png);
+        background-position: bottom left;
+	background-repeat: no-repeat;
         padding: 16px 16px 0px 0px;
+        margin: 0px 0px 0px 0px;
         color: #fff;
         background-color: transparent;
-        font-size: 1px;
+        font-size: 0px;
 }
 
 /*
@@ -112,8 +122,8 @@ div.section {
         border-style: solid;
         border-width: 1px;
 	line-height: 130%;
-        padding: 1%;
-	margin: 1%;
+        padding: 5px;
+	margin: 5px 0px 15px 0px;
 }
 
 /*
@@ -124,10 +134,10 @@ div.body blockquote {
         border-style: solid;
         border-width: 1px;
 	background-color: #f0f0f0;
-	font-size: 0.9em;
-	line-height: 110%;
-	margin: 1em;
-	padding: 0.3em;
+	font-size: small;
+	line-height: 120%;
+	margin: 3px;
+	padding: 3px;
 }
 
 /*
@@ -137,9 +147,9 @@ div.body pre {
 	font-family: monospace;
 	white-space: pre;
 	line-height: 100%;
-	font-size: 100%;
 	margin: 0;
 	padding: 0;
+	font-size: x-small;
 }
 
 div.body p {
@@ -152,16 +162,14 @@ div.body p {
 */
 .calendar {
 	background-color: #fff8ff;
+        text-align: left;
         font-size: x-small;
-
-/*
-        text-align: right;
-	background-color: #ffe8ff;
-	line-height: 130%;
-	padding: 0.5em 1em 0.5em 1em;
-	margin: 0.2em 2em 0.2em 2em;
-*/
 }
+
+.calendar table {
+
+}
+
 
 /*
 フッタの設定 (一番下の chalow のロゴ)
@@ -184,7 +192,7 @@ div.comment {
         border-width: 1px;
         margin: 0.5em;
         padding: 0.5em;
-        font-size: 0.9em;
+        font-size: small;
         background-color: #fff0ff;
 }
 
@@ -193,7 +201,7 @@ div.comment p {
 }
 
 div.day span.canchor {
-        background-image: url(check-tr.png);
+        background-image: url(dot-gray.png);
         background-position: bottom right;
         background-repeat: no-repeat;
         padding: 16px 16px 0px 0px;
@@ -228,10 +236,10 @@ div.commentbody {
 img {
 	margin: 2px;
 }
-
-p {
-        margin-right: 10pt;
-        margin-left: 10pt;
+a img {
+	margin: 2px;
+	border-style: solid;
+        border-width: 1px;
 }
 
 
@@ -241,7 +249,7 @@ for chalow: Referrer by 日付リンク
 div .referer { 
   font-size: x-small;
   color: #808080;
-  background-color: #fff0ff;
+  background-color: #fff8ff;
   margin-top: 0.5em;
   padding: 0.2em;
 }
@@ -263,7 +271,52 @@ div .itemauthor span {
   color: #606060;
 }
 
-#content {float: left; width: 70%}
-#links {padding: 5px; margin: 5px;}
-#links td {border: dotted 1px #808080; padding: 5px; font-size: x-small;}
+#content {
+  position:relative;
+  margin-left: 190px;
+  margin-right: 180px;
+  padding: 0px;	
+}
 
+#links {
+  position:absolute;
+  top:8.5em;
+  left:5px;
+  width: 185px;	
+/*  float: left;
+  margin-right: 5px;*/
+  margin: 0px;
+  padding: 0px;	
+}
+
+#linksright {
+  position:absolute;
+  top:8.5em;	
+  right:5px;
+  width: 175px;	
+/*  float: right;
+  margin-left: 5px;*/
+  margin: 0px;
+  padding: 0px;	
+  background-color: white;
+}
+
+#footer {
+  clear: both;
+  margin-top: 5px;
+}
+
+
+.stdbox table {width: 100%; margin: 0;}
+.stdbox a {text-decoration: none;}
+.stdbox td {border: solid 1px #ff80ff; padding: 3px; font-size: x-small;line-height: 130%;}
+.stdbox ul {margin: 0; padding: 0}
+.stdbox li {margin: 0 0 0 1em}
+.stdbox dl {margin: 0;}
+.stdbox dd {margin: 0 0 0 1em; padding: 0;}
+.funcbox {border:solid 1px #ff80ff;font-size:x-small;padding:3px;margin:2px;
+      line-height: 120%;
+}
+
+.day table {border-collapse: collapse;}
+.day td {border: solid 1px gray; padding: 3px;}

@@ -1,3 +1,116 @@
+2004-05-09  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 1.0rc1[リリース]:
+	公開。
+
+	* README: 
+	mod.
+
+	* sample/diary.css: 
+	table 関連追加 (.day)。
+	h3 を追加。
+
+	* chalow (okikae):
+	表。Hiki の記法を採用。
+
+	以下のように記述すると、
+	> ||項目1-1||項目1-2||項目1-3
+	> ||項目2-1||項目2-2||項目2-3
+	以下のような表になります。
+	||項目1-1||項目1-2||項目1-3
+	||項目2-1||項目2-2||項目2-3
+
+2004-04-24 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* cl.conf: 
+	調整。
+
+2004-04-14 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* sample/dot-pink-16.png: 
+	New!
+
+	* chalow: 
+	廃止：$no_indent 
+	> # タブによるインデントをなくすか (1:なくす or 0:そのまま)
+	> my $no_indent = 0;
+
+	タブインデントが欲しいときは以下のようにしよう！
+	> <div class="body" style="margin-left:4em;">
+
+	* chalow: 
+	今後は kuttukibbs.cgi 1.0rc1 以降のみサポート。
+	<http://nais.to/~yto/tools/kuttukibbs/>
+	kuttukibbs.cgi v0.4 以前の亡霊を削除。
+	削除： $entry_url =~ s/\#/%23/;
+	削除： $item_url =~ s/\#/%23/;
+
+	New: $item_ymd, $entry_ymd
+
+	* cl.conf: mod.
+	インデックスページにサイドバー。
+	コメント周辺。
+
+	* sample/diary.css: mod.
+
+2004-04-01 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* cl.conf: mod.
+
+2004-02-27 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (write_category_page): 
+	カテゴリページ中のエントリが多いときは複数ページにするようにした。
+	これにともない新設定項目。
+	> # カテゴリページ中のエントリ数の上限
+	> my $cat_page_entry_max = 30;
+
+	* chalow (make_day_list): 
+	> if (defined $all_entries{$ym."-".$day}) {
+	↓↓↓↓↓↓↓↓↓↓
+	> if (defined $entry_statistics{ymd}{$ym."-".$day}) {
+
+2004-02-26 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* cl.conf (amazon_search): 
+	New. プラグイン。amazon サーチ結果リンクの作成。
+	>>
+	[src]{{amazon_search('トトロ')}}[/src]
+	→ {{amazon_search('トトロ')}}
+
+	[src]{{amazon_search('トトロ','books-jp')}}[/src]
+	→ {{amazon_search('トトロ','books-jp')}}
+
+	[src]{{amazon_search('トトロ','dvd-jp')}}[/src]
+	→ {{amazon_search('トトロ','dvd-jp')}}
+	<<
+
+2004-02-17 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow:
+	HTML::Template 化
+	- item, entry
+	- write_*_page()
+
+	- 以下、廃止。 cl.conf からも消す。
+	>>
+	# インデックスページの HTML ヘッダに追加したいもの (favicon.ico など)
+	my $index_page_head_plus = "";
+	# 月ページの HTML ヘッダに追加したいもの
+	my $month_page_head_plus = "";
+	# 日ページの HTML ヘッダに追加したいもの
+	my $day_page_head_plus = "";
+	# ツッコミ機能を使用するか (1:YES, 0:NO)
+	my $use_tukkomi = 0;
+	# ツッコミのテンプレート = <div class="comment">...</div> の中味。
+	# TUKKOMI_DATE はそのエントリの日付 (例: 2003-06-25) に変換される
+	my $tukkomi_template = "";
+	<<
+
+	* cl.conf (amazon): 
+	New プラグイン。amazon リンクの作成。これだけありゃいいじゃん的。
+	[2004-02-16-1]
+
 2004-02-16  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.24[リリース]:
