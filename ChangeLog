@@ -1,3 +1,78 @@
+2004-07-26 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 1.0rc2[リリース]:
+	公開。
+
+	* cl-yto.conf:
+	Add. "conf/yto/cl-yto.conf". ytoの設定ファイルをサンプルとしてつけ
+	とくことにした。いろいろ足して行こうかと。
+
+	* cl.conf (clsearch): 
+	[2004-05-12-1]にともない update.
+
+2004-07-22 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* cl.conf: 
+	細かく変更。
+
+	* chalow (write_rss_file): 
+	RSSの各アイテムのタイトルのフォーマットを変更。
+	OLD: <title>$ymd-$i  $ih</title>
+	NEW: <title>$ih</title>
+
+2004-06-27  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* cl.conf: 
+	タイポ： blukfeeds --> bulkfeeds
+
+2004-06-13  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (output_to_file): 
+	Replace Once 機能。1行追加しただけ。
+	> $$contp =~ s/<!-- ReplaceOnce -->/$replace_once/;
+
+	* cl.conf: 
+	新設定項目。
+	> # ファイルの最初に出てくる「<!-- ReplaceOnce -->」を置き換える文字列
+	> $replace_once = "";
+
+2004-06-04  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (make_calendar_table): 
+	typo. alisgn --> align
+
+	* README: 
+	「<!-- -->」についての記述を削除。
+	その他、エスケープやソースの記述法を追記。
+
+	* clkeitai.cgi (output_an_item): 
+	[2004-05-12-1]の方法に準拠。
+	以下を塊として認識する。
+	<!-- start:<TMPL_VAR name=ymdi> -->
+	<!-- end:<TMPL_VAR name=ymdi> -->
+
+2004-05-18  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow: 
+	$version でバージョン番号管理です。
+
+2004-05-12 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* clsearch.cgi: 
+	$home_page_url, $home_page_nameを廃止。
+
+	今までの表示がシンプルモード。新たにアイテムモードも容易。これは
+	v0.19までのclsearch.cgiの表示方式。
+
+	アイテムモードは、以下を塊として認識する。
+	<!-- start:<TMPL_VAR name=ymdi> -->
+	<!-- end:<TMPL_VAR name=ymdi> -->
+
+	clseach.cgi?mode=1 でitem mode。0だとsimple mode。
+
+	(get_item): New.
+	ファイルから、IDにより指定されたitemを取りだす関数。
+
 2004-05-09  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 1.0rc1[リリース]:
@@ -1580,3 +1655,4 @@
 __DATA__
 あああ
 いいい
+	

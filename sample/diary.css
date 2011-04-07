@@ -90,7 +90,7 @@ item header の設定
 .clitemheader { 
         color: red;
 	font-weight: bold;
-	background-color: #ffe8ff;
+/*	background-color: #ffe8ff;*/
         padding: 3px 3px 0px 3px;
 }
 
@@ -103,7 +103,8 @@ h3 {
 /*
 イメージアンカーの設定
 */
-div.day span.sanchor {
+/*div.day span.sanchor {*/
+span.sanchor {
         background-image: url(dot-pink-16.png);
         background-position: bottom left;
 	background-repeat: no-repeat;
@@ -118,7 +119,8 @@ div.day span.sanchor {
 サブタイトルを含むセクション (item) の設定
 */
 div.section { 
-        border-color: #ffd0ff;
+/*        border-color: #ffd0ff;*/
+        border-color: #ffffff;
         border-style: solid;
         border-width: 1px;
 	line-height: 130%;
@@ -236,7 +238,7 @@ div.commentbody {
 img {
 	margin: 2px;
 }
-a img {
+.section a img {
 	margin: 2px;
 	border-style: solid;
         border-width: 1px;

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.80 2004/05/09 06:35:01 yto Exp $
+# $Id: chalow,v 1.85 2004/07/26 11:13:15 yto Exp $
 #
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
@@ -7,13 +7,14 @@
 # 無償・無保証・著作権放棄 (see http://nais.to/~yto/doc/zb/0002.html)
 #
 # chalow ホームページ: http://nais.to/~yto/tools/chalow
-
 use strict;
 use Getopt::Long;
 use POSIX qw(strftime ceil);
 use Jcode;
 use Time::Local;		# for 曜日
 use HTML::Template;
+
+my $version = '1.0rc2';
 
 # 現在時刻の獲得
 my $what_time_is_it_now = strftime "%Y-%m-%d %H:%M", localtime;
@@ -50,6 +51,7 @@ my $index_page_template = << "___INDEX_PAGE_TEMPLATE"
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
+<link rel="alternate" type="application/rss+xml" title="RSS" href="cl.rdf">
 <title><TMPL_VAR name=cl_name></title>
 </head><body>
 <a href="cl.rdf">RSS</a>
@@ -71,6 +73,7 @@ my $month_page_template = << "___MONTH_PAGE_TEMPLATE"
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
+<link rel="alternate" type="application/rss+xml" title="RSS" href="cl.rdf">
 <title><TMPL_VAR name=cl_name> / <TMPL_VAR name=ym></title>
 </head><body>
 <TMPL_IF name=back><a href="<TMPL_VAR name=back>.html">前の月</a></TMPL_IF>
@@ -92,6 +95,7 @@ my $day_page_template = << "___DAY_PAGE_TEMPLATE"
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
+<link rel="alternate" type="application/rss+xml" title="RSS" href="cl.rdf">
 <title><TMPL_VAR name=cl_name> / <TMPL_VAR name=ymd></title>
 </head><body>
 <TMPL_IF name=back><a href="<TMPL_VAR name=back>.html">前の日</a></TMPL_IF>
@@ -114,6 +118,7 @@ my $cat_page_template = << "TMPL"
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
+<link rel="alternate" type="application/rss+xml" title="RSS" href="cl.rdf">
 <title><TMPL_VAR name=cat_name> / <TMPL_VAR name=cl_name></title>
 </head><body>
 <TMPL_IF name=page_list><TMPL_VAR name=page_list></TMPL_IF>
@@ -205,6 +210,8 @@ my $day_page_mode = 0;
 # カテゴリページ中のエントリ数の上限
 my $cat_page_entry_max = 10;
 
+# ファイルの最初に出てくる「<!-- ReplaceOnce -->」を置き換える文字列
+my $replace_once = "";
 
 ### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
 my $signature = qq(<p class="footer">Powered by 
@@ -890,7 +897,7 @@ sub make_calendar_table {
 <table>
 <caption><a href="$ym.html">$ym</a></caption>
 <tr>
-@{[join "", map {qq(<th alisgn="center">$_</th>)} @wn]}
+@{[join "", map {qq(<th align="center">$_</th>)} @wn]}
 </tr>
 @{[join "", map {"<tr>$_</tr>"} @cal]}
 </table>
@@ -961,7 +968,7 @@ sub write_rss_file {
 
 	    $rdfitem .= qq(
 <item rdf:about="$permlink">
- <title>$ymd-$i  $ih</title>
+ <title>$ih</title>
  <link>$permlink</link>
  <description>$co</description>
  <dc:date>$ymd</dc:date>
@@ -984,7 +991,7 @@ sub write_rss_file {
 <link>$clog_url</link>
 <description>$changelog_description</description>
 <dc:date>$dcdate</dc:date>
-<admin:generatorAgent rdf:resource="http://nais.to/~yto/tools/chalow/?v=0.24"/>
+<admin:generatorAgent rdf:resource="http://nais.to/~yto/tools/chalow/?v=$version"/>
 <items>
 <rdf:Seq>\n$rdfseq</rdf:Seq>
 </items>
@@ -1242,6 +1249,8 @@ sub make_item_header_html {
 ### 指定されたファイルへ文字列を出力
 sub output_to_file {
     my ($fname, $contp) = @_;
+    $$contp =~ s/<!-- ReplaceOnce -->/$replace_once/;
+
     if ($update_by_size == 1 and -s $fname == length($$contp)) {
 	return;
     }

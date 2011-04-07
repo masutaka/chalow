@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: clkeitai.cgi,v 1.3 2003/10/21 10:55:14 yto Exp $
+# $Id: clkeitai.cgi,v 1.4 2004/06/04 13:08:30 yto Exp $
 # clkeitai.cgi - chalow により HTML 化されたページをケータイで見る
 
 # アイテム一覧表示 - アンカーなどはなし。アイテム別表示へのジャンプ用。
@@ -59,30 +59,31 @@ sub output_an_item {
     close(F);
 
     my $outstr = "no match";
-    while ($all =~ m|<div class="section">(.*?)<!--eos-->|smg) {
+    while ($all =~ m|start:$ymdi -->(.*?)<!-- end:$ymdi|smg) {
 	my $new = $1;
-	if ($new =~ /name="$ymdi"/){
-	    $new =~ s|<div class="itemauthor">.*?</div>||gsm; # 記述者名除去
-	    $new =~ s|</?p>||gsm;
-	    $new =~ s|</?pre.*?>||gsm;
-	    $new =~ s|</?div.*?>||gsm;
-	    $new =~ s|</?span.*?>||gsm;
-	    $new =~ s|<a name="$ymd.*".*?>(.*?)</a>|$1|g; # ヘッダのを除去
+	$new =~ s|<!--.+?-->||gsm;
 
-	    # img の処理
-	    $new =~ s|(<a.+>)(<img.+>)(</a>)|$1&lt;>$3 $2 |gsm;
-	    $new =~ s|<img\s*src="(.+?\.([^\.]+?))"\s*alt="(.+?)".*?>|
-		qq(<a href="$1">[$3($2)]</a>)|exg;
+	$new =~ s|<div class="itemauthor">.*?</div>||gsm; # 記述者名除去
+	$new =~ s|</?p>||gsm;
+	$new =~ s|</?pre.*?>||gsm;
+	$new =~ s|</?div.*?>||gsm;
+	$new =~ s|</?span.*?>||gsm;
+	$new =~ s|<a name="$ymdi".+?>(.+?)</a>|$1|g; # ヘッダのを除去
+	$new =~ s|\[<a href="cat.+?">(.+?)</a>\]|[$1]|g; # カテゴリのを除去
 
-	    # inside ref
-	    $new =~ s|<a\shref="[\d\-]+.html\#([\d\-]+)">|
-		qq(<a href="clkeitai.cgi?date=$1">)|gxe;
+	# img の処理
+	$new =~ s|(<a.+>)(<img.+>)(</a>)|$1&lt;>$3 $2 |gsm;
+	$new =~ s|<img\s*src="(.+?\.([^\.]+?))"\s*alt="(.+?)".*?>|
+	    qq(<a href="$1">[$3($2)]</a>)|exg;
 
-	    $new =~ s!^(<.+?>|)\t!$1!gsm; # 行頭のタブは絶体除去
+	# inside ref
+	$new =~ s|<a\shref="[\d\-]+.html\#([\d\-]+)">|
+	    qq(<a href="clkeitai.cgi?date=$1">)|gxe;
 
-	    $outstr = $new;
-	    last;
-	}
+	$new =~ s!^(<.+?>|)\t!$1!gsm; # 行頭のタブは絶体除去
+
+	$outstr = $new;
+	last;
     }
 
     if (length($outstr) > $page_size_max) {
@@ -93,7 +94,7 @@ sub output_an_item {
     }
 
     $outstr = jcode($outstr)->sjis;
-    print "<body>$ymdi<pre>$outstr</pre></body></html>\n";
+    print "<body>$ymdi<p>$outstr</p></body></html>\n";
 }
 
 ### アイテム一覧表示
