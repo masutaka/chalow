@@ -1,20 +1,37 @@
+/*
+Title: chalow default
+ */
 
+/*
+ページ全体の基本的な設定。背景色や文字色など
+*/
 body {
 	background-color: White;
 }
 
-pre {
-	font-family: monospace;
-	border-style: solid;
-	border-color: #ffb0ff;
-	background-color: #ffe0ff;
-	white-space: pre;
-	line-height: 130%;
-	margin-right: 4.0em;
-	margin-left: 3.5em;
-	padding: 0.5em 2em;
+/*
+リンク文字列に関する設定
+*/
+a:link {
+        text-decoration: none;
 }
 
+a:visited {
+        text-decoration: none;
+}
+
+
+/*
+ページトップ (とか、下) にある操作ボタンの並ぶ行の設定
+*/
+.adminmenu {
+        text-align: left;
+        margin: 0em;
+}
+
+/*
+日記タイトルの設定
+*/
 h1 {
 	text-align: left;
         border-color: #ff80ff;
@@ -23,22 +40,150 @@ h1 {
         padding: 0.5em;
 }
 
-h2 {
-	text-align: left;
-	padding: 0.5em;
-	background-color: #ffe0ff;
+/*
+1日の日記全体を囲む枠の設定 (entry)
+*/
+div.day { 
+        border-style: dotted;
+        border-color: #ff80ff;
+        border-width: 1px;
+        padding: 1em;
+        margin: 1em;  
 }
 
-img {
+/*
+タイトル行全体の設定 (enrty header)
+*/
+h2 {
+        margin: 0.0em 0.0em 0.5em 0.0em;
+}
+
+/*
+日付の設定 (in enrty header)
+*/
+span.date {
+        border-color: #ff80ff;
+        border-style: solid;
+        border-width: 1px 0 0 5px;
+        padding: 0em 0.5em 0em 0.5em;
+}
+
+/*
+タイトルを除いた1日の日記本文全体の設定 (items)
+*/
+div.body { 
+        border-style: solid;
+        border-color: #ffe0ff;
+        border-width: 1px;
+        padding: 0em;
+        margin: 0em;
+}
+
+/*
+item header の設定
+*/
+/* memo: tDiary だと h3。chalow でも設定によって h3 を出すことが可能 */
+.clitemheader { 
+        color: red;
+	font-weight: bold;
+	background-color: #ffe8ff;
+        padding: 3px 0.5em 0px 0.5em;*/
+/*        padding: 0.1em;*/
+}
+
+/*
+イメージアンカーの設定
+*/
+/*div.day span.panchor {
+        background-image: url(clover_anchor.png);
+        background-position: bottom right;
+        background-repeat: no-repeat;
+        padding: 16px 16px 0px 0px;
+        color: #fff;
+        background-color: transparent;
+        font-size: 1px;
+}*/
+
+/*
+サブタイトルを含むセクション (item) の設定
+*/
+div.section { 
+        border-color: #ffd0ff;
+        border-style: solid;
+        border-width: 1px;
+	line-height: 130%;
+        padding: 0.5em;
 	margin: 0.5em;
+}
+
+/*
+item 中の引用の設定
+*/
+div.body blockquote { 
+        border-color: #808080;
+        border-style: solid;
+        border-width: 1px;
+	background-color: #f0f0f0;
+	font-size: 0.9em;
+	line-height: 110%;
+	margin: 1em;
+	padding: 0.3em;
+}
+
+/*
+各 item の pre の設定 (各 item は pre で囲まれている)
+*/
+/*div.body pre {
+	font-family: monospace;
+	white-space: pre;
+	line-height: 130%;
+	font-size: 100%;
+	margin: 0;
+	padding: 0;
+}*/
+
+div.body p {
+	margin: 0;
+	padding: 0;
+}
+
+/*
+カレンダーの設定
+*/
+.calendar {
+	background-color: #fff8ff;
+        text-align: right;
+        font-size: x-small;
+
+/*
+	background-color: #ffe8ff;
+	line-height: 130%;
+	padding: 0.5em 1em 0.5em 1em;
+	margin: 0.2em 2em 0.2em 2em;
+*/
+}
+
+/*
+フッタの設定 (一番下の chalow のロゴ)
+*/
+.footer {
+	text-align: right;
+	font-size: x-small;
+	margin: 0em;
+}
+
+p.footer a {
+	font-weight: bold;
+}
+
+/*
+いろいろ
+*/
+img {
+	margin: 2px;
 }
 
 p {
         margin-right: 1.0em;
         margin-left: 1.0em;
-        line-height: 130%;
-}
-
-.clquote { 
-	color: gray;
 }

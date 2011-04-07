@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.31 2003/06/14 03:16:14 yto Exp $
+# $Id: chalow,v 1.36 2003/06/22 03:04:09 yto Exp $
 #
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
@@ -33,8 +33,6 @@ my $changelog_name = "ChangeLog";
 my $home_page_url = "http://nais.to/~yto/tools/chalow/";
 # 自分のホームーページの呼び名
 my $home_page_name = "chalow home page";
-# 各項目の見出しの文字の色
-my $label_color = "#a00000";
 # 自動文字列置換
 my $auto_replace = '';
 # CSS ファイル
@@ -51,11 +49,10 @@ my $reverse_order_days = 0;
 my $index_page_template = << "___INDEX_PAGE_TEMPLATE"
 <a href="$home_page_url">$home_page_name</a>
 <h1>$changelog_name</h1>
-最終更新時刻: CLLASTUPDATE
-<h2>月別一覧</h2>
-<p>MONTHPAGELIST</p>
-<h2>最近 NDAYS 日分</h2>
+<p>最終更新時刻: CLLASTUPDATE</p>
 LATESTDAYS
+<p>以上、最近 NDAYS 日分</p>
+<p class="calendar">MONTHPAGELIST</p>
 <a href="$home_page_url">$home_page_name</a>
 ___INDEX_PAGE_TEMPLATE
     ;
@@ -64,29 +61,43 @@ my $month_page_template = << "___MONTH_PAGE_TEMPLATE"
 CLNAVI <a href="index.html">Index</a>
  / <a href="$home_page_url">$home_page_name</a>
 <h1>$changelog_name YEARMONTH</h1>
-<center>DAYLIST</center>
+<p class="calendar">DAYLIST</p>
 DAYSINTHEMONTH
 CLNAVI <a href="index.html">Index</a>
  / <a href="$home_page_url">$home_page_name</a>
 ___MONTH_PAGE_TEMPLATE
     ;
+# インデックスページの HTML ヘッダに追加したいもの (favicon.ico など)
+my $index_page_head_plus = "";
+# 月ページの HTML ヘッダに追加したいもの
+my $month_page_head_plus = "";
 # 処理停止日付: この日付まで処理する (例: "2002-01-01"。0 なら最後まで処理する)
 my $stop_date = 0;
-
+# タブによるインデントをなくすか (1:なくす or 0:そのまま)
+my $no_indent = 0;
+# アイテムヘッダーのフォーマットをどうするか
+# (0:"* HOGE:", 1:"* HOGE", 2:"HOGE:",3:"HOGE")
+my $item_header_style = 0;
+# 表示するとき引用記号 ('>' or '|') を消すか (1:YES, 0:NO)
+my $remove_quote_mark = 0;
+# item header に h3 タグを足すか (1:YES, 0:NO) - tDiary との互換性のため
+my $use_h3_for_item_header = 0;
+# item header の先頭の "*" にアンカーをつけるか (1:YES, 0:NO)
+my $use_item_anchor = 1;
 
 ### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
-my $signature = 
-    qq(<div align="right">Powered by 
-       <a href="http://nais.to/~yto/tools/chalow/"><b>chalow</b></a></div>);
+my $signature = qq(<p class="footer">Powered by 
+<a href="http://nais.to/~yto/tools/chalow/">chalow</a></p>);
 
 ### コマンドライン引数
 Getopt::Long::Configure('bundling');
-my ($opt_topn_tmp, $opt_odir_tmp, $quiet_mode);
+my ($opt_topn_tmp, $opt_odir_tmp, $quiet_mode, $opt_css_file);
 GetOptions('n|top-n=n'   => \$opt_topn_tmp,
 	   'o|output-dir=s'   => \$opt_odir_tmp,
 	   'c|configure-file=s' => \$conf_file,
 	   'q|quiet' => \$quiet_mode,
-	   's|stop-date=s' => \$stop_date);
+	   's|stop-date=s' => \$stop_date,
+	   'C|css=s' => \$opt_css_file);
 
 # ユーザ設定ファイルの読み込み (ファイル名が指定されてたときのみ)
 if ($conf_file ne "") {
@@ -94,13 +105,16 @@ if ($conf_file ne "") {
     open(CONF, "$NKF -ed $conf_file |") or die;
     my $conf = join('', <CONF>);
     eval $conf;
+    die qq(error in "$conf_file" (obsolete variable?): $@\n) if ($@);
 }
 
 # ユーザ設定ファイルよりコマンドライン指定を優先する処理
 $opt_topn = $opt_topn_tmp if (defined $opt_topn_tmp);
 $opt_odir = $opt_odir_tmp if (defined $opt_odir_tmp);
+$css_file = $opt_css_file if (defined $opt_css_file);
 
-# 処理停止日付: 文字列だったものを数値にする (後で比較に使うから)
+# 処理停止日付: 文字列だったものを数値にする。後で数値として日付の比較
+# に使うから。
 $stop_date =~ s/-//g;
 
 if (@ARGV == 0) {
@@ -109,124 +123,233 @@ usage: prog [options] <file> [file]...
     -n, --top-n=NUM             write NUM days to "index.html"
     -o, --output-dir=DIR        directory to output
     -c, --configure-file=FILE   configure file (default "cl.conf")
-    -s, --stop-date             date to stop processing
+    -s, --stop-date=DATE        date to stop processing
+    -C, --css=FILE              css file
     -q, --quiet                 quiet mode
 USAGE
     ;
-} else {
-    my $top_n_ctr = $opt_topn;
-    my $top_n_str = "";
-    my %month_page;
-    my %all_month;
-
-    for my $fname (@ARGV) {
-
-	print "reading \"$fname\"\n" if (!defined $quiet_mode);
-
-	### クリーニングのためにChangeLogファイル一気に読み込む
-	my $fh = new FileHandle;
-	$fh->open("$NKF -ed $fname |") || die "$fname: $!";
-	my $all = join('', <$fh>);
-	$fh->close;
-
-	### ChangeLogをあらかじめクリーニング
-	# \n(\s+)\n2001-09... の $1 を消す
-	$all =~ s/\n[\s\t]+(\n\S)/\n$1/gm;
-	# \n(\s+)\n\t* ほげ: ... の $1 を消す
-	$all =~ s/\n[\s\t]+(\n[\s\t]+\*\s+)/\n$1/gm;
-	# 項目内の表す空行をタブ行にする
-	#   あとで、各項目をブロック単位 ("\n\n" 区切り) で処理するため。
-	$all =~ s/\n(\n\t[^\*])/\n\t$1/gm;
-
-	### クリーニングされたChangeLogを処理
-
-	my @lines = split(/(?=^\d+-\d+-\d+)/m, $all); # 日付単位に分解
-	my ($day, $month) = ("", "");
-	foreach (@lines) {
-	    $top_n_ctr--;
-	    ($day, $month) = (/^((\d+-\d+)-\d+)/);
-	    $all_month{$month} = 1;
-
-	    ### stop date
-	    if ($stop_date != 0) {
-		$day =~ (/^(\d+)-(\d+)-(\d+)/);
-		my $cdate = $1 * 10000 + $2 * 100 + $3;
-		if ($stop_date > $cdate) {
-		    next;
-		}
-	    }
-
-	    ### 日付の後ろをどうするか
-	    if ($show_day_of_week == 1) {
-		# 曜日(Mon, Tue, ...)を追加;
-		# "2000-10-19  Ho Hi  <hh@hh.jp>" --> "2000-10-19  Thu"
-		my $dow = get_day_of_week($_);
-		s/^($day)\s.+/\1  $dow/;
-	    } else {
-		# 日付の後ろの名前などを削除
-		# "2000-10-19  Hoge Hoi  <hh@hhh.com>" --> "2000-10-19"
-		s/^($day)\s.+/\1/;
-	    }
-	    # 秘密の項目を外に出さないように削除
-	    # 例: * p:秘密メモ: YTがまたやらかした。しょうもないやつだ。
-            s/\n\t+\* p:.+?^(\t+\*|$)/$1/gms; # renew 030105
-	    okikae();		# 文字列置き換え
-
-	    $month_page{$month}{$day} = $_;
-
-	    # 最近の何日かだけインデックスページに載せるための処理
-	    $top_n_str .= $_ if ($top_n_ctr >= 0);
-	}
-    }
-
-    write_month_page(\%month_page);
-    write_index_page(\%all_month, \$top_n_str);
+    exit;
 }
+
+my $top_n_ctr = $opt_topn;
+my $top_n_str = "";
+my %month_page;
+my %all_month;
+my $month_page_list = "";
+
+for my $fname (@ARGV) {
+
+    print "reading \"$fname\"\n" if (!defined $quiet_mode);
+
+    ### クリーニングのためにChangeLogファイル一気に読み込む
+    my $fh = new FileHandle;
+    $fh->open("$NKF -ed $fname |") || die "$fname: $!";
+    my $all = join('', <$fh>);
+    $fh->close;
+
+    ### ChangeLogをあらかじめクリーニング
+    # 行頭がタブではなくスペースになっているたら置き換える
+    $all =~ s/^ {8}/\t/gsm;
+    $all =~ s/^ {1,7}\t/\t/gsm;
+    # \n(\s+)\n2001-09... の $1 を消す
+    $all =~ s/\n[\s\t]+(\n\S)/\n$1/gm;
+    # \n(\s+)\n\t* ほげ: ... の $1 を消す
+    $all =~ s/\n[\s\t]+(\n[\s\t]+\*\s+)/\n$1/gm;
+    # 項目内での段落区切り表す空行をタブ行にする
+    # あとで、各項目をブロック単位 ("\n\n" 区切り) で処理するため。
+    $all =~ s/\n(\n\t[^\*])/\n\t$1/gm;
+
+    ### クリーニングされたChangeLogを処理
+
+    my @lines = split(/(?=^\d+-\d+-\d+)/m, $all); # 日付 (entry) 単位に分解
+    my ($day, $month) = ("", "");
+    foreach (@lines) {
+	$top_n_ctr--;
+	($day, $month) = (/^((\d+-\d+)-\d+)/);
+	$all_month{$month} = 1;
+
+	### stop date
+	if ($stop_date != 0) {
+	    $day =~ (/^(\d+)-(\d+)-(\d+)/);
+	    my $cdate = $1 * 10000 + $2 * 100 + $3;
+	    if ($stop_date > $cdate) {
+		next;
+	    }
+	}
+
+	### 日付の後ろをどうするか
+	if ($show_day_of_week == 1) {
+	    # 曜日(Mon, Tue, ...)を追加;
+	    # "2000-10-19" --> "2000-10-19  Thu"
+	    my $dow = get_day_of_week($day);
+	    s/^($day)\s.+/$1 $dow/;
+	} else {
+	    # 日付の後ろの名前などを削除
+	    # "2000-10-19  Hoge Hoi  <hh@hhh.com>" --> "2000-10-19"
+	    s/^($day)\s.+/$1/;
+	}
+
+	# 秘密の項目を外に出さないように削除
+	# 例: * p:秘密メモ: YTがまたやらかした。しょうもないやつだ。
+        s/\n\t+\* p:.+?^(\t+\*|$)/$1/gms; # renew 030105
+
+	parse_entry();		# エントリをパーズして、文字列置き換え
+
+	s/^\s+//; s/\s+$//;			     
+
+	$month_page{$month}{$day} = qq(<div class="day">$_</div></div>\n);
+	# 各 entry を <div class="day"></div> で囲む↑
+
+	# 最近の何日かだけインデックスページに載せるための処理
+	$top_n_str .= $month_page{$month}{$day} if ($top_n_ctr >= 0);
+    }
+}
+
+write_month_page(\%month_page);
+write_index_page(\%all_month, \$top_n_str);
+
 
 print "done.\n" if (!defined $quiet_mode);
 
 exit;
 
 
+### エントリをパーズし、文字列の置き換え関数を呼ぶ
+sub parse_entry {
+    my ($eh, $items, $items_new);
+
+    # (1) entry header とそれ以外に分解
+    if (/\A(\d{4}-\d\d-\d\d.+?\n)(.+)\Z/sm) {
+	($eh, $items) = ($1, $2);
+	#print "($eh, $items)\n";
+
+	# (2) entry header への処理
+
+	### 日付部分に name (URLで直接リンクがはれるように)
+	# anchor : ^YYYY-MM-DD
+	my ($day, $mon) = ($eh =~ /^((\d\d\d\d-\d\d)-\d\d)/); # 後で使う
+	$eh =~ s!^(((\d\d\d\d-\d\d)-\d\d).*)\n!<h2><span class="date"><a name="$2" href="$3.html#$2">$1</a></span></h2>\n<div class="body">!;
+	# ↑なぜ href="#$2" ではないのか? -> index.html#$2 になると困るから
+
+	### item anchor へのアクセスを日付へ変換する ad hoc な方法
+	# 一度 item anchor を使ってたけどもうやめたときなど用。
+	# 0000-00-00-1 から 0000-00-00-9 までへのリンクは entry header へ行く。
+	if ($use_item_anchor == 0) {
+	    for (my $i = 1; $i <= 9; $i++) {
+		$eh =~ s|</h2>|<a name="$day-$i"></a></h2>|;
+	    }
+	}
+
+	# (3) 個々の item に分解し、各 item ごとに処理
+	my $ctr = 0;
+	while ($items =~ /^(\t\* .+?\n(?=\s*(\t\*|\Z)))/gsm) {
+	    my $item = $1;
+	    #print "item[$item]\n";
+	    $ctr++;		# 何個目の item か (for item anchor)
+
+	    # (4) item header とそれ以外に分解
+	    my ($ih, $s, $c) = ($item =~ /^\t\* (.+?):(\s)(.*)\Z/sm);
+	    #print "ih[$ih] c[$c]\n";
+
+	    if (defined $ih) {
+		# (5) item header の処理
+		$ih = okikae($ih);
+
+		if ($item_header_style == 0) {
+		    $ih = qq(\t* <span class="clitemheader">$ih</span>:$s);
+		} elsif ($item_header_style == 1) {
+		    $ih = qq(\t* <span class="clitemheader">$ih</span>$s);
+		} elsif ($item_header_style == 2) {
+		    $ih = qq(\t<span class="clitemheader">$ih</span>:$s);
+		} elsif ($item_header_style == 3) {
+		    $ih = qq(\t<span class="clitemheader">$ih</span>$s);
+		}
+
+		$ih =~ s|^\t\*|\t<span class="panchor">*</span>|;
+
+		if ($use_item_anchor == 1) {
+		    $ih =~ s|^\t(<.+?>\*</.+?>)|\t<a name="$day-$ctr" href="$mon.html#$day-$ctr">$1</a>|;
+		}
+
+		if ($use_h3_for_item_header == 1) {
+		    $ih =~ s|(<span.+</span>)|<h3 class="subtitle">$1</h3>|;
+		}
+	    } else {
+		$ih = "";
+		$c = $item;
+	    }
+
+	    # (6) item の中味の処理
+	    $c = okikae($c);
+
+	    # item の組み上げ
+	    $item = $ih.$c;
+
+	    # タブによるインデントをどうするか
+	    $item =~ s!^(<.+?>|)\t!$1!gsm if ($no_indent == 1);
+
+	    # 各 item を <div class="section"></div> で囲む
+	    $item = qq(<div class="section"><p><pre style="background-color:transparent;border:none;line-height:inherit;font-size:100%;margin:0;padding:0;">$item</pre></p></div>\n);
+	
+	    $items_new .= $item;
+	}
+    }
+
+    # エントリの組み上げ
+    $_ = $eh.$items_new;
+    return $_;
+}
+
+
 ### 文字列の置き換え
 sub okikae {
-    ### "<" は置き換える。ただし、コメントに関わる場合は無視
-#    s/<([^!])/&lt;$1/gi;
-    s|<(/?[a-z]+)|&lt;$1|gi;
-    # カスタマイズのヒント: <s></s> を残す→ s|<(/?[a-rt-z]+)|&lt;$1|gi;
-    # <b> を残す→ s|<(/?[ac-z]+)|&lt;$1|gi; (副作用 = <br> なども残る)
+    local ($_) = @_;	
 
-    ### 自動文字列置換適用
-    eval $auto_replace;
+    s/&/&amp;/go;
+#    s/>/&gt;/go;		# > が &.. になると、URL とか引用のマッチ狂う
+    s/"/&quot;/go;		# ";
+    ### "<" は置き換える。ただし、コメント (<!-- -->) に関わる場合は無視
+    #    s/<([^!])/&lt;$1/gi;
+    s|<(/?[a-z]+)|&lt;$1|gio;
+    # カスタマイズのヒント: <s></s> を残す→ 
+    # s|<(/?[a-rt-z]+)|&lt;$1|gi; <b> を残す→ 
+    # s|<(/?[ac-z]+)|&lt;$1|gi; (副作用 = <br> なども残る)
 
     ### 引用 (quote): "| ..." か "> ..."
-    s/^\t([\|>].*)/\t<span class="clquote">$1<\/span>/gm;
-
-    ### 日付で参照リンク
-    # date ref : [YYYY-MM-DD]
-    s!\[((\d\d\d\d-\d\d)-\d\d)\]!<a href="$2.html#$1">[$1]</a>!g;
-
-    ### URL表記を href で
-    # URL : http://....
-    # 正規表現は http://www.din.or.jp/~ohzaki/perl.htm#httpURL より。
-    # バックスラッシュを用いたURL中での改行に対応 021025
-    my $URLCHARS = "[-_.!~*'()a-zA-Z0-9;/?:@&=+,%\#\$]";
-    my $URLDELIM = "\\\\\\n[\\t ]+";
-    s{([^,"])(s?https?://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
-     {$1.'<a href="'.join('', split(/$URLDELIM/, $2)).'">'.
-      join('', split(/\\/, $2)).'</a>'}gem; #"])}
+    if ($remove_quote_mark == 1) {
+	my $a;
+	s!((^\t((\||>)[^\n]*)\n)+)!'<blockquote>'.($a = $1,
+	    $a =~ s{^\t(\||>)\s?}{\t}gm, $a).'</blockquote>'!gme;
+    } else {
+	s!((^\t((\||>)[^\n]*)\n)+)!<blockquote>$1</blockquote>!gmx;
+    }
 
     ### 画像張り付け
     # image : [IMG:image/2000-06-20-08-32-57.m.jpg]
     s!\[IMG:([^\]]+)\]!get_img_str($1)!ge;
 
-    ### 日付部分に name (URLで直接リンクがはれるように)
-    # anchor : ^YYYY-MM-DD
-    s!^((\d\d\d\d-\d\d)-\d\d)!<a name="$1" href="$2.html#$1">$1</a>!;
+    ### 日付で参照リンク
+    # date ref : [YYYY-MM-DD]
+    s!\[((\d\d\d\d-\d\d)-\d\d(-\d+)?)\]!<a href="$2.html#$1">[$1]</a>!g;
 
-    ### 各項目の見出しに色づけ
-    # label : * XXXX: ...
-    s!\t\* ([^:\n]+):(\s)!\t* <font color="$label_color">$1</font>:$2!g;
+    ### URL表記を href で
+    # URL : http://....
+    # 正規表現は http://www.din.or.jp/~ohzaki/perl.htm#httpURL より。
+    # バックスラッシュを用いたURL中での改行に対応 021025
+    #my $URLCHARS = "[-_.!~*'()a-zA-Z0-9;/?:@&=+,%\#\$]";
+    my $URLCHARS = "[-_.!~*'a-zA-Z0-9;/?:@&=+,%\#\$]";
+    my $URLDELIM = "\\\\\\n[\\t ]+";
+    s{((s?https?|ftp)://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
+     {'<a href="'.join('', split(/$URLDELIM/, $1)).'">'.
+      join('', split(/\\/, $1)).'</a>'}gem;
+#    s{([^,"])((s?https?|ftp)://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
+#     {$1.'<a href="'.join('', split(/$URLDELIM/, $2)).'">'.
+#      join('', split(/\\/, $2)).'</a>'}gem; #"])}
+
+    ### 自動文字列置換適用
+    eval $auto_replace;
+
+    return $_;
 }
 
 
@@ -261,30 +384,30 @@ sub write_month_page {
 	my $fname = "| $NKF -ed > $opt_odir/$i.html";
 	my $fh = new FileHandle;
 	$fh->open($fname) || die "$fname: $!";
-	print $fh "<html><head><title>$i</title>\n";
-	print $fh "<meta http-equiv=\"Content-Type\"
-                   content=\"text/html;charset=EUC-JP\">\n";
+	print $fh qq(<html lang="ja"><head><title>$i</title>\n);
+	print $fh qq(<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">\n);
 	print $fh qq(<link rel=stylesheet href="$css_file" media=all>\n)
 	    if defined $css_file;
-	print $fh "</head><body>\n";
+	print $fh $month_page_head_plus;
+	print $fh "</head><body><div>\n";
 
 	my $template = $month_page_template;
 
 	### 日々のエントリ作成
-	my $content = "<pre>\n";
 	my @cont;
 	if ($reverse_order_days) { # 降順: 日付の新しいのが上 (〜v0.11 と同じ)
 	    @cont = reverse sort keys %{$month_page->{$i}};
 	} else {		# 昇順: 日付の古いのが上
 	    @cont = sort keys %{$month_page->{$i}};
 	}
-	$content .= join('', map {$month_page->{$i}{$_}} @cont);
-	$content .= "</pre>\n";
+	my $content = join('', map {$month_page->{$i}{$_}} @cont);
+	$content = "\n$content\n";
 
 	### 月別一覧を作成
 	my $mpl = make_month_page_list($month_page); 
 
 	### 内部置き換え文字列
+	$template =~ s!CLLASTUPDATE!$what_time_is_it_now!g;
 	$template =~ s!YEARMONTH!$i!g;
 	$template =~ s!CLNAVI!$navi!g;
 	$template =~ s!DAYLIST!$daylist!g;
@@ -292,7 +415,7 @@ sub write_month_page {
 	$template =~ s!DAYSINTHEMONTH!$content!g;
 
         print $fh $template;
-        print $fh "$signature</body></html>\n";
+        print $fh "$signature</div></body></html>\n";
     }
 }
 
@@ -304,12 +427,12 @@ sub write_index_page {
     my $fname = "| $NKF -ed > $opt_odir/index.html";
     my $fh = new FileHandle;
     $fh->open($fname) || die "$fname: $!";
-    print $fh "<html><head><title>$changelog_name</title>\n";
-    print $fh "<meta http-equiv=\"Content-Type\" 
-               content=\"text/html;charset=EUC-JP\">\n";
+    print $fh qq(<html lang="ja"><head><title>$changelog_name</title>\n);
+    print $fh qq(<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">\n);
     print $fh qq(<link rel=stylesheet href="$css_file" media=all>\n)
 	if defined $css_file;
-    print $fh "</head><body>\n";
+    print $fh $index_page_head_plus;
+    print $fh "</head><body><div>\n";
 
     my $template = $index_page_template;
 
@@ -320,23 +443,23 @@ sub write_index_page {
     $template =~ s!CLLASTUPDATE!$what_time_is_it_now!g;
     $template =~ s!NDAYS!$opt_topn!g;
     $template =~ s!MONTHPAGELIST!$mpl!g;
-    $template =~ s!LATESTDAYS!<pre>$$top_n_str</pre>!g if ($opt_topn);
+    $template =~ s!LATESTDAYS!\n$$top_n_str!g if ($opt_topn);
     # ↑ 最近 N 日分
 
     print $fh $template;
-    print $fh "$signature</body></html>\n";
+    print $fh "$signature</div></body></html>\n";
 }
 
 
-my $month_page_list = "";
+### 月別一覧を作成
 sub make_month_page_list {
-    return $month_page_list if ($month_page_list ne ""); # cache
     my ($month_page) = @_;
-    my $month_page_list = "";
+    return $month_page_list if ($month_page_list ne ""); # cache
     my @month_list = sort keys %{$month_page};
     my ($start_year) = ($month_list[0] =~ /^(\d\d\d\d)/);
     my ($end_year) = ($month_list[$#month_list] =~ /^(\d\d\d\d)/);
 
+    $month_page_list = "";
     for (my $y = $end_year; $y >= $start_year; $y--) { # year loop
 	$month_page_list .= "$y : ";
 	for (my $m = 1; $m <= 12; $m++) { # month loop	
@@ -357,8 +480,7 @@ sub make_month_page_list {
 sub get_img_str {
     my ($fn) = @_;
     die "file not found: $opt_odir/$fn\n" unless (-e $opt_odir."/".$fn);
-    my $rv = qq(<img src="$fn" alt="画像");
-    return $rv.">";	
+    return qq(<img src="$fn" alt="画像">);
 }
 
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: clsearch.cgi,v 1.5 2003/06/12 11:58:20 yto Exp $
+# $Id: clsearch.cgi,v 1.8 2003/06/22 03:04:09 yto Exp $
 # clsearch.cgi - HTML 化された ChangeLog (by chalow) を検索するCGI
 use strict;
 
@@ -8,7 +8,7 @@ use strict;
 my $home_page_url = "http://nais.to/~yto/";
 my $home_page_name = "たつをのホームページ";
 my $numnum = 20; # 一度に表示できる数
-my $css_file;
+my $css_file = "diary.css";
 ### to here
 
 # nkf 自動設定 --- 日本語コードで悩まされないために...
@@ -41,48 +41,37 @@ if (defined $key) {
     my @fl = reverse sort <[0-9][0-9][0-9][0-9]-[0-9][0-9].html>;
     for my $fn (@fl) {
 	open(F, "$NKF -ed $fn |") or die "file open error: $fn\n";
+	my $all = join('', <F>);
+	close(F);
+
 	my $date = "";
-	$/ = "";
-	while (<F>) {
-	    chomp;
-	    s/^.+?<pre>\n//sm;	# for first day on the month
-	    next unless (/^<a\sname/ or /^[\s\t]+\*/);
-	    if (/^<.+?>(\d\d\d\d-\d\d-\d\d)</) {
-		$date = $_;
-		next;
-	    } elsif (! /^[\s\t]+\*/) {
+	while ($all =~ m!(<div\sclass=("day">.+?</h2>
+				       |"section">.+?</div>))!gsmx) {
+	    my $item = $1;
+	    if ($2 =~ /^"day"/) {
+		$date = $item;
 		next;
 	    }
 
-	    my $item = $_;
+	    my $tmpi = $item;
+	    $tmpi =~ s/[\n\t]+//g; # 改行消し
+	    $tmpi =~ s/<.+?>//g; # タグ抜き
 
-	    my $line = $date." ".$item;
-	    $line =~ s/[\n\t]+//g; # 改行消し
-	    $line =~ s/<.+?>//g; # タグ抜き
-	    
-	    # $line でパターンマッチし、マッチしたら $item を出力する。
-	    if ($line =~ m/$key/i) {
+	    if ($tmpi =~ m/$key/i) {
 		$cnt++;
-
-		my $ostr = "[$cnt] $date\n\n";
-
+		next if ($cnt < $from + 1 or $cnt >= $from + 1 + $numnum);
+		my $ostr = "[$cnt] $date\n";
 		# タグ中の文字列はハイライトしない
 		my @tmp = split(/(<.+?>)/, $item);
 		foreach my $ii (@tmp) {
-		    $ii =~ s|($key)|<font
-			style="background-color: pink">$1</font>|gix
+		    $ii =~ s|($key)|<strong 
+			style="background-color:yellow">$1</strong>|gix
 			    if ($ii !~ /^</);
 		    $ostr .= $ii;
 		}
-		$ostr .= "\n\n";
-		
-		if ($cnt >= $from + 1 and
-		    $cnt < $from + 1 + $numnum) {
-		    $outstr .= $ostr;
-		}
+		$outstr .= $ostr."</div>\n";
 	    }
 	}
-	close F;
     }
 }
 
@@ -92,31 +81,40 @@ my ($qkey) = ($q->query_string =~ /(key=[^&]+)/);
 
 # ■■■ 過去記事表示のための選択棒 ■■■
 my $bar = "";
+my ($navip, $navin);
 if ($page_max != 0) { # 1ページのみのときは選択棒なし
-    $bar = "<hr>\n";
     for (my $i = 0; $i <= $page_max; $i++) {
 	if ($from / $numnum == $i) {
-	    $bar .= $i + 1;
+	    $bar .= "<strong>".($i + 1).'</strong>';
 	} else {
 	    $bar .= $q->a({-href => "$myself?from=".($i * $numnum)."&".$qkey},
 			  $i + 1);
 	}
 	$bar .= " ";
+
+	if ($from / $numnum == $i - 1) {
+	    $navin = $q->a({-href => "$myself?from=".($i * $numnum).
+				"&".$qkey}, "[ 次へ ]");
+	} elsif ($from / $numnum == $i + 1) {
+	    $navip = $q->a({-href => "$myself?from=".($i * $numnum).
+				"&".$qkey}, "[ 前へ ]");
+	}
+
     }
-    $bar .= "(${numnum}件ずつ表示)";
+#    $bar .= "(${numnum}件ずつ表示)";
 }
 
 if ($cnt == 0) {
-    print "見つかりませんでした。\n";
+    print "<p>見つかりませんでした。</p>\n";
 } else {
-    print "$cnt 件 見つかりました。\n";
+    print "<p>$cnt 件 見つかりました。</p>\n";
 }
 
-print qq($bar<hr><pre>$outstr</pre>$bar<hr>
+print qq(<p>$navip $bar $navin</p><pre>$outstr</pre><p>$navip $bar $navin</p>
 <a href="index.html">ChangeLog INDEX</a>
  / <a href="$home_page_url">$home_page_name</a>
-<div align="right">Powered by 
-<a href="http://nais.to/~yto/tools/chalow/"><b>chalow</b></a></div>);
+<div style="text-align:right">Powered by 
+<a href="http://nais.to/~yto/tools/chalow/"><strong>chalow</strong></a></div>);
 
 print $q->end_html(), "\n";
 

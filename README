@@ -4,7 +4,7 @@ ChangeLog を HTML に変換するツール
 
 README
 
-$Id: README,v 1.14 2003/06/14 03:16:14 yto Exp $
+$Id: README,v 1.19 2003/06/22 03:21:34 yto Exp $
 
 ----------------------------------------------------------------------
 まずは、やってみよう!
@@ -12,19 +12,19 @@ $Id: README,v 1.14 2003/06/14 03:16:14 yto Exp $
 
 このファイルのあるディレクトリで、以下のコマンドを実行してみて下さい。
 
-| % ./chalow -o sample sample/ChangeLog
+| % ./chalow -o sample ChangeLog
 
-これにより、sample/ChangeLog という ChangeLog 形式の日記ファイルが、
+これにより、./ChangeLog という ChangeLog 形式の日記ファイルが、
 sample ディレクトリ以下の複数の HTML ファイルに変換されました。
 
 | % ls sample/*.html
-| sample/2001-11.html  sample/2001-12.html  sample/index.html
+| sample/2001-12.html  ...  sample/index.html
 
 sample/index.html を Web ブラウザで見てみましょう。
 
 また、以下のコマンドを実行すると、CSS を使った Web 日記になります。
 
-| ./chalow -o sample -c cl.conf sample/ChangeLog
+| ./chalow -o sample -c cl.conf ChangeLog
 
 
 ----------------------------------------------------------------------
@@ -53,6 +53,7 @@ usage: chalow [options] <file> [file]...
     -o, --output-dir=DIR        directory to output
     -c, --configure-file=FILE   configure file (default "cl.conf")
     -s, --stop-date             date to stop processing
+    -C, --css=FILE              css file
     -q, --quiet                 quiet mode
 
 -n で、「インデックスページ」に最近の何日分を載せるか指定できる。
@@ -61,6 +62,7 @@ usage: chalow [options] <file> [file]...
 -c で、「ユーザ設定ファイル」を指定する。指定しないとデフォルトの設定。
 -s で、処理停止日付 ($stop_date) を指定する。この日付まで処理する。
    未指定なら最後まで処理する。 (例: --stop-date "2002-01-01")
+-C で、chalow: CSS ファイルをコマンドラインから指定できる。
 -q を指定すると、変換作業進捗情報を標準出力に出力しなくなる。
 
 なお、chalow の実行には、nkf が必要。
@@ -94,6 +96,12 @@ usage: chalow [options] <file> [file]...
 - 自動文字列置換 (※6) 
 - CSS ファイル
 - 月ページに表示する日付の順番 (降順 or 昇順) の調整
+- タブによるインデントをなくすか
+- アイテムヘッダーのフォーマットをどうするか
+- 表示するとき引用記号 ('>' or '|') を消すか
+- item header に h3 タグを足すか (※7)
+- item header の先頭の "*" にアンカーをつけるか
+
 
 ※4 「項目」とは、'*' で始まる一塊のテキスト。「項目の見出し」とは '*' 
 の後から始まり ':' の前までのテキスト。
@@ -125,6 +133,11 @@ $index_page_template, $month_page_template
     s|\[\[(.+?)\]\]|<b>$1</b>|gms;
   ';
 
+※7 tDiary のテーマ (CSS ファイル) をそのまま使うために必要。
+tDiary のテーマを使うには以下のような設定を行うと良い。
+- $item_header_style = 1 or 2 (イメージアンカーを使うとき)
+- $use_h3_for_item_header = 1
+- $css_file = "tDiaryのテーマのCSSファイル.css"
 
 ----------------------------------------------------------------------
 ChangeLog の特殊な記法
@@ -176,7 +189,8 @@ ChangeLog の特殊な記法
 	&lt;u&gt;Hello&lt;/u&gt; <!-- こんにちは -->
 
 
-- 引用 (citation): タブの後に "|" か ">" が来る行は引用とみなし、CSS の clquote  クラスの span で囲まれる。
+- 引用 (citation): タブの後に "|" か ">" が来る行は引用とみなし、CSS
+  の clquote  クラスの span で囲まれる。
   <span class="clquote">| ...</span>
 
 	> 引用

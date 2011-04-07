@@ -1,3 +1,156 @@
+2003-06-22  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* p:TODO:
+	- 日本語コードの選択
+
+	* version 0.15:
+	公開
+
+	* README: 
+	mod
+
+	* sample/ChangeLog: 
+	remove
+
+	* chalow:
+	tDiary テーマ適用の調整。各 item を p で囲むようにした。
+
+	* ChangeLog の各部の名称:
+	chalow では各部を以下のように呼ぶことにします。
+	設定ファイル、CSS、プログラムソースを見るときにご参照下さい。
+	[IMG:image/chalow-cl-name-s.gif]
+
+	* 半角スペース連続が消えてしまう問題: 
+	pre の代わりに p とか div とかで "white-space: pre; font-family:
+	monospace;" と指定する方法は、以下のような「半角スペース連続」表記
+	で崩れるという問題がある。item を pre で囲むのはいまいちな感じでは
+	あるが、今しばらくはやむを得ない。
+
+	これが...
+	> 4       5       6       7       8       9       10
+	> ┴───┴───┴───┴───┴───┴───┴
+	> - 階層１
+	>   - 階層２
+	>     - 階層３
+
+	こうなる
+	> 4 5 6 7 8 9 10
+	> ┴───┴───┴───┴───┴───┴───┴
+	> - 階層１
+	> - 階層２
+	> - 階層３
+
+2003-06-21  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* README:
+	tDiary のテーマを使うための設定について。
+
+	* {chalow,cl.conf}: 
+	tDiary のセクションアンカーみたいなのを実装。使うには、新設定項目 
+	$use_item_anchor を 1 にする。
+
+	> # item header の先頭の "*" にアンカーをつけるか (1:YES, 0:NO)
+	> $use_item_anchor = 1;
+
+	$item_header_style の設定で、"* HOGE:" か "* HOGE" にしておく必要
+	あり。
+
+	これにともない、okikae() 中の「日付で参照リンク」を修正。
+	- item anchor への参照リンクの記述方法の例: [2003-06-21-1]。
+	- もちろん今までの [2003-06-21] というのも使える。
+	- テスト: [2001-12-13-3] [2001-12-02] [2001-12-08-2](ない)
+
+	* {chalow,cl.conf,sample/diary.css}: 
+	- デフォルトの設定として、月ページリスト、日付リストを calendar ク
+	  ラスの p で囲む。
+	- 一番下に出る chalwo ロゴを p.footer にした。p.footer a で bold 
+	  がデフォルト。
+	- <p class="adminmenu">: ページトップなどにある自分のホームページ
+	  へのリンクなど。
+	- デフォルトで、各 item header の先頭の "*" を panchor クラスで囲
+	  む → "div.day span.panchor"。 "*" をイメージにもできる。
+	  $item_header_style の設定で、"* HOGE:" か "* HOGE" にしておく必
+	  要あり。
+	
+2003-06-20 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* README:
+	mod
+
+	* chalow (parse_entry):
+	New. ChangeLog 処理のロジックを変更した。
+	main -> okikae() という呼び出し関係が、
+	main -> parse_entry() -> okikae() に。
+
+	* chalow:
+	CSS ファイルをコマンドラインから指定できるようにした。
+	いろいろなテーマが簡単に試せる。Ex: --css=hoge.css
+
+	* {sample/diary.css,cl.cong,chalow}: 
+	- tDiary の CSS と共通にする作戦: h1 はページタイトルっていうのは
+	  決め打ちでも良いと思うが、h2 を日記の各日付のタイトルと決め打ち
+	  されていたのでちょっと困った。で、従うことにする。修正。
+	- その他いろいろ
+	
+	* {chalow,cl.conf}:
+	新たな設定項目を追加
+	> # 表示するとき引用記号 ('>' or '|') を消すか (1:YES, 0:NO)
+	> my $remove_quote_mark = 0;
+	> # item header に h3 タグを足すか (1:YES, 0:NO) - tDiary との互換性のため
+	> my $use_h3_for_item_header = 0;
+
+	change var name: $old_style_item_header --> $item_header_style
+
+	* chalow (okikae): 
+	- 引用を blockquote にするようにした。 "div.body blockquote" で指
+	  定。
+
+2003-06-19 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow:
+	ユーザ設定ファイルの読み込み時のエラーを出力するようにした。(use $@)
+
+	* clsearch.cgi:
+	- div 囲み entry に対応。
+	- clsearch.cgi の検索結果に "前へ" と "次へ" も表示するようにした。
+
+	* chalow: 
+	佐藤さんからのフィードバック (030218) を参考に、正しいHTML を出力
+	するようにしよう! ... と思ったが途中で挫折。
+	- <div align="right"> → <div style="text-align:right">
+	- <b> -> <strong>
+	- 全体を div で囲む
+
+	* chalow: 
+	- tDiary の CSS と共通にする作戦
+	  - 各 entry を <div class="day"></div> で囲むようにした。
+	  - 各 item を <div class="sectoin"></div> で囲むようにした。
+	  - 1 entry 内の複数の item を <div class="body"></div> で囲むよう
+	    にした。
+	- 全体を pre で囲むのをやめる
+	
+	* sample/diary.css:
+	add new classes
+
+	* {chalow,cl.conf}: 
+	新たな設定項目を追加
+	> # タブによるインデントをなくすか (1:なくす or 0:そのまま)
+	> my $no_indent = 0;
+	> # アイテムヘッダーのフォーマットをどうするか (0:"* HOGE:", 1:"HOGE:",2:"HOGE")
+	> my $old_style_item_header = 1;
+	> # インデックスページの HTML ヘッダに追加したいもの (favicon.ico など)
+	> my $index_page_head_plus = "";
+	> # 月ページの HTML ヘッダに追加したいもの
+	> my $month_page_head_plus = "";
+
+	* chalow (okikae):
+	- 日付を h3 タグと date クラスの span で囲むようにした。CSS でいじ
+	  りやすくするため。
+	- アイテムヘッダーを <span class="clitemheader"></span> で囲むよう
+	  にした。
+	- URL 変換で、ftp:// も変換するようにした。(ishii-k さんからのフィー
+	  ドバック (030616))
+
 2003-06-14  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.14: 公開
@@ -29,12 +182,6 @@
 	クリプト。これにより、同じことを行う秘密の expert-mode が不要になっ
 	た。
 
-2003-06-02  YAMASHITA Tatsuo  <yto@nais.to>
-
-	* TODO:
-	- stop-date 時の "<<<", ">>>"
-	- clsearch.cgi の検索結果に "<<<", ">>>"
-
 2003-05-31  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* chalow: "nkf -e" --> "nkf -ed" (念のため)
@@ -62,7 +209,7 @@
 	(write_month_page): テンプレート方式にする。
 	(write_index_page): テンプレート方式にする。
 
-	* 内部置き換え文字列:
+	* 内部置き換え文字列: update 030619. 最新情報は cl.conf を見て!
 	- 月ページ用
 	  CLNAVI: 先月来月ページへのリンク
 	  YEARMONTH: YYYY-MM
@@ -90,6 +237,8 @@
 	| 引用
 	| 引用
 	 | これは引用ではない
+
+	(→[2003-06-20]) <blockquote> に変更 "div.body blockquote" で指定
 
 2003-03-31  YAMASHITA Tatsuo  <yto@nais.to>
 
