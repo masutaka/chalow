@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: clsearch.cgi,v 1.16 2003/09/17 12:43:15 yto Exp $
+# $Id: clsearch.cgi,v 1.17 2003/10/30 13:13:38 yto Exp $
 # clsearch.cgi - chalow ¤Ë¤è¤ê HTML ²½¤µ¤ì¤¿ ChangeLog ¤ò¸¡º÷¤¹¤ë CGI
 use strict;
 
@@ -27,7 +27,8 @@ print qq(<link rel=stylesheet href="$css_file" media=all>\n)
     if defined $css_file;
 print qq(</head><body><a href="index.html">ChangeLog INDEX</a>
  / <a href="$home_page_url">$home_page_name</a>\n);
-print $q->startform, $q->textfield('key'), $q->submit, $q->endform, "\n";
+print $q->startform(-method=>'GET'), $q->textfield('key'),
+    $q->submit, $q->endform, "\n";
 
 # ¢£¢£¢£ ¸¡º÷ ¢£¢£¢£
 my $outstr = "";

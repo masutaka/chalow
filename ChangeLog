@@ -1,3 +1,87 @@
+2003-11-02  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.21: 
+	公開。
+	バグ修正や小さな変更のみ。機能の追加などはなし。
+
+        * p:TODO:
+        - 日本語コードの選択
+        - # ではじまる行は消す
+        - 日付ごとだけでなく、アイテムごとに「くっつき BBS」
+        - chalowlib?
+        - くっつき BBS との連携まわりをすっきりさせる
+        - ページ単位だけど、リンク元表示
+          参考: <http://www.ijn-jp.net/user8/report/svchat13.html>
+          要調査: JavaScript で #2003... も取れるか?
+
+	* chalow: 
+	- h4rss をなくす (all_entries のキー)。
+
+2003-11-01  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (write_rss_file): 
+	全体の dc:time に日付だけじゃなく時間も入れるようにした。
+
+2003-10-30  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* cl.conf: 
+	clsearch プラグインを追加。
+
+	* chalow (write_index_page): 
+	インデックスページのテンプレートで YEARMONTH が使えるようになりま
+	した！
+
+	* chalow: 
+	- $all_month を廃止。
+	- make_month_page_list は一回だけ呼ぶことにした。
+	- write_index_page と write_month_page の引数の数へらす。
+	- 最近の何日かだけインデックスページに載せるための処理を
+	  write_index_page へ。
+
+	* chalow (clean_changelog): 
+	項目内での段落区切り表す空行をタブ行にするとこの正規表現を変更。
+	ついでに連続空行を詰める。
+	OLD  $$strp =~ s/\n(\n\t[^\*])/\n\t$1/gm;
+	NEW  $$strp =~ s/\n+(\n\t[^\*])/\n\t$1/gm;
+
+2003-10-28  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* clsearch.cgi: 
+	検索結果にリンク出来るようにデフォルトとして GET を指定。
+
+2003-10-27  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (write_rss_file): 
+	> <dc:data>$today</dc:data>　→　<dc:date>$today</dc:date>
+	http://mailarc.namazu.org/htmlmail/chalow/62
+
+	(parse_entry): 
+	> push @{$same_date{"$m-$d"}}, $y; # 同じ日付 (月日) を持つ年のリスト
+	→
+	> push @{$same_date{"$m-$d"}}, $y  # 同じ日付 (月日) を持つ年のリスト
+	>     if (!grep(/$y/, @{$same_date{"$m-$d"}}));
+	http://mailarc.namazu.org/htmlmail/chalow/63
+
+	バグフィックス２つ。
+
+2003-10-23  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (okikae): 
+	コメントを残す、というデフォルト設定をやめた。
+
+	* chalow (clean_changelog): 
+	Saito HiroAki 氏のパッチを適用したのち、若干手直し。
+
+	[chalow:60] プライベートアイテムだけのエントリでparse error 
+	http://mailarc.namazu.org/htmlmail/chalow/60
+
+2003-10-22 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* p:秘密です: [2003-10-23-1]のテスト。
+	ほほう。
+
+	へへへ
+
 2003-10-21 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.20: 
@@ -39,16 +123,6 @@
 	引用です。
 	<<
 	となります。
-
-        * p:TODO:
-        - 日本語コードの選択
-        - # ではじまる行は消す
-        - 日付ごとだけでなく、アイテムごとに「くっつき BBS」
-        - chalowlib?
-        - くっつき BBS との連携まわりをすっきりさせる
-        - ページ単位だけど、リンク元表示
-          参考: <http://www.ijn-jp.net/user8/report/svchat13.html>
-          要調査: JavaScript で #2003... も取れるか?
 
 2003-09-29 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
 
@@ -186,7 +260,7 @@
 
 	* {clsearch.cgi,chalow}: 
 	検索がしやすいように、各 item (section) の終わりをあらわすマーク 
-	＜!--eos--> を入れる方針にした。最初からこうすれば良かった...。
+	<!--eos--> を入れる方針にした。最初からこうすれば良かった...。
 
 2003-08-29 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
 

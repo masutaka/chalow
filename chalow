@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.59 2003/10/21 11:10:23 yto Exp $
+# $Id: chalow,v 1.63 2003/11/02 13:26:49 yto Exp $
 #
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
@@ -15,6 +15,7 @@ use Jcode;
 
 # 現在時刻の獲得
 my $what_time_is_it_now = strftime "%Y-%m-%d %H:%M", localtime;
+my $dcdate = strftime "%Y-%m-%dT%H:%M:%S+09:00", localtime;
 
 ### ユーザ設定項目
 
@@ -126,7 +127,7 @@ my $show_author_name = 0;
 my $output_itemlist = 1;
 # 日ごとにページを作るか (0:NO, 1:YES, 2:YES&月ページはヘッダのみ)
 my $day_page_mode = 0;
-# 出力先ファイルとサイズが異なる場合のみ出力する (0:NO, 1:YES)
+# 出力先ファイルとサイズが異なる場合のみ出力する (0:NO, 1:YES) : "-u" で指定
 my $update_by_size = 0;
 
 ### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
@@ -191,10 +192,7 @@ USAGE
 }
 
 my $top_n_ctr = $opt_topn;
-my $top_n_str = "";
 my %month_page;
-my %all_month;
-my $month_page_list = "";
 
 my %all_items;			# for RSS
 my %same_date;			# for same date jump
@@ -237,7 +235,6 @@ for my $fname (@ARGV) {
     foreach (@lines) {
 	my $user;		# このエントリを書いた人
 	($day, $month, $user) = (/^((\d+-\d+)-\d+).*?\s\s(.+)\n/);
-	$all_month{$month} = 1;
 
 	### stop date
 	# 月別一覧などに影響がでる。DEBUG 用ですな。
@@ -259,10 +256,6 @@ for my $fname (@ARGV) {
 	    s/^($day)\s.+/$1  $user/;
 	}
 
-	# 秘密の項目を外に出さないように削除
-	# 例: * p:秘密メモ: YTがまたやらかした。しょうもないやつだ。
-        s/\n\t+\* p:.+?^(\t+\*|$)/$1/gms;
-			 
 	# エントリをパーズして、文字列置き換え
 	parse_entry($_, \%{$all_entries{$day}});
     }
@@ -345,21 +338,14 @@ font-size:100%;margin:0;padding:0;">$item</pre>
 }
 
 
-### 最近の何日かだけインデックスページに載せるための処理
-my $ctr = $top_n_ctr;
-foreach my $ym (sort {$b cmp $a} keys %month_page) {
-    last if ($ctr < 0);
-    foreach my $ymd (sort  {$b cmp $a} keys %{$month_page{$ym}}) {
-	$ctr--;
-	last if ($ctr < 0);
-	$top_n_str .= $month_page{$ym}{$ymd};
-    }
-}
 
+
+### 月別一覧を作成
+my $month_page_list = make_month_page_list(\%month_page); 
 
 ### HTML ファイルの出力
-write_index_page(\%all_month, \$top_n_str);
-write_month_page(\%month_page);
+write_index_page();
+write_month_page();
 write_day_page() if ($day_page_mode);
 
 print "done.\n" if (!defined $quiet_mode);
@@ -393,7 +379,8 @@ sub parse_entry {
 	# ↑なぜ href="#$ymd" ではないのか? -> index.html#$ymd になると困るから
     }
 
-    push @{$same_date{"$m-$d"}}, $y; # 同じ日付 (月日) を持つ年のリスト
+    push @{$same_date{"$m-$d"}}, $y  # 同じ日付 (月日) を持つ年のリスト
+	if (!grep(/$y/, @{$same_date{"$m-$d"}}));
 
     # ハッシュに格納
     $enthashp->{eh} = $eh;
@@ -415,12 +402,8 @@ sub parse_entry {
 	# (\s) には、スペース、タブ、改行がマッチ　↑
 	#print "ih[$ih] c[$c]\n";
 
+	# (5) item header の処理
 	if (defined $ih) {
-
-	    # ハッシュに格納
-	    $enthashp->{$num}{h4rss} = $ih; # for RSS
-
-	    # (5) item header の処理
 	    $ih = okikae($ih);
 
 	    # 前に足すもの
@@ -489,9 +472,9 @@ sub okikae {
     s/&/&amp;/go;
 #    s/>/&gt;/go;		# > が &.. になると、URL とか引用のマッチ狂う
 #    s/"/&quot;/go;		# ";
-    ### "<" は置き換える。ただし、コメント (<!-- -->) に関わる場合は無視
-    #    s/<([^!])/&lt;$1/gi;
-    s|<(/?[a-z]+)|&lt;$1|gio;
+    ### "<" は置き換える。
+    s|<(/?[a-z!]+)|&lt;$1|gio;
+#    s|<(/?[a-z]+)|&lt;$1|gio;	# コメント (<!-- -->) をのこしたい場合はこれ
     # カスタマイズのヒント: <s></s> を残す→ 
     # s|<(/?[a-rt-z]+)|&lt;$1|gi; <b> を残す→ 
     # s|<(/?[ac-z]+)|&lt;$1|gi; (副作用 = <br> なども残る)
@@ -591,16 +574,13 @@ sub write_day_page {
 	my $content = $month_page{$ym}{$ymd};
 	$content =~ s|<h2>.+?</h2>||sm;
 
-	### 月別一覧を作成
-	my $mpl = make_month_page_list(\%month_page); 
-
 	### 内部置き換え文字列
 	$template =~ s!CLLASTUPDATE!$what_time_is_it_now!g;
 	$template =~ s!YEARMONTHDAY!$ymd!g;
 	$template =~ s!YEARMONTH!$ym!g;
 	$template =~ s!CLNAVI!$navi!g;
 	$template =~ s!DAYLIST!$day_list!g;
-	$template =~ s!MONTHPAGELIST!$mpl!g;
+	$template =~ s!MONTHPAGELIST!$month_page_list!g;
 	$template =~ s!DAYSINTHEMONTH!$content!g;
 
 	my $ostr = "$hd$template$signature</div></body></html>\n";
@@ -619,10 +599,8 @@ sub write_day_page {
 
 ### 月ページ(ex: 2001-01.html)を作る。
 sub write_month_page {
-    my ($month_page) = @_;
-    my @month_list = reverse sort keys %$month_page;
+    my @month_list = reverse sort keys %month_page;
     for (my $idx = 0; $idx < @month_list; $idx++) {
-
 	my $ym = $month_list[$idx];
 
 	# 月ページ移動ナビ (前後の月ページへのリンク)
@@ -631,7 +609,6 @@ sub write_month_page {
 	    if ($idx < @month_list - 1);
 	$navi .= qq(<a href="$month_list[$idx - 1].html">&gt;&gt;&gt;</a> )
 	    if ($idx > 0);
-
 
 	# 日へのリンク (日付一覧)
 	my $day_list = make_day_list($ym);
@@ -649,26 +626,23 @@ sub write_month_page {
 	### 日々のエントリ作成
 	my @cont;
 	if ($reverse_order_days) { # 降順: 日付の新しいのが上 (〜v0.11 と同じ)
-	    @cont = reverse sort keys %{$month_page->{$ym}};
+	    @cont = reverse sort keys %{$month_page{$ym}};
 	} else {		# 昇順: 日付の古いのが上
-	    @cont = sort keys %{$month_page->{$ym}};
+	    @cont = sort keys %{$month_page{$ym}};
 	}
-	my $content = join('', map {$month_page->{$ym}{$_}} @cont);
+	my $content = join('', map {$month_page{$ym}{$_}} @cont);
 	if ($day_page_mode == 2) { # 日モード (月ページヘッダのみモード)
 	    $content =~ s!(<pre.*?>|</pre>)!!gsm;
 	    $content =~ s|(<div\sclass="section">.*?<span\sclass="clitemheader">.*?</span>(</h3>)?).*?<!--eos-->|$1</p></div>|gsm;
 	}
 	$content = "\n$content\n";
 
-	### 月別一覧を作成
-	my $mpl = make_month_page_list($month_page); 
-
 	### 内部置き換え文字列
 	$template =~ s!CLLASTUPDATE!$what_time_is_it_now!g;
 	$template =~ s!YEARMONTH!$ym!g;
 	$template =~ s!CLNAVI!$navi!g;
 	$template =~ s!DAYLIST!$day_list!g;
-	$template =~ s!MONTHPAGELIST!$mpl!g;
+	$template =~ s!MONTHPAGELIST!$month_page_list!g;
 	$template =~ s!DAYSINTHEMONTH!$content!g;
 
 	my $ostr = "$hd$template$signature</div></body></html>\n";
@@ -687,7 +661,16 @@ sub write_month_page {
 
 ### インデックスページ(index.html)を作る
 sub write_index_page {
-    my ($month_page, $top_n_str) = @_;
+    ### 最近の何日かだけインデックスページに載せるための処理
+    my $top_n_str = "";
+    my @recent = (reverse sort keys %all_entries)[0..$top_n_ctr];
+    for (my $i = 0; $i < $top_n_ctr and $recent[$i]; $i++) {
+	my $ymd = $recent[$i];
+	my ($ym, $d) = ($ymd =~ /^(\d{4}-\d\d)-(\d\d)$/);
+	$top_n_str .= $month_page{$ym}{$ymd};
+    }
+    my ($ym, $d) = ($recent[0] =~ /^(\d{4}-\d\d)-(\d\d)$/);
+
     my $hd;
     $hd .= qq(<html lang="ja"><head><title>$changelog_name</title>\n);
     $hd .= qq(<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">\n);
@@ -698,14 +681,12 @@ sub write_index_page {
 
     my $template = $index_page_template;
 
-    ### 月別一覧を作成
-    my $mpl = make_month_page_list($month_page); 
-
     ### 内部置き換え文字列
     $template =~ s!CLLASTUPDATE!$what_time_is_it_now!g;
+    $template =~ s!YEARMONTH!$ym!g;
     $template =~ s!NDAYS!$opt_topn!g;
-    $template =~ s!MONTHPAGELIST!$mpl!g;
-    $template =~ s!LATESTDAYS!\n$$top_n_str!g if ($opt_topn);
+    $template =~ s!MONTHPAGELIST!$month_page_list!g;
+    $template =~ s!LATESTDAYS!\n$top_n_str!g if ($opt_topn);
     # ↑ 最近 N 日分
 
     my $ostr = "$hd$template$signature</div></body></html>\n";
@@ -724,12 +705,10 @@ sub write_index_page {
 ### 月別一覧を作成
 sub make_month_page_list {
     my ($month_page) = @_;
-    return $month_page_list if ($month_page_list ne ""); # cache
     my @month_list = sort keys %{$month_page};
     my ($start_year) = ($month_list[0] =~ /^(\d\d\d\d)/);
     my ($end_year) = ($month_list[$#month_list] =~ /^(\d\d\d\d)/);
-
-    $month_page_list = "";
+    my $month_page_list = "";
     for (my $y = $end_year; $y >= $start_year; $y--) { # year loop
 	$month_page_list .= "$y : ";
 	for (my $m = 1; $m <= 12; $m++) { # month loop	
@@ -843,7 +822,8 @@ sub write_rss_file {
 
 	    my ($ym) = ($ymd =~ /^(\d{4}-\d\d)-\d\d/);
 
-	    my $ih = $all_entries{$ymd}{$i}{h4rss};
+	    my $ih = $all_entries{$ymd}{$i}{ih};
+	    $ih =~ s|<[^<>]+?>||gosm;
 	    $ih =~ s/&/&amp;/go;
 	    $ih =~ s/>/&gt;/go;
 	    $ih =~ s/</&lt;/go;
@@ -887,7 +867,6 @@ sub write_rss_file {
 	}
     }
 
-    my ($today) = ($what_time_is_it_now =~ /^(\d+-\d\d-\d\d)/);
     my $rdfstr = << "RDFSTR"
 <?xml version="1.0" encoding="utf-8"?>
 
@@ -900,7 +879,7 @@ sub write_rss_file {
 <title>$changelog_name</title>
 <link>$clog_url</link>
 <description></description>
-<dc:data>$today</dc:data>
+<dc:date>$dcdate</dc:date>
 <items>
 <rdf:Seq>\n$rdfseq</rdf:Seq>
 </items>
@@ -977,12 +956,16 @@ sub clean_changelog {
     my ($strp) = @_;
     # 行頭がタブではなくスペースになっているたら置き換える
     $$strp =~ s/^( {8}| {1,7}\t)/\t/gsm;
-    #$$strp =~ s/^ {8}/\t/gsm;
-    #$$strp =~ s/^ {1,7}\t/\t/gsm;
     # \n(\s+)\n2001-09... の $1 を消す
     $$strp =~ s/\n[\s\t]+(\n\S)/\n$1/gm;
     # \n(\s+)\n\t* ほげ: ... の $1 を消す
     $$strp =~ s/\n[\s\t]+(\n[\s\t]+\*\s+)/\n$1/gm;
-    # 項目内での段落区切り表す空行をタブ行にする
-    $$strp =~ s/\n(\n\t[^\*])/\n\t$1/gm;
+    # 項目内での段落区切り表す空行をタブ行にする。ついでに連続空行を詰める。
+#    $$strp =~ s/\n(\n\t[^\*])/\n\t$1/gm;
+    $$strp =~ s/\n+(\n\t[^\*])/\n\t$1/gm;
+    # 秘密の項目を外に出さないように削除
+    # 例: * p:秘密メモ: YTがまたやらかした。しょうもないやつだ。
+    $$strp =~ s/\n\t+\* p:.+?^(\t+\*|$)/$1/gms;
+    # 秘密の項目を削除した結果、空になったエントリを削除
+    $$strp =~ s/^\d{4}-\d{2}-\d{2}.*?\n+(?=(\d{4}-\d{2}-\d{2}.*?\n)|\Z)//gm;
 }
