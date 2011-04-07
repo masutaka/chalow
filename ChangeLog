@@ -1,3 +1,155 @@
+2003-10-21 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.20: 
+	公開
+
+	* 今回の変更点: 
+	- 日ページ作成機能
+	- 変更のあったファイルだけ出力するモード
+	- 複数ファイルのマージ
+	- HTML タグをそのまま書く記法
+	- 検索 CGI まわりの変更
+	- 携帯電話用 CGI
+	- TrackBack を使うための改造
+
+	* clkeitai.cgi (output_simple_list): 
+	アイテムのサイズが大きすぎるとバグるので修正。
+
+	* chalow (write_day_page,write_month_page,write_index_page): 
+	出力先ファイルとサイズが異なる場合のみ出力するモードを設けた。
+	> # 出力先ファイルとサイズが異なる場合のみ出力する (0:NO, 1:YES)
+	> $update_by_size = 1;
+	
+	さらに、新コマンドラインオプション
+	> -u  出力先ファイルとサイズが異なる場合のみ出力する
+
+	* chalow (write_rss_file): 
+	rss の description の中味の文字列長の上限を決めて、切るようにした。
+
+	* README: 
+	mod.
+
+	* chalow (okikae): 
+	引用の新記法：">>" と "<<" で囲む。ref はてなダイアリー。
+	> >>
+	> 引用です。
+	> <<
+	とすると、
+	>>
+	引用です。
+	<<
+	となります。
+
+        * p:TODO:
+        - 日本語コードの選択
+        - # ではじまる行は消す
+        - 日付ごとだけでなく、アイテムごとに「くっつき BBS」
+        - chalowlib?
+        - くっつき BBS との連携まわりをすっきりさせる
+        - ページ単位だけど、リンク元表示
+          参考: <http://www.ijn-jp.net/user8/report/svchat13.html>
+          要調査: JavaScript で #2003... も取れるか?
+
+2003-09-29 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (write_rss_file): 
+	RSS の description で改行がスペースになってしまっていたのを修正。
+
+2003-09-25 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow: 
+	TrackBack を使うための改造。
+
+	$tukkomi_template の New 置き換え項目 DATE_ID = "20030924"
+
+	<div class="comment">$template</div> の div は cl.conf で設定書い
+	てもら方針に変更。
+	> $items_new .= qq(<div class="comment">$template</div>);
+	↓
+	> $items_new .= $template;
+
+2003-09-17 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* clkeitai.cgi: 
+	New!!!
+	chalow により HTML 化されたページをケータイで見るための CGI。
+
+	検索用ファイル cl.itemlist が必要です。cl.conf の $output_itemlist
+	(検索用ファイルを作るか否か) を 1 にするが必要あります。
+
+	アイテム一覧表示。デフォルトです。HTML タグはほとんどなく、プレイ
+	ンテキストに近い表示です。アイテム別表示へのリンクがあります。
+
+	アイテム別表示。アンカーあり。改行あり。アイテム一覧から選んでジャ
+	ンプして来ます。
+
+	* clsearch.cgi: 
+	use binmode().
+
+	* chalow (write_rss_file): 
+	<description></description> にアイテムの中味を入れた。
+
+	* cl.conf:
+	ちょい修正。
+
+	* chalow: 
+	use binmode(). 全てのファイル IO に。
+
+2003-09-10  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* {dot-pink.png,dot-gray.png}:
+	New for item header
+
+2003-09-05 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* clsearch.cgi: 
+	複数キーでも検索できるようにした。
+	スペースで区切る。スペース入りのキーは "" で囲む。
+
+	* chalow: 
+	複数のファイルをマージできるようにした。今までもそうできるはずだっ
+	たのだが、できてなかった (同じ日付を上書きしてしまう)。
+	
+	* chalow (clean_changelog): 
+	New. ChangeLog のクリーニング、を独立関数化。
+
+	* chalow (escape_string,unescape_string): 
+	New.  文字列置き換えから一時的に退避し、後に復帰するための関数たち。
+	開始マーク '\t_HTML_START_\n' と終了マーク '\t_HTML_END_\n' に囲ま
+	れた領域はそのまま HTML ファイルへ出力する。
+	(設定により、行頭のタブは削られることもある)
+
+	_HTML_START_
+	例: <a href="javascript:(function(){for(i=0;i<document.all.length;i++)
+	{e=document.all(i);if(e.style){e.style.fontSize=&quot;medium&quot;
+	}}})();">フォントサイズ指定の解除</a>
+	_HTML_END_
+
+2003-09-04 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (write_day_page):
+	New. 日ページ作成。
+
+	> # 日ごとにページを作るか (1:YES, 0:NO)
+	> my $day_page_mode = 1;
+	
+	* chalow (make_day_list):
+	New. 日付一覧を作成、を独立関数にした。
+
+	* chalow (datestr2anchor):
+	New. 日付で参照リンク作成、を独立関数にした。
+
+	* clsearch.cgi: 
+	検索用ファイルを使用するように大幅に書き換え。
+	Jcode.pm は不要に (もともといらなかった疑惑...)。
+
+	* chalow (write_itemlist_file): 
+	New. 検索用ファイルを出力する。検索用に itemlist を 1 ファイルにま
+	とめたファイルを作ることにした。
+
+	> # 検索用ファイル (itemlist) を作るか (1:YES, 0:NO)
+	> my $output_itemlist = 1;
+
 2003-08-30 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.19: 
@@ -7,7 +159,7 @@
 
 	- プラグイン機能
 	  例：(記号は全角で表記していますが、実際は半角)
-	  ｛｛google_seach('海老名 映画館')｝｝ → {{google_seach('海老名 映画館')}}
+	  ｛｛google_search('海老名 映画館')｝｝ → {{google_search('海老名 映画館')}}
 
 	- 自分の日記内だけでのリファラー機能
 	  ref. <http://nais.to/~yto/clog/2002-06.html#2002-06-28-2>
@@ -26,24 +178,13 @@
 
 	- RSS に <dc:date> も足すようにした
 
-        * p:TODO:
-        - 日本語コードの選択
-        - # ではじまる行は消す
-        - 日付ごとだけでなく、アイテムごとに「くっつき BBS」
-        - chalowlib?
-        - くっつき BBS との連携まわりをすっきりさせる
-        - ページ単位だけど、リンク元表示
-          参考: <http://www.ijn-jp.net/user8/report/svchat13.html>
-          要調査: JavaScript で #2003... も取れるか?
-        - トラックバック
-
 	* README:
 	mod.
 
 	* chalow (parse_entry): 
 	$descending_order_item_num 廃止。アイテムの ID は降順で固定。
 
-	* {clseach.cgi,chalow}: 
+	* {clsearch.cgi,chalow}: 
 	検索がしやすいように、各 item (section) の終わりをあらわすマーク 
 	＜!--eos--> を入れる方針にした。最初からこうすれば良かった...。
 
@@ -55,14 +196,14 @@
 	ます。あんまり多くのことはできませんが...。
 
 	例：(記号は全角で表記していますが、実際は半角)
-	> ｛｛google_seach('海老名 映画館')｝｝ → {{google_seach('海老名 映画館')}}
+	> ｛｛google_search('海老名 映画館')｝｝ → {{google_search('海老名 映画館')}}
 
 	プラグインは cl.conf に足して置けば使えます。
 
 	in cl.conf
 	> # -------------------------------------------------------------
 	> # 以下、プラグイン
-	> sub google_seach {
+	> sub google_search {
 	>     my ($k) = @_;
 	>     my $o = $k;
 	>     $k =~ s/([^0-9a-z_ ])/'%'.unpack('H2', $1)/gei;
@@ -906,3 +1047,6 @@
 
 	* README: 公開にそなえて README を書き始める。
 
+__DATA__
+あああ
+いいい

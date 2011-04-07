@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: clsearch.cgi,v 1.12 2003/08/29 15:22:44 yto Exp $
+# $Id: clsearch.cgi,v 1.16 2003/09/17 12:43:15 yto Exp $
 # clsearch.cgi - chalow により HTML 化された ChangeLog を検索する CGI
 use strict;
 
@@ -7,17 +7,17 @@ use strict;
 # お好みにあわせて変えて下さい
 my $home_page_url = "http://nais.to/~yto/";
 my $home_page_name = "たつをのホームページ";
-my $numnum = 20; # 一度に表示できる数
+my $numnum = 20;		# 一度に表示できる数
 my $css_file = "diary.css";
 ### to here
 
-use Jcode;
 use CGI;
 my $q = new CGI;
 
 my $myself = $q->url();		# このCGIのURL
 my $key = $q->param('key');
 my $from = $q->param('from') || 0;
+my $clen = $q->param('context_length') || 200;
 
 # ■■■ HTML head 出力 ■■■
 print "Content-type: text/html; charset=euc-jp\n\n";
@@ -33,40 +33,52 @@ print $q->startform, $q->textfield('key'), $q->submit, $q->endform, "\n";
 my $outstr = "";
 my $cnt = 0;
 
-if (defined $key) {
-    my @fl = reverse sort <[0-9][0-9][0-9][0-9]-[0-9][0-9].html>;
-    for my $fn (@fl) {
-	open(F, "< $fn") or die "Can't open $fn : $!\n";
-	my $all = join('', <F>);
-	$all = Jcode->new($all)->euc;
-	close(F);
+if (defined $key and $key !~ /^\s*$/) {
+    $key =~ s/\xa1\xa1/ /g;	# ad hoc
+    $key =~ s/\s+$//;
+    $key =~ s/^\s+//;
 
-	my $date = "";
-	while ($all =~ m%(<div\sclass=("day">.+?</h2>|"section">.+?<!--eos-->))%gsmx) {
-	    my $item = $1;
-	    if ($2 =~ /^"day"/) {
-		$date = $item;
-		next;
+    my @keys = ($key =~ /(".+?"|\S+)/g);
+    @keys = map {s/^"(.+)"$/$1/; s/(.)/'\x'.unpack("H2", $1)/gie; $_;} @keys;
+
+    my $fn = "cl.itemlist";
+    open(F, "< $fn") or die "Can't open $fn : $!\n";
+    binmode(F);
+    while (<F>) {
+	my ($date, $c) = (/^(.+?)\t(.+)$/);
+
+	if ($c =~ m|$keys[0]|i) {
+
+	    next if (@keys != grep {$c =~ m|$_|i} @keys);
+	    # ↑高速化の余地
+	    
+	    $cnt++;
+
+	    #next if ($cnt < $from + 1);last if ($cnt >= $from + 1 + $numnum);
+	    next if ($cnt < $from + 1 or $cnt >= $from + 1 + $numnum);
+	    # ↑高速化の余地
+
+	    if ($c =~ m|^.*?(.{0,$clen})($keys[0])(.{0,$clen}).*?$|i) {
+		my ($pre, $k, $pos) = ($1, $2, $3);
+		#print join(",",map {unpack("H*",$_)} split("",$post))"<br>\n";
+		# 80-ff が奇数だったら 1 バイト削除 (要ブラッシュ up)
+		$pre =~ s!^[\x80-\xff](([\x80-\xff]{2})*[\x00-\x7f])!$1!;
+		$pre =~ s!^[\x80-\xff](([\x80-\xff]{2})*)$!$1!;
+		$pos =~ s!^(.*?[\x00-\x7f]([\x80-\xff]{2})*?)[\x80-\xff]$!$1!;
+		$pos =~ s!^(([\x80-\xff]{2})*?)[\x80-\xff]$!$1!;
+
+		$c = qq($pre$k$pos);
+
+		my $aaa = join('|', @keys);
+		$c =~ s!($aaa)!<em style="background-color:yellow">$1</em>!gi;
+
+	    } else {
+		die;
 	    }
-
-	    my $tmpi = $item;
-	    $tmpi =~ s/[\n\t]+//g; # 改行消し
-	    $tmpi =~ s/<.+?>//g; # タグ抜き
-
-	    if ($tmpi =~ m/$key/i) {
-		$cnt++;
-		next if ($cnt < $from + 1 or $cnt >= $from + 1 + $numnum);
-		my $ostr = "[$cnt] $date\n";
-		# タグ中の文字列はハイライトしない
-		my @tmp = split(/(<.+?>)/, $item);
-		foreach my $ii (@tmp) {
-		    $ii =~ s|($key)|<strong style="background-color:yellow">$1</strong>|gix if ($ii !~ /^</);
-		    $ostr .= $ii;
-		}
-		$outstr .= $ostr."</div>\n"; # <div class="day"> の閉じ
-	    }
+	    $outstr .= qq(<div class="section">$cnt. $date  $c</div>\n);
 	}
     }
+    close(F);
 }
 
 my $page_max = int(($cnt - 1) / $numnum);
@@ -76,7 +88,7 @@ my ($qkey) = ($q->query_string =~ /(key=[^&]+)/);
 # ■■■ 過去記事表示のための選択棒 ■■■
 my $bar = "";
 my ($navip, $navin);
-if ($page_max != 0) { # 1ページのみのときは選択棒なし
+if ($page_max != 0) {		# 1ページのみのときは選択棒なし
     for (my $i = 0; $i <= $page_max; $i++) {
 	if ($from / $numnum == $i) {
 	    $bar .= "<strong>".($i + 1).'</strong>';
@@ -95,7 +107,6 @@ if ($page_max != 0) { # 1ページのみのときは選択棒なし
 	}
 
     }
-#    $bar .= "(${numnum}件ずつ表示)";
 }
 
 if ($cnt == 0) {

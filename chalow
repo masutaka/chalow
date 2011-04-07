@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.51 2003/08/30 11:49:22 yto Exp $
+# $Id: chalow,v 1.59 2003/10/21 11:10:23 yto Exp $
 #
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
@@ -45,6 +45,7 @@ my $index_page_template = << "___INDEX_PAGE_TEMPLATE"
 <a href="$home_page_url">$home_page_name</a>
 <h1>$changelog_name</h1>
 <p>最終更新時刻: CLLASTUPDATE</p>
+<p class="calendar">MONTHPAGELIST</p>
 LATESTDAYS
 <p>以上、最近 NDAYS 日分</p>
 <p class="calendar">MONTHPAGELIST</p>
@@ -56,16 +57,36 @@ my $month_page_template = << "___MONTH_PAGE_TEMPLATE"
 CLNAVI <a href="index.html">Index</a>
  / <a href="$home_page_url">$home_page_name</a>
 <h1>$changelog_name YEARMONTH</h1>
+<p class="calendar">MONTHPAGELIST</p>
 <p class="calendar">DAYLIST</p>
 DAYSINTHEMONTH
+<p class="calendar">DAYLIST</p>
+<p class="calendar">MONTHPAGELIST</p>
 CLNAVI <a href="index.html">Index</a>
  / <a href="$home_page_url">$home_page_name</a>
 ___MONTH_PAGE_TEMPLATE
+    ;
+# 日ページのテンプレート
+my $day_page_template = << "___DAY_PAGE_TEMPLATE"
+CLNAVI <a href="index.html">Index</a>
+ / <a href="YEARMONTH.html">今月の一覧</a>
+ / <a href="$home_page_url">$home_page_name</a>
+<h1>$changelog_name YEARMONTHDAY</h1>
+<p class="calendar"><a href="YEARMONTH.html">YEARMONTH</a> / DAYLIST</p>
+DAYSINTHEMONTH
+<p class="calendar"><a href="YEARMONTH.html">YEARMONTH</a> / DAYLIST</p>
+<p class="calendar">MONTHPAGELIST</p>
+CLNAVI <a href="index.html">Index</a>
+ / <a href="YEARMONTH.html">今月の一覧</a>
+ / <a href="$home_page_url">$home_page_name</a>
+___DAY_PAGE_TEMPLATE
     ;
 # インデックスページの HTML ヘッダに追加したいもの (favicon.ico など)
 my $index_page_head_plus = "";
 # 月ページの HTML ヘッダに追加したいもの
 my $month_page_head_plus = "";
+# 日ページの HTML ヘッダに追加したいもの
+my $day_page_head_plus = "";
 # 処理停止日付: この日付まで処理する (例: "2002-01-01"。0 なら最後まで処理する)
 my $stop_date = 0;
 # タブによるインデントをなくすか (1:なくす or 0:そのまま)
@@ -94,12 +115,19 @@ my $use_tukkomi = 0;
 my $tukkomi_template = "";
 # RSS を出力するか (1:YES, 0:NO)
 my $output_rss = 1;
-# ChangeLog を公開する URL (相対 URL 不可)
+# ChangeLog を公開する URL (相対 URL 不可) - RSS に必要
+# 末尾の "/" は不要
 my $clog_url = "http://nais.to/~yto/clog";
 # 他の年の同じ日付 (月日) へのリンクを張るか (1:YES, 0:NO)
 my $same_date_jump = 1;
 # 各アイテムに記述者名を表示するか (1:YES, 0:NO)
 my $show_author_name = 0;
+# 検索用ファイル (itemlist) を作るか (1:YES, 0:NO)
+my $output_itemlist = 1;
+# 日ごとにページを作るか (0:NO, 1:YES, 2:YES&月ページはヘッダのみ)
+my $day_page_mode = 0;
+# 出力先ファイルとサイズが異なる場合のみ出力する (0:NO, 1:YES)
+my $update_by_size = 0;
 
 ### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
 my $signature = qq(<p class="footer">Powered by 
@@ -113,11 +141,13 @@ GetOptions('n|top-n=n'   => \$opt_topn_tmp,
 	   'c|configure-file=s' => \$conf_file,
 	   'q|quiet' => \$quiet_mode,
 	   's|stop-date=s' => \$stop_date,
+	   'u|update-by-size' => \$update_by_size,
 	   'C|css=s' => \$opt_css_file);
 
 # ユーザ設定ファイルの読み込み (ファイル名が指定されてたときのみ)
 if ($conf_file ne "") {
     open(CONF, $conf_file) or die "Can't open $conf_file : $!\n";
+    binmode(CONF);
     my $conf = join('', <CONF>);
     $conf = Jcode->new($conf)->euc;
     eval $conf;
@@ -136,6 +166,7 @@ src="kuttukibbs.js"></script>
 <script language="JavaScript" type="text/javascript">
 function CallFunc() {KbShowCommentShort(num, 5, 50)}</script>);
 
+    $day_page_head_plus .= $s;
     $month_page_head_plus .= $s;
     $index_page_head_plus .= $s;
 }
@@ -151,6 +182,7 @@ usage: prog [options] <file> [file]...
     -o, --output-dir=DIR        directory to output
     -c, --configure-file=FILE   configure file (default "cl.conf")
     -s, --stop-date=DATE        date to stop processing
+    -u, --update-by-size        overwrite only if sizes are different
     -C, --css=FILE              css file
     -q, --quiet                 quiet mode
 USAGE
@@ -173,27 +205,26 @@ my %all_entries;		# 全エントリを格納
 # all_entrries{ymd}{eh} - エントリヘッダ
 # all_entrries{ymd}{1,2,3,...}{ih,c} - アイテム No., アイテムヘッダ, 中味
 
+my $all;
 for my $fname (@ARGV) {
-
     print "reading \"$fname\"\n" if (!defined $quiet_mode);
 
     ### クリーニングのためにChangeLogファイル一気に読み込む
     open(F, $fname) || die "$fname: $!";
-    my $all = join('', <F>);
+    binmode(F);
+    my $tmp .= join('', <F>);
     close(F);
-    $all = Jcode->new($all)->euc;
 
-    ### ChangeLogをあらかじめクリーニング
-    # 行頭がタブではなくスペースになっているたら置き換える
-    $all =~ s/^ {8}/\t/gsm;
-    $all =~ s/^ {1,7}\t/\t/gsm;
-    # \n(\s+)\n2001-09... の $1 を消す
-    $all =~ s/\n[\s\t]+(\n\S)/\n$1/gm;
-    # \n(\s+)\n\t* ほげ: ... の $1 を消す
-    $all =~ s/\n[\s\t]+(\n[\s\t]+\*\s+)/\n$1/gm;
-    # 項目内での段落区切り表す空行をタブ行にする
-    # あとで、各項目をブロック単位 ("\n\n" 区切り) で処理するため。
-    $all =~ s/\n(\n\t[^\*])/\n\t$1/gm;
+    ### 末尾メモ領域の削除
+    # 行頭から __DATA__ で始まる行以降は無視する。
+    $tmp =~ s/^\t?__DATA__.*$/\n/gsm;
+
+    $all .= $tmp."\n";
+}
+
+{
+    $all = Jcode->new($all)->euc; # 文字コードを euc にしておく
+    clean_changelog(\$all);	# ChangeLog をあらかじめクリーニング
 
     ### クリーニングされたChangeLogを処理
 
@@ -243,16 +274,14 @@ for my $fname (@ARGV) {
 write_rss_file() if ($output_rss);
 
 
+### 検索用ファイル (itemlist) を作る
+write_itemlist_file() if ($output_itemlist);
+
+
 ### 追加情報のためのループ
 foreach my $ymd (sort keys %all_entries) {
 
     my ($y, $m, $d) = ($ymd =~ /^(\d{4})-(\d\d)-(\d\d)$/);
-
-    sub date2anchor {
-	my ($d) = @_;
-	$d =~ s!((\d\d\d\d-\d\d)-\d\d(-\d+)?)!<a href="$2.html#$1">[$1]</a>!;
-	return $d;
-    }
 
     my $items_new;
     foreach my $i (sort {$b <=> $a} keys %{$all_entries{$ymd}}) {
@@ -266,7 +295,7 @@ foreach my $ymd (sort keys %all_entries) {
 	if (defined $inside_ref{"$ymd-$i"}) {
 	    $inside_ref_str .= 
 		qq(<div class="referer"><span>Referrer (Inside): ).
-		    join(" ", map {date2anchor($_)}
+		    join(" ", map {datestr2anchor("[".$_."]")}
 			 @{$inside_ref{"$ymd-$i"}})."</span></div>";
 	}
 
@@ -281,8 +310,10 @@ font-size:100%;margin:0;padding:0;">$item</pre>
     if ($same_date_jump == 1) {
 	if (defined $same_date{"$m-$d"} and @{$same_date{"$m-$d"}} != 1) {
 	    my $t = join(' ', map {
-		($_ == $y) ? "" : qq(<a href="$_-$m.html\#$_-$m-$d">$_</a>)}
-			 reverse @{$same_date{"$m-$d"}});
+		($_ == $y) ? "" : 
+		    (($day_page_mode) ? qq(<a href="$_-$m-$d.html">$_</a>) :
+		     qq(<a href="$_-$m.html\#$_-$m-$d">$_</a>))
+		    } reverse @{$same_date{"$m-$d"}});
 	    $items_new = qq(<div class="calendar">$t</div>).$items_new;
 	}
     }
@@ -290,15 +321,21 @@ font-size:100%;margin:0;padding:0;">$item</pre>
     ### 日付リンクによるリファラー
     if (defined $inside_ref{"$ymd"}) {
 	$items_new .= qq(<div class="referer"><span>Referrer (Inside): ).
-	    join(" ", map {date2anchor($_)}
+	    join(" ", map {datestr2anchor("[".$_."]")}
 		 @{$inside_ref{"$ymd"}})."</span></div>";
     }
 
     ### ツッコミ機能を使う
     if ($use_tukkomi == 1) {
 	my $template = $tukkomi_template;
-	$template =~ s/TUKKOMI_DATE/$y-$m.html%23$ymd/g;
-	$items_new .= qq(<div class="comment">$template</div>);
+	if ($day_page_mode) {	# 日ページ
+	    $template =~ s/TUKKOMI_DATE/$ymd.html/g;
+	} else {		# 月ページ
+	    $template =~ s/TUKKOMI_DATE/$y-$m.html%23$ymd/g;
+	}
+	my $dateid = $ymd; $dateid =~ s/-//g; # Date ID : Ex. "20030924"
+	$template =~ s/DATE_ID/$dateid/g;
+	$items_new .= $template;
     }
 
     ### 各エントリの HTML 組み上げ
@@ -323,7 +360,7 @@ foreach my $ym (sort {$b cmp $a} keys %month_page) {
 ### HTML ファイルの出力
 write_index_page(\%all_month, \$top_n_str);
 write_month_page(\%month_page);
-
+write_day_page() if ($day_page_mode);
 
 print "done.\n" if (!defined $quiet_mode);
 
@@ -347,21 +384,16 @@ sub parse_entry {
 	= ($eh =~ /^(((\d\d\d\d)-(\d\d)-(\d\d)).*?)\s\s(.+)/);
     $user =~ s/</&lt;/g;
 
-#    $eh =~ s!^(((\d\d\d\d-\d\d)-\d\d).*?)\s\s(.+)\n!<h2><span class="date"><a name="$2" href="$3.html#$2">$1</a></span></h2>\n<div class="body">!;
-
-    $eh = qq(<h2><span class="date"><a name="$ymd" href="$y-$m.html#$ymd">$ymdw</a></span></h2>\n<div class="body">);
-    # ↑なぜ href="#$ymd" ではないのか? -> index.html#$ymd になると困るから
+    if ($day_page_mode) {	# 日モード
+	$eh = qq(<h2><span class="date"><a name="$ymd" href="$ymd.html">).
+	    qq($ymdw</a></span></h2>\n<div class="body">);
+    } else {			# 月モード
+	$eh = qq(<h2><span class="date"><a name="$ymd" href=).
+	    qq("$y-$m.html#$ymd">$ymdw</a></span></h2>\n<div class="body">);
+	# ↑なぜ href="#$ymd" ではないのか? -> index.html#$ymd になると困るから
+    }
 
     push @{$same_date{"$m-$d"}}, $y; # 同じ日付 (月日) を持つ年のリスト
-
-    ### item anchor へのアクセスを日付へ変換する ad hoc な方法
-    # 一度 item anchor を使ってたけどもうやめたときなど用。
-    # 0000-00-00-1 から 0000-00-00-9 までへのリンクは entry header へ行く。
-    if ($use_item_anchor == 0) {
-	for (my $i = 1; $i <= 9; $i++) {
-	    $eh =~ s|</h2>|<a name="$ymd-$i"></a></h2>|;
-	}
-    }
 
     # ハッシュに格納
     $enthashp->{eh} = $eh;
@@ -396,7 +428,11 @@ sub parse_entry {
 	    if ($item_header_style == 0 or $item_header_style == 1) {
 		$ihb = $item_header_mark;
 		if ($use_item_anchor == 1) {
-		    $ihb = qq(<a name="$ymd-$num" href="$y-$m.html#$ymd-$num">$ihb</a>);
+		    if ($day_page_mode) { # 日モード
+			$ihb = qq(<a name="$ymd-$num" href="$ymd.html#$ymd-$num">$ihb</a>);
+		    } else {	# 月モード
+			$ihb = qq(<a name="$ymd-$num" href="$y-$m.html#$ymd-$num">$ihb</a>);
+		    }
 		}
 		$ihb .= " ";
 	    }
@@ -448,6 +484,8 @@ sub parse_entry {
 sub okikae {
     local ($_) = @_;	
 
+    escape_string(\$_);
+
     s/&/&amp;/go;
 #    s/>/&gt;/go;		# > が &.. になると、URL とか引用のマッチ狂う
 #    s/"/&quot;/go;		# ";
@@ -465,7 +503,11 @@ sub okikae {
     s!^\t\-{4}!<hr>!gms;
 
     ### URL。Hiki の記法を採用。
-    s!\[\[(.+?)\|(.+?)\]\]!get_link_str($1, $2)!gmse;
+    s!\[\[(.+?)\s*\|\s*(.+?)\]\]!get_link_str($1, $2)!gmse;
+
+    ### 引用 (quote): ">>" と "<<" で囲む
+    s!^\t>>\n!<blockquote>!gm;
+    s!^\t<<\n!</blockquote>!gm;
 
     ### 引用 (quote): "| ..." か "> ..."
     if ($remove_quote_mark == 1) {
@@ -489,7 +531,7 @@ sub okikae {
 
     ### 日付で参照リンク
     # date ref : [YYYY-MM-DD]
-    s!\[((\d\d\d\d-\d\d)-\d\d(-\d+)?)\]!<a href="$2.html#$1">[$1]</a>!g;
+    $_ = datestr2anchor($_);
 
     ### URL表記を href で
     # URL : http://....
@@ -508,10 +550,70 @@ sub okikae {
     ### 自動文字列置換適用
     eval $auto_replace;
 
+    unescape_string(\$_);
+
     ### プラグイン
     s!{{(.+?)}}!eval($1)!gems;
 
     return $_;
+}
+
+
+### 日ページ(ex: 2001-01-01.html)を作る。
+sub write_day_page {
+    my @day_list = reverse sort keys %all_entries;
+
+    for (my $idx = 0; $idx < @day_list; $idx++) {
+
+	my $ymd = $day_list[$idx];
+
+	# 日ページ移動ナビ (前後の日ページへのリンク)
+	my $navi = "";
+	$navi .= qq(<a href="$day_list[$idx + 1].html">&lt;&lt;&lt;</a> )
+	    if ($idx < @day_list - 1);
+	$navi .= qq(<a href="$day_list[$idx - 1].html">&gt;&gt;&gt;</a> )
+	    if ($idx > 0);
+
+	# 日へのリンク (日付一覧)
+	my ($ym) = ($ymd =~ /^(\d+-\d+)/);
+	my $day_list = make_day_list($ym);
+
+	my $hd;
+	$hd .= qq(<html lang="ja"><head><title>$changelog_name - $ymd</title>\n);
+	$hd .= qq(<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">\n);
+	$hd .= qq(<link rel=stylesheet href="$css_file" media=all>\n)
+	    if defined $css_file;
+	$hd .= $day_page_head_plus;
+	$hd .= "</head><body><div>\n";
+
+	my $template = $day_page_template;
+
+	my $content = $month_page{$ym}{$ymd};
+	$content =~ s|<h2>.+?</h2>||sm;
+
+	### 月別一覧を作成
+	my $mpl = make_month_page_list(\%month_page); 
+
+	### 内部置き換え文字列
+	$template =~ s!CLLASTUPDATE!$what_time_is_it_now!g;
+	$template =~ s!YEARMONTHDAY!$ymd!g;
+	$template =~ s!YEARMONTH!$ym!g;
+	$template =~ s!CLNAVI!$navi!g;
+	$template =~ s!DAYLIST!$day_list!g;
+	$template =~ s!MONTHPAGELIST!$mpl!g;
+	$template =~ s!DAYSINTHEMONTH!$content!g;
+
+	my $ostr = "$hd$template$signature</div></body></html>\n";
+	my $fname = "$opt_odir/$ymd.html";
+	if ($update_by_size == 1 and -s $fname == length($ostr)) {
+	    next;
+	}
+	print "output to \"$opt_odir/$ymd.html\"\n" if (!defined $quiet_mode);
+	open(F, "> $fname") || die "$fname: $!\n";
+	binmode(F);
+        print F $ostr;
+	close(F);
+    }
 }
 
 
@@ -521,7 +623,7 @@ sub write_month_page {
     my @month_list = reverse sort keys %$month_page;
     for (my $idx = 0; $idx < @month_list; $idx++) {
 
-	my $i = $month_list[$idx];
+	my $ym = $month_list[$idx];
 
 	# 月ページ移動ナビ (前後の月ページへのリンク)
 	my $navi = "";
@@ -530,38 +632,32 @@ sub write_month_page {
 	$navi .= qq(<a href="$month_list[$idx - 1].html">&gt;&gt;&gt;</a> )
 	    if ($idx > 0);
 
-	# 日へのリンク (日付一覧)
-	my $lday = get_last_day_of_month($i);
-	my $daylist;
-	for (my $d = 1; $d <= $lday; $d++) {
-	    if (defined $month_page->{$i}{sprintf "%s-%02d", $i, $d}) {
-		$daylist .=
-		    sprintf qq(<a href="\#%s-%02d">%02d</a> ), $i, $d, $d;
-	    } else {
-		$daylist .= sprintf "%02d ", $d;
-	    }
-	}
 
-	print "output to \"$opt_odir/$i.html\"\n" if (!defined $quiet_mode);
-	my $fname = "$opt_odir/$i.html";
-	open(F, "> $fname") || die "$fname: $!\n";
-	print F qq(<html lang="ja"><head><title>$i</title>\n);
-	print F qq(<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">\n);
-	print F qq(<link rel=stylesheet href="$css_file" media=all>\n)
+	# 日へのリンク (日付一覧)
+	my $day_list = make_day_list($ym);
+
+	my $hd;
+	$hd .= qq(<html lang="ja"><head><title>$changelog_name - $ym</title>\n);
+	$hd .= qq(<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">\n);
+	$hd .= qq(<link rel=stylesheet href="$css_file" media=all>\n)
 	    if defined $css_file;
-	print F $month_page_head_plus;
-	print F "</head><body><div>\n";
+	$hd .= $month_page_head_plus;
+	$hd .= "</head><body><div>\n";
 
 	my $template = $month_page_template;
 
 	### 日々のエントリ作成
 	my @cont;
 	if ($reverse_order_days) { # 降順: 日付の新しいのが上 (〜v0.11 と同じ)
-	    @cont = reverse sort keys %{$month_page->{$i}};
+	    @cont = reverse sort keys %{$month_page->{$ym}};
 	} else {		# 昇順: 日付の古いのが上
-	    @cont = sort keys %{$month_page->{$i}};
+	    @cont = sort keys %{$month_page->{$ym}};
 	}
-	my $content = join('', map {$month_page->{$i}{$_}} @cont);
+	my $content = join('', map {$month_page->{$ym}{$_}} @cont);
+	if ($day_page_mode == 2) { # 日モード (月ページヘッダのみモード)
+	    $content =~ s!(<pre.*?>|</pre>)!!gsm;
+	    $content =~ s|(<div\sclass="section">.*?<span\sclass="clitemheader">.*?</span>(</h3>)?).*?<!--eos-->|$1</p></div>|gsm;
+	}
 	$content = "\n$content\n";
 
 	### 月別一覧を作成
@@ -569,14 +665,21 @@ sub write_month_page {
 
 	### 内部置き換え文字列
 	$template =~ s!CLLASTUPDATE!$what_time_is_it_now!g;
-	$template =~ s!YEARMONTH!$i!g;
+	$template =~ s!YEARMONTH!$ym!g;
 	$template =~ s!CLNAVI!$navi!g;
-	$template =~ s!DAYLIST!$daylist!g;
+	$template =~ s!DAYLIST!$day_list!g;
 	$template =~ s!MONTHPAGELIST!$mpl!g;
 	$template =~ s!DAYSINTHEMONTH!$content!g;
 
-        print F $template;
-        print F "$signature</div></body></html>\n";
+	my $ostr = "$hd$template$signature</div></body></html>\n";
+	my $fname = "$opt_odir/$ym.html";
+	if ($update_by_size == 1 and -s $fname == length($ostr)) {
+	    next;
+	}
+	print "output to \"$opt_odir/$ym.html\"\n" if (!defined $quiet_mode);
+	open(F, "> $fname") || die "$fname: $!\n";
+	binmode(F);
+        print F $ostr;
 	close(F);
     }
 }
@@ -585,15 +688,13 @@ sub write_month_page {
 ### インデックスページ(index.html)を作る
 sub write_index_page {
     my ($month_page, $top_n_str) = @_;
-    print "output to \"$opt_odir/index.html\"\n" if (!defined $quiet_mode);
-    my $fname = "$opt_odir/index.html";
-    open(F, "> $fname") || die "$fname: $!\n";
-    print F qq(<html lang="ja"><head><title>$changelog_name</title>\n);
-    print F qq(<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">\n);
-    print F qq(<link rel=stylesheet href="$css_file" media=all>\n)
+    my $hd;
+    $hd .= qq(<html lang="ja"><head><title>$changelog_name</title>\n);
+    $hd .= qq(<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">\n);
+    $hd .= qq(<link rel=stylesheet href="$css_file" media=all>\n)
 	if defined $css_file;
-    print F $index_page_head_plus;
-    print F "</head><body><div>\n";
+    $hd .= $index_page_head_plus;
+    $hd .= "</head><body><div>\n";
 
     my $template = $index_page_template;
 
@@ -607,8 +708,15 @@ sub write_index_page {
     $template =~ s!LATESTDAYS!\n$$top_n_str!g if ($opt_topn);
     # ↑ 最近 N 日分
 
-    print F $template;
-    print F "$signature</div></body></html>\n";
+    my $ostr = "$hd$template$signature</div></body></html>\n";
+    my $fname = "$opt_odir/index.html";
+    if ($update_by_size == 1 and -s $fname == length($ostr)) {
+	return;
+    }
+    print "output to \"$opt_odir/index.html\"\n" if (!defined $quiet_mode);
+    open(F, "> $fname") || die "$fname: $!\n";
+    binmode(F);
+    print F $ostr;
     close(F);
 }
 
@@ -638,24 +746,43 @@ sub make_month_page_list {
 }
 
 
+### 日付一覧を作成
+my %daylist;
+sub make_day_list {	
+    my ($i) = @_;
+    my $lday = get_last_day_of_month($i);
+    return $daylist{$i} if (defined $daylist{$i}); # cache
+    for (my $d = 1; $d <= $lday; $d++) {
+	if (defined $month_page{$i}{sprintf "%s-%02d", $i, $d}) {
+	    if ($day_page_mode) { # 日モード
+		$daylist{$i} .= sprintf(qq(<a href="%s-%02d.html">%02d</a> ),
+					$i, $d, $d);
+	    } else {		# 月モード
+		$daylist{$i} .= sprintf(qq(<a href="\#%s-%02d">%02d</a> ),
+					$i, $d, $d);
+	    }
+	} else {
+	    $daylist{$i} .= sprintf "%02d ", $d;
+	}
+    }
+    return $daylist{$i};
+}
+
+
 # anchor, img タグ文字列を生成。
 sub get_link_str {
     my ($a, $b) = @_;
     if ($a =~ /\.(jpg|jpeg|png|gif)$/i) {
-	return qq(<a href="$b"><img src="$a" alt="$b"></a>);
+	return qq(<a href="$b"><img src="$a" alt="画像"></a>);
     } elsif ($b =~ /\.(jpg|jpeg|png|gif)$/i) {
 	return qq(<img src="$b" alt="$a">);
     } else {
-	return qq(<a href="$b">$a</a>);
+	my $show_server_name = 0;
+	my $c = ($show_server_name and $b =~ m!://([^/]+)!) ? "($1)" : "";
+	return qq(<a href="$b">$a</a>$c);
+	#return qq(<a href="$b">$a</a>);
     }
 }
-
-# img タグ文字列を生成。
-#sub get_img_str {
-#    my ($fn) = @_;
-#    die "file not found: $opt_odir/$fn\n" unless (-e $opt_odir."/".$fn);
-#    return qq(<img src="$fn" alt="画像">);
-#}
 
 
 ### 年月日を入力とし曜日を出力する関数 since 021001
@@ -697,9 +824,14 @@ sub write_rss_file {
 <item rdf:about="$clog_url/YEARMONTH.html#ITEMID">
  <title>ITEMID  ITEMHEADER</title>
  <link>$clog_url/YEARMONTH.html#ITEMID</link>
- <description></description>
+ <description>CONTENT</description>
  <dc:date>DCDATE</dc:date>
 </item>);
+
+    if ($day_page_mode) {	# ad hoc - あとでなおすこと!
+	$rdfseq_template =~ s/YEARMONTH/YEARMONTHDAY/g;
+	$rdfitem_template =~ s/YEARMONTH/YEARMONTHDAY/g;
+    }
 
     my $ctr = $top_n_ctr;
     foreach my $ymd (sort {$b cmp $a} keys %all_entries) {
@@ -716,16 +848,39 @@ sub write_rss_file {
 	    $ih =~ s/>/&gt;/go;
 	    $ih =~ s/</&lt;/go;
 	    $ih =~ s/"/&quot;/go; # ";
+	    
+	    my $co = $all_entries{$ymd}{$i}{c};
+	    $co =~ s|<img.+?alt="(.*?)".*?>|[$1]|gosm;
+	    $co =~ s|<[^<>]+?>||gosm;
+	    $co =~ s/&/&amp;/go;
+	    $co =~ s/>/&gt;/go;
+	    $co =~ s/</&lt;/go;
+	    $co =~ s/"/&quot;/go; # ";
+            $co =~ s/\t//g;
+
+	    my $cont_max_len = 300;
+	    if (length($co) > $cont_max_len) {
+		$co =~ s/^(.{$cont_max_len}).*$/$1/sm;
+		$co =~ s/\n[^\n]*$//;
+		$co .= "...";
+	    }
+
+	    $co =~ s/[\x00-\x1f]+/ /g;
+	    $co =~ s/\s\s+/ /g;
+            $co =~ s/\n//g; # 改行消し
 
 	    my $seqtmp = $rdfseq_template;
 	    my $itemtmp = $rdfitem_template;
 
+	    $seqtmp =~ s|YEARMONTHDAY|$ymd|;
 	    $seqtmp =~ s|YEARMONTH|$ym|;
 	    $seqtmp =~ s|ITEMID|$ymd-$i|;
+	    $itemtmp =~ s|YEARMONTHDAY|$ymd|g;
 	    $itemtmp =~ s|YEARMONTH|$ym|g;
 	    $itemtmp =~ s|ITEMID|$ymd-$i|g;
 	    $itemtmp =~ s|ITEMHEADER|$ih|;
 	    $itemtmp =~ s|DCDATE|$ymd|;
+	    $itemtmp =~ s|CONTENT|$co|;
 
 	    $rdfseq .= $seqtmp;
 	    $rdfitem .= $itemtmp;
@@ -757,6 +912,77 @@ RDFSTR
     $rdfstr = Jcode->new($rdfstr)->utf8;
     my $fn = "$opt_odir/cl.rdf";
     open(F, "> $fn") || die "$fn: $!\n";
+    binmode(F);
     print F $rdfstr;
     close(F);
+}
+
+
+### 検索用ファイルを出力する
+# clsearch.cgi 用のファイルを生成
+sub write_itemlist_file {
+    my $ostr;
+    foreach my $ymd (sort {$b cmp $a} keys %all_entries) {
+	foreach my $i (sort {$b <=> $a} keys %{$all_entries{$ymd}}) {
+	    next if ($i !~ /^\d/);
+	    my ($ym) = ($ymd =~ /^(\d{4}-\d\d)-\d\d/);
+	    my $c = $all_entries{$ymd}{$i}{h}." ".$all_entries{$ymd}{$i}{c};
+            $c =~ s/[\n\t]+//g; # 改行消し
+	    $c =~ s/\s\s+/ /g;
+	    $c =~ s|<img.+?alt="(.*?)".*?>|[$1]|gosm;
+            $c =~ s/<.+?>//g; # タグ抜き
+	    $ostr .= datestr2anchor("[$ymd-$i]")."\t$c\n";
+	}
+    }
+    my $fn = "$opt_odir/cl.itemlist";
+    open(F, "> $fn") || die "$fn: $!\n";
+    binmode(F);
+    print F $ostr;
+    close(F);
+}
+
+
+### 日付で参照リンク
+sub datestr2anchor {
+    my ($d) = @_;
+    if ($day_page_mode) {	# 日モード
+	$d =~ s!\[((\d{4}-\d\d-\d\d)(-\d+)?)\]!<a href="$2.html#$1">[$1]</a>!g;
+    } else {			# 月モード
+	$d =~ s!\[((\d{4}-\d\d)-\d\d(-\d+)?)\]!<a href="$2.html#$1">[$1]</a>!g;
+    }
+    return $d;
+}
+
+
+### 文字列置き換えから一時的に退避し、後に復帰する
+my $num_of_escaped_string;
+my %escaped_string;
+sub escape_string {
+    my ($strp) = @_;
+    my $btag = '\t_HTML_START_\n'; # 開始マーク
+    my $atag = '\t_HTML_END_\n'; # 終了マーク
+    $num_of_escaped_string = 0;
+    $$strp =~ s!$btag(.*?)$atag!
+	$escaped_string{++$num_of_escaped_string} = $1,
+	sprintf("\x5\x13%d\x3", $num_of_escaped_string)!gsmxe;
+}
+sub unescape_string {
+    my ($strp) = @_;
+    $$strp =~ s|\x5\x13(\d+)\x3|$escaped_string{$1}|g;
+}
+
+
+### ChangeLog のクリーニング
+sub clean_changelog {
+    my ($strp) = @_;
+    # 行頭がタブではなくスペースになっているたら置き換える
+    $$strp =~ s/^( {8}| {1,7}\t)/\t/gsm;
+    #$$strp =~ s/^ {8}/\t/gsm;
+    #$$strp =~ s/^ {1,7}\t/\t/gsm;
+    # \n(\s+)\n2001-09... の $1 を消す
+    $$strp =~ s/\n[\s\t]+(\n\S)/\n$1/gm;
+    # \n(\s+)\n\t* ほげ: ... の $1 を消す
+    $$strp =~ s/\n[\s\t]+(\n[\s\t]+\*\s+)/\n$1/gm;
+    # 項目内での段落区切り表す空行をタブ行にする
+    $$strp =~ s/\n(\n\t[^\*])/\n\t$1/gm;
 }

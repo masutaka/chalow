@@ -4,7 +4,7 @@ ChangeLog を HTML に変換するツール
 
 README
 
-$Id: README,v 1.23 2003/08/30 11:11:59 yto Exp $
+$Id: README,v 1.24 2003/10/21 10:55:14 yto Exp $
 
 ----------------------------------------------------------------------
 まずは、やってみよう!
@@ -53,6 +53,7 @@ usage: chalow [options] <file> [file]...
     -o, --output-dir=DIR        directory to output
     -c, --configure-file=FILE   configure file (default "cl.conf")
     -s, --stop-date             date to stop processing
+    -u, --update-by-size        overwrite only if sizes are different
     -C, --css=FILE              css file
     -q, --quiet                 quiet mode
 
@@ -63,6 +64,7 @@ usage: chalow [options] <file> [file]...
 -s で、処理停止日付 ($stop_date) を指定する。この日付まで処理する。
    未指定なら最後まで処理する。 (例: --stop-date "2002-01-01")
 -C で、chalow: CSS ファイルをコマンドラインから指定できる。
+-u を指定すると、出力先ファイルとサイズが異なる場合のみ上書き出力する。
 -q を指定すると、変換作業進捗情報を標準出力に出力しなくなる。
 
 
@@ -82,7 +84,8 @@ usage: chalow [options] <file> [file]...
 ユーザ設定ファイル
 ----------------------------------------------------------------------
 
-ユーザ設定ファイル ("-c" で指定する) では以下の項目を指定できる。
+ユーザ設定ファイル ("-c" で指定する) では以下の項目などを指定できる。
+詳細は、添付されている cl.conf (サンプル) を参照されたい。
 
 - 日記の名前
 - 自分のホームーページのURL、呼び名
@@ -99,6 +102,8 @@ usage: chalow [options] <file> [file]...
 - 表示するとき引用記号 ('>' or '|') を消すか
 - item header に h3 タグを足すか (※7)
 - item header の先頭の "*" にアンカーをつけるか
+- 日ページ (2003-10-01.html 等) を出力するか
+- RSS ファイルを出力するか
 - ...
 
 ※4 「項目」とは、'*' で始まる一塊のテキスト。「項目の見出し」とは '*' 
@@ -204,6 +209,13 @@ ChangeLog の特殊な記法
 	| 引用
 	 | これは引用ではない
 
+  または、">>" と "<<" で囲まれた領域が blockquote で囲まれる。
+	       
+	>>
+	引用
+	引用
+	引用
+	<<
 
 - 文字修飾の記法
 
