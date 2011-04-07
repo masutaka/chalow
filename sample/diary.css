@@ -152,10 +152,10 @@ div.body p {
 */
 .calendar {
 	background-color: #fff8ff;
-        text-align: right;
         font-size: x-small;
 
 /*
+        text-align: right;
 	background-color: #ffe8ff;
 	line-height: 130%;
 	padding: 0.5em 1em 0.5em 1em;
@@ -230,8 +230,8 @@ img {
 }
 
 p {
-        margin-right: 1.0em;
-        margin-left: 1.0em;
+        margin-right: 10pt;
+        margin-left: 10pt;
 }
 
 
@@ -262,4 +262,8 @@ div .itemauthor span {
   border-width: 0px 5px 1px 0px;
   color: #606060;
 }
+
+#content {float: left; width: 70%}
+#links {padding: 5px; margin: 5px;}
+#links td {border: dotted 1px #808080; padding: 5px; font-size: x-small;}
 

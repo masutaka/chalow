@@ -1,22 +1,210 @@
-2004-01-11  YAMASHITA Tatsuo  <yto@nais.to>
+2004-02-16  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.23: 
-	作業途中だけどとりあえず公開。
-	パワーユーザ以外にはおすすめしません。
+	* version 0.24[リリース]:
+	公開。
+
+	* 今後の予定[メモ]: 
+	- HTML::Template を採用。
+	  - $*_page_head_plus の廃止
+	  - $use_tukkomi, $tukkomi_template の廃止
+	    - コメントや TB 関連は entry の template に直接書く方針
+	  - $css_file の廃止
 
 	* p:TODO:
-	- HTML::Template や XML などのモジュールを使う
-	  - $*_page_head_plus の廃止
-	  - $use_tukkomi の廃止
-	  - $tukkomi_template の廃止
-	  - $css_file の廃止
-        
 	- 日本語コードの選択
         - chalowlib?
         - くっつき BBS との連携まわりをすっきりさせる
 	- ページ単位だけど、リンク元表示
           参考: <http://www.ijn-jp.net/user8/report/svchat13.html>
           要調査: JavaScript で #2003... も取れるか?
+
+2004-02-15  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow: 
+	細かい修整作業いろいろ。
+	- usage 表示の場所いじる
+	- $top_n_ctr 廃止(いらんかった)
+	- New ↓
+	> my %entry_statistics;
+	> # {ymd} : 日付 (年-月-日) の重複 (for 複数人利用)
+	> # {ym} : 各年月に含まれている日付エントリ数
+	> # {md} : 同じ月日を持つ年 for same date jump
+
+2004-02-14  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* cl.conf: 
+	新設定項目。
+	> # 日付一覧をカレンダー表示にするか (1:YES, 0:NO)
+	> $calendar_style = 0;
+
+	* chalow (write_rss_file): 
+	description が長いとき省略するという機能をちょっと直す。
+	まだ ad hoc だけど、まあいいや。本当は utf8 でやりたい。
+	(html2xmlstr): New.  for RSS output.
+	(write_js_file): 日付にもリンクを付けた。
+	(make_day_list_str): New.  for 日付一覧
+	(make_day_list): 整理。
+	(make_calendar_table): New.  日付一覧のカレンダースタイルを作成。
+
+	* README: 
+	mod.
+
+2004-02-13  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (parse_entry)[メモ]: 
+	item header の後に続けて何も書かずに改行するスタイルのとき、
+	item header を h3 で囲む設定にすると、
+	空行が item の header と content の間に入ってしまう問題について。
+	> * itemheader:
+	> content content content
+	$use_h3_for_item_header = 1 のときは、item content の最初の空行を
+	削るようにしている。
+
+	* chalow (output_to_file): 
+	New. 指定されたファイルへ文字列を出力
+
+	* chalow: 
+	テンプレート化への布石いろいろ。
+
+	* chalow (write_rss_file): 
+	$permlink を使ってちょっとだけすっきり。
+
+	* chalow (parse_entry)[メモ]: 
+	置き換えの方針：ハッシュに格納するときに okikae()。
+	置き換えた文字列をRSSなどに流用するので。
+
+2004-02-12  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* README: 
+	Mod.
+
+2004-02-11  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (parse_entry): 
+	プラグマ pragma の処理。
+	日付エントリの上と下にメッセージを埋め込めるようにしてみた。
+
+	* メッセージ埋め込み、案2:
+	> * message-top:
+	> <span style="font-size:x-small;padding:3pt;margin:3pt">
+	> 美食家の末は乞食 --- ベンジャミン・フランクリン
+	> </span>
+	> 
+	> * message-bottom:
+	> <span style="font-size:x-small;padding:3pt;margin:3pt">
+	> ♪ Jeith Jarrett / La Scala
+	> </span>
+
+	* message-top:
+	<span style="font-size:x-small;padding:3pt;margin:3pt">
+	美食家の末は乞食 --- ベンジャミン・フランクリン
+	</span>
+
+	* message-bottom:
+	<span style="font-size:x-small;padding:3pt;margin:3pt">
+	♪ Jeith Jarrett / La Scala
+	</span>
+
+	* メッセージ埋め込み、案1: 廃案。
+	> * chalow::pragma: 
+	> <msg_top>美食家の末は乞食 --- ベンジャミン・フランクリン</msg_top>
+	> <msg_btm>♪ Jeith Jarrett / La Scala</msg_btm>
+
+2004-02-08  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* cl.conf (cat): 
+	New. カテゴリページへのリンクを生成するプラグイン。
+
+	* chalow:
+	カテゴリ別ページ作成関連作業。cat_life.html のようなの出力。
+	(get_category_filename): New.
+	(write_category_page): New. 
+	(write_js_file): カテゴリ一覧JavaScriptファイルも出力するようにし
+	た。cl-cat.js
+
+	* ChangeLogの構造[メモ]: 
+	>>
+	ChangeLog
+	└entry*
+	　　├entry header (= XXXX-XX-XX)
+	　　└item*
+	　　　　├id (= XXXX-XX-XX-X)
+	　　　　├item header
+	　　　　│　├title
+	　　　　│　└category?
+	　　　　├item content
+	　　　　└item author?
+	<<
+
+	* chalow: 
+	HTML::Template 適用に向けていろいろいじる。
+	(parse_entry): データ格納とHTML作成を行なっていたが、HTML作成部分
+	を分離する。
+
+	* chalow (clean_changelog): 
+	クリーニング時に曜日を削ることにした。後で足す。
+
+	* cl.conf: 
+	ユーザ設定項目の整理。
+	remove $opt_odir
+
+	* chalow (make_item_header_html): 
+	New.
+	item header では okikae を適用しないように方針を変更。
+	カテゴリ処理をあとで施すために。
+
+	* chalow (make_entry_header_html): 
+	New.
+
+	* chalow (get_inside_ref): 
+	New.  HTML::Template を採用したらなくなるかも。
+	inside referrer の重複を無くした。
+
+2004-01-25  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow: 
+	デバグモード ($debug_mode) 作った。ref. [2004-01-09-1]
+
+2004-01-23  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* cl.conf (wiki_link): 
+	update.
+
+2004-01-16  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (write_js_file): 
+	js ファイルの url に $clog_url_pref を足すようにした。
+
+2004-01-14 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+
+        * cl.conf,sample/diary.css:
+        サイドメニューは id="links" (CSS だと #links) で、
+        本体は id="content" (CSS だと #content) で囲む方針にした。
+        これは MovableType の方式をまねた。
+
+2004-01-13 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+
+        * cl.conf (shorten_url): New.  URL を短く表示するプラグイン。
+        使い方：以下の様に書くと、
+        [src]
+        参考：{{shorten_url('http://example.com/0123456789/0123456789/
+        0123456789/0123456789/0123456789/0123456789-a.html',54)}}
+        {{shorten_url('http://example.com/0123456789/0123456789/
+        0123456789/0123456789/0123456789/0123456789-b.html')}}
+        [/src]
+        こうなります：
+        >>
+        参考：{{shorten_url('http://example.com/0123456789/0123456789/
+        0123456789/0123456789/0123456789/0123456789-a.html',54)}}
+        {{shorten_url('http://example.com/0123456789/0123456789/
+        0123456789/0123456789/0123456789/0123456789-b.html')}}
+        <<
+
+2004-01-11  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.23[リリース]: 
+	作業途中だけどとりあえず公開。
+	パワーユーザ以外にはおすすめしません。
 
 2004-01-09 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
 
@@ -52,7 +240,7 @@
 	New write_js_file().
 	JavaScript feed ファイルを出力する関数
 
-	* chalow:
+	* pre廃止[メモ]:
 	pre 囲みをやめる。各行の行末に <br> を付けるようにした。
 	pre 指定は別に行なう。
 	ソースの表示は [esc][src][/src][/esc] を使う→エンティティ置換＆pre。
@@ -144,7 +332,7 @@
 
 2003-11-04  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.22: 
+	* version 0.22[リリース]: 
 	公開。
 	バグ修正と小さな変更のみ。
 
@@ -163,7 +351,7 @@
 
 2003-11-02  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.21: 
+	* version 0.21[リリース]: 
 	公開。
 	バグ修正や小さな変更のみ。機能の追加などはなし。
 
@@ -237,7 +425,7 @@
 
 2003-10-21 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.20: 
+	* version 0.20[リリース]: 
 	公開
 
 	* 今回の変更点: 
@@ -379,7 +567,7 @@
 
 2003-08-30 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.19: 
+	* version 0.19[リリース]: 
 	公開
 
 	* 変更点のまとめ: 
@@ -417,7 +605,7 @@
 
 2003-08-29 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* chalow:
+	* プラグイン機能[メモ]:
 	プラグイン機能が登場!
 	「{」２つと「}」２つで囲むとプラグイン (関数) を呼び出すことができ
 	ます。あんまり多くのことはできませんが...。
@@ -455,6 +643,7 @@
 
 	* chalow: (get_link_str):
 	New for Hiki 記法。そして、 get_img_str() を廃止。
+
 	* p:[IMG:image/gazou.png] [IMG:image/gazou.png http://nais.to/~yto/]
 
 	* chalow (okikae): 
@@ -564,7 +753,7 @@
 
 2003-08-03  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.18: 
+	* version 0.18[リリース]: 
 	公開
 
 	* add-extent.pl: 
@@ -654,7 +843,7 @@
 	
 2003-07-12  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.17: 
+	* version 0.17[リリース]: 
 	公開
 
 	* memo:
@@ -744,10 +933,10 @@
 
 2003-06-23 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.16:
+	* version 0.16[リリース]:
 	公開
 
-	* chalow (parse_entry): 
+	* chalow (parse_entry)[メモ]: 
 	<http://oikaze.com/~tamada/Diary/2003-06.html#2003-06-23>
 
 	> tDiary のテーマも使えるようになると見栄えが全然違いますな。
@@ -768,7 +957,7 @@
 
 2003-06-22  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.15:
+	* version 0.15[リリース]:
 	公開
 
 	* README: 
@@ -780,12 +969,12 @@
 	* chalow:
 	tDiary テーマ適用の調整。各 item を p で囲むようにした。
 
-	* ChangeLog の各部の名称:
+	* ChangeLog の各部の名称[メモ]:
 	chalow では各部を以下のように呼ぶことにします。
 	設定ファイル、CSS、プログラムソースを見るときにご参照下さい。
-	[IMG:image/chalow-cl-name-s.gif]
+	[[IMG|image/chalow-cl-name-s.gif]]
 
-	* 半角スペース連続が消えてしまう問題: 
+	* 半角スペース連続が消えてしまう問題[メモ]: 
 	pre の代わりに p とか div とかで "white-space: pre; font-family:
 	monospace;" と指定する方法は、以下のような「半角スペース連続」表記
 	で崩れるという問題がある。item を pre で囲むのはいまいちな感じでは
@@ -918,15 +1107,15 @@
 
 2003-06-14  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.14: 公開
+	* version 0.14[リリース]: 公開
 
 	* README: mod
 
 2003-06-12  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* clsearch.cgi: 検索結果で、月ページでトップに表示されるエントリの
-	日付が表示されないバグを修正。(ad hoc. 全体的に手を入れなおす必要
-	があるかも)
+	* clsearch.cgi: 
+	検索結果で、月ページでトップに表示されるエントリの日付が表示されな
+	いバグを修正。(ad hoc. 全体的に手を入れなおす必要があるかも)
 
 2003-06-11  YAMASHITA Tatsuo  <yto@nais.to>
 
@@ -963,7 +1152,7 @@
 	my $month_page_header;		# 月ページのヘッダ
 	my $month_page_footer;		# 月ページのフッタ
 
-	* テンプレート方式とは:
+	* テンプレート方式とは[メモ]:
 	$index_page_template, $monthd_page_template に body 内部の内容を
 	「内部置き換え文字列」などを用いて表現する方式。
 	カスタマイズ (レイアウト) の自由度を高めるために採用。
@@ -1019,7 +1208,7 @@
 
 2003-01-18 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.13: 公開
+	* version 0.13[リリース]: 公開
 
 	* README (usage): clweek.pl についての記述を追加
 
@@ -1033,7 +1222,7 @@
 
 2003-01-05 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.12: 公開
+	* version 0.12[リリース]: 公開
 
 	* README: 更新
 
@@ -1069,7 +1258,7 @@
 
 2002-12-27 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.11: 公開
+	* version 0.11[リリース]: 公開
 
 	* chalow (write_month_page_list): 月別一覧表示を改造。記述の無い月
 	も一覧に表示するようにした。
@@ -1088,7 +1277,7 @@
 
 2002-10-26 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.10: 公開
+	* version 0.10[リリース]: 公開
 
 2002-10-25 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
 
@@ -1101,7 +1290,7 @@
 
 2002-10-19 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.9: 公開
+	* version 0.9[リリース]: 公開
 
 2002-10-18 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
 
@@ -1138,7 +1327,7 @@
 
 2002-06-29 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.8: 公開
+	* version 0.8[リリース]: 公開
 
 	* clsearch.cgi: new. パッケージに追加してみた。
 
@@ -1162,7 +1351,7 @@
 
 2002-06-23 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.7: 公開
+	* version 0.7[リリース]: 公開
 
 	* chalow (write_month_page): $month_page_header 中の YEARMONTH と
 	いう文字列を、"年-月" 文字列 (例えば、"2002-06") に置き換えるよう
@@ -1184,7 +1373,7 @@
 
 2001-12-16 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.6: 公開
+	* version 0.6[リリース]: 公開
 
 	* chalow:
 	[2001-12-13] にやった「見出しにマッチする正規表現」の調整の続き。
@@ -1195,7 +1384,7 @@
 
 2001-12-13 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.5: 公開
+	* version 0.5[リリース]: 公開
 
 	* README: 手直し。
 
@@ -1211,7 +1400,7 @@
 
 2001-12-09 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.4: 公開
+	* version 0.4[リリース]: 公開
 
 2001-12-08 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
@@ -1242,7 +1431,7 @@
 
 2001-12-02 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.3: 公開
+	* version 0.3[リリース]: 公開
 
 	* README: 手直し。
 
@@ -1253,7 +1442,7 @@
 	cl-simple.conf → sample/cl-simple.conf
 	(thanks to satoru-t)
 
-	* version 0.2: 公開してみる。
+	* version 0.2[リリース]: 公開してみる。
 
 	* cl-simple.conf: パッケージに追加。README の実行例で使用。
 
@@ -1267,7 +1456,8 @@
 
 2001-12-01 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* version 0.1: 公開してみる。Web ページも作る。
+	* version 0.1[リリース]: 
+	公開してみる。Web ページも作る。
 	http://nais.to/~yto/tools/chalow/
 
 	* chalow: 軽く手入れ。
