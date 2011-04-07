@@ -4,7 +4,7 @@ ChangeLog を HTML に変換するツール
 
 README
 
-$Id: README,v 1.10 2002/10/29 12:31:38 yto Exp $
+$Id: README,v 1.11 2003/01/05 05:53:57 yto Exp $
 
 ----------------------------------------------------------------------
 まずは、やってみよう!
@@ -24,7 +24,7 @@ sample/index.html を Web ブラウザで見てみましょう。
 
 また、以下のコマンドを実行すると、CSS を使った Web 日記になります。
 
-| ./chalow -o sample -c sample/cl-simple.conf sample/ChangeLog
+| ./chalow -o sample -c cl.conf sample/ChangeLog
 
 
 ----------------------------------------------------------------------
@@ -72,8 +72,7 @@ usage: chalow [options] <file> [file]...
   | % ./chalow -n 2 -o sample sample/ChangeLog
 
 - ユーザ設定ファイルを使う
-  | % ./chalow -c cl.conf ChangeLog
-  | % ./chalow -c sample/cl-simple.conf -o ~/www/tools/chalow/cl ChangeLog
+  | % ./chalow -c cl.conf -o ~/www/tools/chalow/cl ChangeLog
 
 
 ----------------------------------------------------------------------
@@ -89,8 +88,9 @@ usage: chalow [options] <file> [file]...
 - 各項目 (※4) の見出しの文字の色
 - インデックスページのヘッダ、フッタ
 - 月ページのヘッダ、フッタ (※5) 
-- 自動文字列置換 (※5) 
+- 自動文字列置換 (※6) 
 - CSS ファイル
+- 月ページに表示する日付の順番 (降順 or 昇順) の調整
 
 ※4 「項目」とは、'*' で始まる一塊のテキスト。「項目の見出し」とは '*' 
 の後から始まり ':' の前までのテキスト。
@@ -102,11 +102,12 @@ usage: chalow [options] <file> [file]...
 
   YEARMONTH → その月ページの年月を表す文字列 (例: "2002-10")
   CLNAVI → 月ページ移動ナビ (前後の月ページへのリンク) "<<< >>>"
+  DAYLIST → その月ページ内の日付へのリンク (日付一覧)
 
   例: $month_page_header = "CLNAVI <a href=\"index.html\">Index</a>
-  <h1>$changelog_name YEARMONTH</h1>\n";
+  <h1>$changelog_name YEARMONTH</h1><p>DAYLIST</p>\n";
 
-※5 「自動文字列置換」は、ChangeLog 中の文字列を任意の文字列に変換して
+※6 「自動文字列置換」は、ChangeLog 中の文字列を任意の文字列に変換して
 いときに用いる。要するに perl のプログラムを書いておくと HTML への変換
 のときに適用してくれるというわけ。
 
@@ -116,7 +117,15 @@ usage: chalow [options] <file> [file]...
 
   $auto_replace = '
   s!(NAISTO)!<a href="http://nais.to/">$1</a>!g;
-  s!(google)!<a href="http://www.google.com/">$1</a>!g;
+  s!(\sgoogle\s)!<a href="http://www.google.com/">$1</a>!g;
+  ';
+
+- Tips: 「自動文字列置換」によるキーワードの強調: 強調したい文字列
+  を "[[" "]]" で囲むと強調表示される。
+  - 例: ええと、[[うぴ]]、つまり、[[強調]]しちゃったりして。
+
+  $auto_replace = '
+    s|\[\[(.+?)\]\]|<b>$1</b>|gms;
   ';
 
 

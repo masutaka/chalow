@@ -1,16 +1,40 @@
+2002-12-29  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* sample: "&amp;lt;" の表示についてのサンプル↓
+	assert(i < 0xDEAD);     /* Error if the sentinel doesn't work. */
+	fj.comp.security, <89936e$skq$1@nsv1002.zaq.ne.jp>
+	ls -d ^*.c nikki<9810-2003>.html **/*.h~bar.h
+	cut -d: -f1 /etc/passwd | sort < a
+	print "<br>\n" if($. % 8 == 0);'
+	while (<>) {
+	- 細野真宏 / 経済ニュースが面白いほどわかる本<日本経済編> / 中経出版
+	perl -ne 'if(/WN|\d:/){s/<.*?>//g;print}' k2ad.shtml
+	"<" と ">" でくくった 
+	| < Bye
+	| for (my $i = 1; $i <= 10; $i++) { print "$i\n"; sleep 1; }
+	| hex2bdf < unifont.hex > unifont.bdf
+	"<<<", ">>>"
+	| print "<b>このファイルには書き込めません</b>\n"
+
+2002-12-27  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* キーワードの強調: あああ[[強調]]あああああああああああ[[ああああ
+	ああああ]]ああああああああ
+
 2002-05-22  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* すりきり: 大さじ 1 杯は、粉の場合でも、すりきり 1 杯のことらしい。
 	山盛りにすると 1.5 〜 2 倍くらいになるらしい。(曖昧だったので調べ
 	てみた。)
+	<$ <9> <ooo> < ho>
 
 2002-05-17  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* 昼寝: いつにまにか眠りこんでしまった。11 時から 15 時。最近、疲
 	れがたまっていたのか?
 
-	* 帰省: 実家に帰る。海老名経由で ViNAWALK によろうと計画していたが、
-	昼寝が長過ぎたので断念。また今度。
+	* 帰省: 実家に帰る。*海老名*経由で *ViNAWALK* によろうと計画してい
+	たが、*昼寝*が長過ぎたので断念。また今度。
 
 2002-02-11  YAMASHITA Tatsuo  <yto@nais.to>
 
@@ -25,6 +49,14 @@
 
 	聞くところによると、風邪に効くたべものは、ショウガ、チーズ、豆腐、
 	ネギ、リンゴだそうだ。さっそく摂取せねば。
+
+	* p:秘密: これは表示されないよ。
+
+	秘密。
+
+	* メモ: めもめも
+
+	* p:秘密: これは表示されないよ。
 
 2002-01-26  YAMASHITA Tatsuo  <yto@nais.to>
 

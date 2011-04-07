@@ -1,3 +1,39 @@
+2003-01-05  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.12: 公開
+
+	* README: 更新
+
+	* chalow (okikae): キーワードの強調[2002-12-28]の廃止。
+
+	* cl-simple.conf: delete. use "cl.conf"
+
+	* chalow: ChangeLog をパーズするループを書き換える。いじりやすくし
+	た。
+	(get_last_day_of_month): New. 年月を入力としその月の最終日を出力す
+	る関数。
+	(write_month_page): 月ページに、日へのリンク (日付一覧) を出せるよ
+	うにした。
+	(write_month_page): 月ページに、表示する日付の順番を調整できるよう
+	にした。降順 or 昇順。今までは、降順だけだった。
+	- 月ページで、日付を降順 (新しい日付が上) で表示するか (1:yes or 0:no)
+	  $reverse_order_days = 1;
+
+2002-12-28  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (okikae): (030105: 機能廃止。「自動文字列置換」でやっても
+	らう方針にした。[[README に解説]]を書いた。以下の記述は obsolete)
+
+	あんまり機能を追加するのは嫌なんだけど、*キーワードの強調*をできる
+	ようにした。そのうち変更するかも。
+
+	強調したい文字列を * で囲む。内側のすき間にスペースや記号が入って
+	はダメ。
+	- 悪い例: こんにちは * ほげぴー * です! いわゆる *よろしく!*
+
+	また、"<" を変換する正規表現を書き換えた。残したいタグをカスタマイ
+	ズしやすくなったかな。詳しくはソースを。
+
 2002-12-27  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.11: 公開
