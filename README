@@ -1,64 +1,64 @@
 chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 
-ChangeLog $B$r(B HTML $B$KJQ49$9$k%D!<%k(B
+ChangeLog を HTML に変換するツール
 
 README
 
 $Id: README,v 1.1 2007-10-19 22:07:48+09 tatsuoyamashita Exp tatsuoyamashita $
 
 ----------------------------------------------------------------------
-$B%$%s%9%H!<%k(B
+インストール
 ----------------------------------------------------------------------
 
-chalow$B<+BN$N%$%s%9%H!<%k$OITMW$G$9$,!"0J2<$N(BPerl$B%b%8%e!<%k$,I,MW$G$9!#(B
-CPAN$B$+$iF~<j$7$F%$%s%9%H!<%k$7$F$*$$$F$/$@$5$$!#(B
+chalow自体のインストールは不要ですが、以下のPerlモジュールが必要です。
+CPANから入手してインストールしておいてください。
 
 - Jcode
 - HTML::Template
 
 ----------------------------------------------------------------------
-$B$^$:$O!"$d$C$F$_$h$&(B!
+まずは、やってみよう!
 ----------------------------------------------------------------------
 
-$B$3$N%U%!%$%k$N$"$k%G%#%l%/%H%j$G!"0J2<$N%3%^%s%I$r<B9T$7$F$_$F2<$5$$!#(B
+このファイルのあるディレクトリで、以下のコマンドを実行してみて下さい。
 
 | % ./chalow -o sample ChangeLog
 
-$B$3$l$K$h$j!"(B./ChangeLog $B$H$$$&(B ChangeLog $B7A<0$NF|5-%U%!%$%k$,!"(B
-sample $B%G%#%l%/%H%j0J2<$NJ#?t$N(B HTML $B%U%!%$%k$KJQ49$5$l$^$7$?!#(B
+これにより、./ChangeLog という ChangeLog 形式の日記ファイルが、
+sample ディレクトリ以下の複数の HTML ファイルに変換されました。
 
 | % ls sample/*.html
 | sample/2001-12.html  ...  sample/index.html
 
-sample/index.html $B$r(B Web $B%V%i%&%6$G8+$F$_$^$7$g$&!#(B
+sample/index.html を Web ブラウザで見てみましょう。
 
-$B$^$?!"0J2<$N%3%^%s%I$r<B9T$9$k$H!"(BCSS $B$r;H$C$?(B Web $BF|5-$K$J$j$^$9!#(B
+また、以下のコマンドを実行すると、CSS を使った Web 日記になります。
 
 | ./chalow -o sample -c cl.conf ChangeLog
 
 
 ----------------------------------------------------------------------
-$B35MW(B
+概要
 ----------------------------------------------------------------------
 
-ChangeLog $B$N5-=RFbMF$+$i!"!V%$%s%G%C%/%9%Z!<%8!W!V7n%Z!<%8!W(B
-$B!VF|%Z!<%8!W$r:n@.$7!"!V=PNO@h%G%#%l%/%H%j!W$K=PNO$9$k!#(B
+ChangeLog の記述内容から、「インデックスページ」「月ページ」
+「日ページ」を作成し、「出力先ディレクトリ」に出力する。
 
-$B%$%s%G%C%/%9%Z!<%8(B (index.html) $B$H$O!"F|5-%?%$%H%k!"3F7n%Z!<%8$X$N%j%s(B
-$B%/!":G6a?tF|J,$N5-=R$,4^$^$l$k%Z!<%8!#(B
+インデックスページ (index.html) とは、日記タイトル、各月ページへのリン
+ク、最近数日分の記述が含まれるページ。
 
-$B7n%Z!<%8(B ($BNc(B: 2001-11.html) $B$H$O!"%U%!%$%kL>$O!"(B"$BG/(B-$B7n(B.html" $B$H$$$&%U%)!<(B
-$B%^%C%H!#$=$N7n$NA45-=R$,4^$^$l$k$Z!<%8!#(B
+月ページ (例: 2001-11.html) とは、ファイル名は、"年-月.html" というフォー
+マット。その月の全記述が含まれるぺージ。
 
-$BF|%Z!<%8$H$O!"(B"$BG/(B-$B7n(B-$BF|(B.html" $B$H$$$&%U%!%$%kL>$G=PNO$5$l$k!"0lF|$4$H$N(B
-$BFbMF$N%Z!<%8!#%*%W%7%g%s$GF|%Z!<%8$r=PNO$9$k$h$&$KA*Br$G$-$k!#(B
+日ページとは、"年-月-日.html" というファイル名で出力される、一日ごとの
+内容のページ。オプションで日ページを出力するように選択できる。
 
-$B=PNO@h%G%#%l%/%H%j$H$O!"(BChangeLog $B$+$iJQ49$5$l$?(B HTML $B%U%!%$%k$,=PNO$5(B
-$B$l$k@h!#%G%U%)%k%H$G$O8=:_$N%G%#%l%/%H%j!#(B
+出力先ディレクトリとは、ChangeLog から変換された HTML ファイルが出力さ
+れる先。デフォルトでは現在のディレクトリ。
 
 
 ----------------------------------------------------------------------
-$B;H$$J}(B
+使い方
 ----------------------------------------------------------------------
 
 usage: chalow [options] <file> [file]...
@@ -71,249 +71,249 @@ usage: chalow [options] <file> [file]...
     -8, --utf8                  utf8 mode
     -q, --quiet                 quiet mode
 
--n $B$G!"!V%$%s%G%C%/%9%Z!<%8!W$K:G6a$N2?F|J,$r:\$;$k$+;XDj$G$-$k!#(B
--o $B$G!"!V=PNO@h%G%#%l%/%H%j!W$r;XDj$9$k!#B8:_$7$J$$%G%#%l%/%H%j$r;XDj(B
-   $B$7$F$O$$$1$J$$!#(B
--c $B$G!"!V%f!<%6@_Dj%U%!%$%k!W$r;XDj$9$k!#;XDj$7$J$$$H%G%U%)%k%H$N@_Dj!#(B
--s $B$G!"=hM}Dd;_F|IU(B ($stop_date) $B$r;XDj$9$k!#$3$NF|IU$^$G=hM}$9$k!#(B
-   $BL$;XDj$J$i:G8e$^$G=hM}$9$k!#(B ($BNc(B: --stop-date "2002-01-01")
--C $B$G!"(Bchalow: CSS $B%U%!%$%k$r%3%^%s%I%i%$%s$+$i;XDj$G$-$k!#(B
--u $B$r;XDj$9$k$H!"=PNO@h%U%!%$%k$H%5%$%:$,0[$J$k>l9g$N$_>e=q$-=PNO$9$k!#(B
--8 $B$r;XDj$9$k$H!"(BUTF8$B$G$N=PNO$K$J$k!#(BChangeLog, cl.conf $B$O(BUTF8$B$r2>Dj!#(B
--q $B$r;XDj$9$k$H!"JQ49:n6H?JD=>pJs$rI8=`=PNO$K=PNO$7$J$/$J$k!#(B
+-n で、「インデックスページ」に最近の何日分を載せるか指定できる。
+-o で、「出力先ディレクトリ」を指定する。存在しないディレクトリを指定
+   してはいけない。
+-c で、「ユーザ設定ファイル」を指定する。指定しないとデフォルトの設定。
+-s で、処理停止日付 ($stop_date) を指定する。この日付まで処理する。
+   未指定なら最後まで処理する。 (例: --stop-date "2002-01-01")
+-C で、chalow: CSS ファイルをコマンドラインから指定できる。
+-u を指定すると、出力先ファイルとサイズが異なる場合のみ上書き出力する。
+-8 を指定すると、UTF8での出力になる。ChangeLog, cl.conf はUTF8を仮定。
+-q を指定すると、変換作業進捗情報を標準出力に出力しなくなる。
 
 
-$B<B9TNc(B:
+実行例:
 
-- $B%+%l%s%H%G%#%l%/%H%j$K(B HTML $B%U%!%$%k$r=PNO$9$k(B
+- カレントディレクトリに HTML ファイルを出力する
 	% ./chalow ChangeLog
 
-- $B%$%s%G%C%/%9%Z!<%8$K:G6a(B 2 $BF|J,$@$1=PNO$9$k(B
+- インデックスページに最近 2 日分だけ出力する
 	% ./chalow -n 2 -o sample sample/ChangeLog
 
-- $B%f!<%6@_Dj%U%!%$%k$r;H$&(B
+- ユーザ設定ファイルを使う
 	% ./chalow -c cl.conf -o ~/www/tools/chalow/cl ChangeLog
 
 
 ----------------------------------------------------------------------
-$B%f!<%6@_Dj%U%!%$%k(B
+ユーザ設定ファイル
 ----------------------------------------------------------------------
 
-$B%f!<%6@_Dj%U%!%$%k(B ("-c" $B$G;XDj$9$k(B) $B$G$O0J2<$N9`L\$J$I$r;XDj$G$-$k!#(B
-$B>\:Y$O!"E:IU$5$l$F$$$k(B cl.conf ($B%5%s%W%k(B) $B$r;2>H$5$l$?$$!#(B
+ユーザ設定ファイル ("-c" で指定する) では以下の項目などを指定できる。
+詳細は、添付されている cl.conf (サンプル) を参照されたい。
 
-- $BF|5-$NL>A0!"(BURL
-- $B%$%s%G%C%/%9%Z!<%8(B (index.html) $B$G:G6a2?F|J,$rI=<($9$k$+(B
-- $B%$%s%G%C%/%9%Z!<%8$N%F%s%W%l!<%H(B ($B"((B5)
-- $B7n%Z!<%8$N%F%s%W%l!<%H(B ($B"((B5)
-- $B<+F0J8;zNsCV49(B ($B"((B6) 
-- CSS $B%U%!%$%k(B
-- $B7n%Z!<%8$KI=<($9$kF|IU$N=gHV(B ($B9_=g(B or $B>:=g(B) $B$ND4@0(B
-- $B%?%V$K$h$k%$%s%G%s%H$r$J$/$9$+(B
-- $B%"%$%F%`%X%C%@!<$N%U%)!<%^%C%H$r$I$&$9$k$+(B
-- $BI=<($9$k$H$-0zMQ5-9f(B ('>' or '|') $B$r>C$9$+(B
-- item header $B$K(B h3 $B%?%0$rB-$9$+(B ($B"((B7)
-- item header $B$N@hF,$N(B "*" $B$K%"%s%+!<$r$D$1$k$+(B
-- $BF|%Z!<%8(B (2003-10-01.html $BEy(B) $B$r=PNO$9$k$+(B
-- RSS $B%U%!%$%k$r=PNO$9$k$+(B
+- 日記の名前、URL
+- インデックスページ (index.html) で最近何日分を表示するか
+- インデックスページのテンプレート (※5)
+- 月ページのテンプレート (※5)
+- 自動文字列置換 (※6) 
+- CSS ファイル
+- 月ページに表示する日付の順番 (降順 or 昇順) の調整
+- タブによるインデントをなくすか
+- アイテムヘッダーのフォーマットをどうするか
+- 表示するとき引用記号 ('>' or '|') を消すか
+- item header に h3 タグを足すか (※7)
+- item header の先頭の "*" にアンカーをつけるか
+- 日ページ (2003-10-01.html 等) を出力するか
+- RSS ファイルを出力するか
 - ...
 
-$B"((B5 $B%$%s%G%C%/%9%Z!<%8$H7n%Z!<%8$N(B HTML $B%F%s%W%l!<%H$O(B 
+※5 インデックスページと月ページの HTML テンプレートは 
 $index_page_template, $month_page_template
-$B$G@_Dj$9$k!#>\$7$/$O(B cl.conf $B$N%3%a%s%H$r;2>H$5$l$?$$!#(B
+で設定する。詳しくは cl.conf のコメントを参照されたい。
 
-$B"((B6 $B!V<+F0J8;zNsCV49!W$O!"(BChangeLog $BCf$NJ8;zNs$rG$0U$NJ8;zNs$KJQ49$7$F(B
-$B$$$H$-$KMQ$$$k!#MW$9$k$K(B perl $B$N%W%m%0%i%`$r=q$$$F$*$/$H(B HTML $B$X$NJQ49(B
-$B$N$H$-$KE,MQ$7$F$/$l$k$H$$$&$o$1!#(B
+※6 「自動文字列置換」は、ChangeLog 中の文字列を任意の文字列に変換して
+いときに用いる。要するに perl のプログラムを書いておくと HTML への変換
+のときに適用してくれるというわけ。
 
-  $BNc(B: "NAISTO" $B$r(B "<a href="http://nais.to/">NAISTO</a>" $B$K!"(B
-  "google" $B$r(B "<a href="http://www.google.com/">google</a>" 
-  $B$KJQ49$9$k!#(B
+  例: "NAISTO" を "<a href="http://nais.to/">NAISTO</a>" に、
+  "google" を "<a href="http://www.google.com/">google</a>" 
+  に変換する。
 	$auto_replace = '
 	s!(NAISTO)!<a href="http://nais.to/">$1</a>!g;
 	s!(\sgoogle\s)!<a href="http://www.google.com/">$1</a>!g;
 	';
 
-$B"((B7 tDiary $B$N%F!<%^(B (CSS $B%U%!%$%k(B) $B$r$=$N$^$^;H$&$?$a$KI,MW!#(B
-tDiary $B$N%F!<%^$r;H$&$K$O0J2<$N$h$&$J@_Dj$r9T$&$HNI$$!#(B
-- $item_header_style = 1 or 2 ($B%$%a!<%8%"%s%+!<$r;H$&$H$-(B)
+※7 tDiary のテーマ (CSS ファイル) をそのまま使うために必要。
+tDiary のテーマを使うには以下のような設定を行うと良い。
+- $item_header_style = 1 or 2 (イメージアンカーを使うとき)
 - $use_h3_for_item_header = 1
-- $css_file = "tDiary$B$N%F!<%^$N(BCSS$B%U%!%$%k(B.css"
-- $item_template $B$G(B h3 $B$G(B header $B$r0O$`!#(B
+- $css_file = "tDiaryのテーマのCSSファイル.css"
+- $item_template で h3 で header を囲む。
 
 ----------------------------------------------------------------------
-ChangeLog $B$NFC<l$J5-K!(B
+ChangeLog の特殊な記法
 ----------------------------------------------------------------------
 
-$B0lIt(B Hiki $B$N5-K!$H6&DL$K$7$F$$$^$9!#(B
+一部 Hiki の記法と共通にしています。
 
 
-- $BHkL)$N9`L\(B: ChangeLog $B$K$O5-$7$?$$$,!"(BWeb $BF|5-$H$7$F8x3+$9$k$H$-$K$O(B
-  $B:o$j$?$$9`L\$O!"0J2<$N$h$&$K!V9`L\$N8+=P$7!W$N@hF,$K(B "p:" $B$rIU$1$k!#(B
-  (p $B$O(B private $B$N0UL#(B)
+- 秘密の項目: ChangeLog には記したいが、Web 日記として公開するときには
+  削りたい項目は、以下のように「項目の見出し」の先頭に "p:" を付ける。
+  (p は private の意味)
 
-	* p:$BHkL)%a%b(B: YT$B$,$^$?$d$i$+$7$?!#$7$g$&$b$J$$$d$D$@!#(B
-
-
-- $BF|IU$G;2>H%j%s%/(B: "[YYYY-MM-DD]" $B$H$$$&J8;zNs$O!"<+F0E*$K2a5n$N9`L\(B
-  $B$X$N;2>H%j%s%/$XJQ49$5$l$k!#(B"[YYYY-MM-DD-I]" $B$H$$$&Iw$K%"%$%F%`(B 
-  No. $B$b;XDj$G$-$k!#(B
-
-	$B@hF|(B[2001-12-01]$B!"$I$3$+$X9T$C$?!#(B
-	$B"-(B
-	$B@hF|(B<a href="2001-12.html#2001-12-01">[2001-12-01]</a>$B!"(B
-	$B$I$3$+$X9T$C$?!#(B
+	* p:秘密メモ: YTがまたやらかした。しょうもないやつだ。
 
 
-- $BG$0U$N(B URL $B$X$N%j%s%/(B
+- 日付で参照リンク: "[YYYY-MM-DD]" という文字列は、自動的に過去の項目
+  への参照リンクへ変換される。"[YYYY-MM-DD-I]" という風にアイテム 
+  No. も指定できる。
 
-  $B!VC18l(B|URL$B!W$r(B 2 $B$D$NH>3Q%+%.%+%C%3$G0O$`$H$rG$0U$N(B URL $B$X$N%j%s%/(B
-  $B$K$J$j$^$9!#Nc!'(B 
+	先日[2001-12-01]、どこかへ行った。
+	↓
+	先日<a href="2001-12.html#2001-12-01">[2001-12-01]</a>、
+	どこかへ行った。
+
+
+- 任意の URL へのリンク
+
+  「単語|URL」を 2 つの半角カギカッコで囲むとを任意の URL へのリンク
+  になります。例： 
 	[[Yahoo!|http://www.yahoo.co.jp/]]
 	
-  $B$3$N$H$-(B URL $B$NKvHx$,(B jpg,jpeg,png,gif $B$@$H(B IMG $B%?%0$KE83+$5$l$^$9!#(B
-  $B!J;XDj$7$?C18l$,(BALT$B$K@_Dj$5$l$k!K!#Nc!'(B
-	[[$B?^(B|image/gazou.png]]
+  このとき URL の末尾が jpg,jpeg,png,gif だと IMG タグに展開されます。
+  （指定した単語がALTに設定される）。例：
+	[[図|image/gazou.png]]
 	
-  $B!VC18l!W$NKvHx$,(B jpg,jpeg,png,gif $B$@$H%/%j%C%/2DG=$J(B IMG $B%?%0$KE8(B
-  $B3+$5$l$^$9!#(BIMG $B$,(B URL $B$X$N%j%s%/$K$J$j$^$9!#Nc!'(B
+  「単語」の末尾が jpg,jpeg,png,gif だとクリック可能な IMG タグに展
+  開されます。IMG が URL へのリンクになります。例：
 	[[image/gazou.png|http://nais.to/~yto/]]
 
-  $B$^$?!"(BURL $B$C$]$$$b$N$,$"$k$H>!<j$K%j%s%/$,$O$i$l$^$9!#Nc!'(B
+  また、URL っぽいものがあると勝手にリンクがはられます。例：
 	http://www.yahoo.co.jp/
 
-  $BD9$$(B URL $B$O!"%P%C%/%9%i%C%7%e(B('\')$B$GESCf2~9T$9$k$3$H$,$G$-$k!#2<5-$N(B
-  $BNc$N$h$&$KJQ49$5$l$k!#(B
+  長い URL は、バックスラッシュ('\')で途中改行することができる。下記の
+  例のように変換される。
 
 	http://example.com/123456789012345678901234567890\
 	123456789012345678901234567890.html
-	$B"-(B
+	↓
 	<a href="http://example.com/...0.html>http://example.com/...890
 	123456789012345678901234567890.html</a>
 
 
-- $B0zMQ(B (citation): $B%?%V$N8e$K(B "|" $B$+(B ">" $B$,Mh$k9T$O0zMQ$H$_$J$7!"(B
-  blockquote $B$G0O$^$l$k!#(B
+- 引用 (citation): タブの後に "|" か ">" が来る行は引用とみなし、
+  blockquote で囲まれる。
 
-	> $B0zMQ(B
-	> $B0zMQ(B
-	> $B0zMQ(B
-		> $B$3$l$O0zMQ$G$O$J$$(B
+	> 引用
+	> 引用
+	> 引用
+		> これは引用ではない
 
-	| $B0zMQ(B
-	| $B0zMQ(B
-	 | $B$3$l$O0zMQ$G$O$J$$(B
+	| 引用
+	| 引用
+	 | これは引用ではない
 
-  $B$^$?$O!"(B">>" $B$H(B "<<" $B$G0O$^$l$?NN0h$,(B blockquote $B$G0O$^$l$k!#(B
+  または、">>" と "<<" で囲まれた領域が blockquote で囲まれる。
 	       
 	>>
-	$B0zMQ(B
-	$B0zMQ(B
-	$B0zMQ(B
+	引用
+	引用
+	引用
 	<<
 
 
-- $BJ8;z=$>~$N5-K!(B
+- 文字修飾の記法
 
-  $B!V(B'$B!W(B2$B8D$G$O$5$s$@ItJ,$O6/D4$5$l$^$9!#!V(B'$B!W(B3$B8D$G$O$5$s$@ItJ,$O$5$i(B
-  $B$K6/D4$5$l$^$9!#!V(B=$B!W(B2$B8D$G$O$5$s$@ItJ,$O<h>C@~$K$J$j$^$9!#Nc!'(B
+  「'」2個ではさんだ部分は強調されます。「'」3個ではさんだ部分はさら
+  に強調されます。「=」2個ではさんだ部分は取消線になります。例：
 
 	==ABC==  ''ABC''  '''ABC'''
 
-- $B?eJ?@~$N5-K!(B
+- 水平線の記法
 
-  $B%^%$%J%95-9f!V(B-$B!W$r9T$N@hF,$N%?%V$N8e$+$i(B 4 $B$D=q$/$H?eJ?@~$K$J$j$^(B
-  $B$9!#Nc!'(B
-	$B$"$O$O(B
+  マイナス記号「-」を行の先頭のタブの後から 4 つ書くと水平線になりま
+  す。例：
+	あはは
 	----
-	$B$$$R$R(B
+	いひひ
 
 
-- $BI=(B(table)$B$N5-K!(B
+- 表(table)の記法
 
-  $B0J2<$N$h$&$K5-=R$7$^$9!#(B
-	||$B9`L\(B1-1||$B9`L\(B1-2||$B9`L\(B1-3
-	||$B9`L\(B2-1||$B9`L\(B2-2||$B9`L\(B2-3
-
-
-- $B!VB3$-$rFI$`!W$NI=5-(B
-
-  '====' $B$H5-=R$9$k$H!V(BRead More...$B!W$H$$$&%j%s%/$,$G$-(B item page $B$X(B
-  $B%8%c%s%W$7$^$9!#(B 
-  item page $B$r=P$9$h$&$K$7$?$H$-(B($page_mode=2)$B$N$_5!G=$7$^$9!#(B
+  以下のように記述します。
+	||項目1-1||項目1-2||項目1-3
+	||項目2-1||項目2-2||項目2-3
 
 
-- $B%W%i%0%$%s5!G=(B
+- 「続きを読む」の表記
 
-  $B!V(B{{$B!W$H!V(B}}$B!W$G0O$`$H%W%i%0%$%s(B ($B4X?t(B) $B$r8F$S=P$9$3$H$,$G$-(B
-  $B$^$9!#(B
-
-  $BNc(B: {{google_seach('$B3$O7L>(B $B1G2h4[(B')}}
-
-  $B%W%i%0%$%s$O(B cl.conf $B$KB-$7$FCV$1$P;H$($^$9!#(B
+  '====' と記述すると「Read More...」というリンクができ item page へ
+  ジャンプします。 
+  item page を出すようにしたとき($page_mode=2)のみ機能します。
 
 
-- $B%+%F%4%j5!G=(B
+- プラグイン機能
 
-  item header $B$G%+%F%4%j$r;XDj$9$k$H!"%+%F%4%jJL%Z!<%8$K=PNO$5$l$^$9!#(B
-  $B%+%F%4%j$N;XDj$N;EJ}!'(B
-	* $B%?%$%H%k(B [$B%+%F%4%jL>(B][$B%+%F%4%jL>(B][$B%+%F%4%jL>(B]...: ...
+  「{{」と「}}」で囲むとプラグイン (関数) を呼び出すことができ
+  ます。
 
-  $BNc!'(B
-	* $B%&%R%g$N9XF~J}K!(B [KnowHow]: $B$^$:$O%3%s%S%K$X9T$C$F(B...
-	* $B$&$^$$!*(B[$B<r(B][$B%3%s%S%K(B]: $B:rF|!"%3%s%S%K$G8+$D$1$?(B...
+  例: {{google_seach('海老名 映画館')}}
 
-  $B%+%F%4%j$r;XDj$9$k$H!"<+F0E*$K$=$N%+%F%4%j$N%Z!<%8$,@8@.$5$l$^$9!#(B
-  $B%+%F%4%j%Z!<%8$N%U%!%$%kL>$O!V(Bcat_[$B%+%F%4%jL>(B].html$B!W$N$h$&$K$J$j$^$9!#(B
+  プラグインは cl.conf に足して置けば使えます。
 
-- $BF|!9$N%a%C%;!<%8Kd$a9~$_(B
 
-  $BF|IU%(%s%H%j$N>e$H2<$K$=$NF|$N%a%C%;!<%8$rI=<($9$k$3$H$,$G$-$^$9!#(B
-  $B0J2<$N$h$&$J(B item $B$r=q$-$^$9!#(B
-  item $B$NCf$N(B HTML $B%?%0$O%(%9%1!<%W$5$l$^$;$s!#(B
+- カテゴリ機能
+
+  item header でカテゴリを指定すると、カテゴリ別ページに出力されます。
+  カテゴリの指定の仕方：
+	* タイトル [カテゴリ名][カテゴリ名][カテゴリ名]...: ...
+
+  例：
+	* ウヒョの購入方法 [KnowHow]: まずはコンビニへ行って...
+	* うまい！[酒][コンビニ]: 昨日、コンビニで見つけた...
+
+  カテゴリを指定すると、自動的にそのカテゴリのページが生成されます。
+  カテゴリページのファイル名は「cat_[カテゴリ名].html」のようになります。
+
+- 日々のメッセージ埋め込み
+
+  日付エントリの上と下にその日のメッセージを表示することができます。
+  以下のような item を書きます。
+  item の中の HTML タグはエスケープされません。
 
 	* message-top:
-	<p>$BH~?)2H$NKv$O8p?)(B --- $B%Y%s%8%c%_%s!&%U%i%s%/%j%s(B</p>
+	<p>美食家の末は乞食 --- ベンジャミン・フランクリン</p>
 	
 	* message-bottom:
-	<span style="font-size:small">$B"v(B Jeith Jarrett / La Scala</span>
+	<span style="font-size:small">♪ Jeith Jarrett / La Scala</span>
 
 
-- $B%(%9%1!<%W(B
-  $B0J2<$N5-K!$G(BHTML$B$rD>=q$-$9$k$3$H$,$G$-$^$9!#(B
+- エスケープ
+  以下の記法でHTMLを直書きすることができます。
 	[literal]...[/literal], [sic]...[/sic], [esc]...[/esc]
 
 
-- $B%=!<%9(B
-  $B%=!<%9$NI=<($O(B [src]...[/src] $B$r;H$$$^$9!#(B
-  $BFbIt$G$O%(%s%F%#%F%#CV49$H(Bpre$B0O$_$r9T$$$^$9!#(B
+- ソース
+  ソースの表示は [src]...[/src] を使います。
+  内部ではエンティティ置換とpre囲みを行います。
 
 
-- ChangeLog$B$NKvHx(B
-  $B9TF,$,!V(B__DATA__$B!W$G;O$^$k9T$,$"$k$H!"$=$l0J9_$N5-=R$OL5;k$5$l$^$9!#(B
-  $B%?%V$,F~$C$F$$$l$PBg>fIW$G$9!#(B
+- ChangeLogの末尾
+  行頭が「__DATA__」で始まる行があると、それ以降の記述は無視されます。
+  タブが入っていれば大丈夫です。
 
 
 ----------------------------------------------------------------------
-$BCm0U(B
+注意
 ----------------------------------------------------------------------
 
-ChengaLog $B%U%!%$%k$NF|IU9T$O!"0J2<$N%U%)!<%^%C%H$G$J$1$l$P$J$i$J$$!#(B
+ChengaLog ファイルの日付行は、以下のフォーマットでなければならない。
 
 	2001-11-21  YAMASHITA Tatsuo  <yto@example.com>
 	or
 	2001-11-21 (Wed)  YAMASHITA Tatsuo  <yto@example.com>
 
-$BMKF|F~$jF|IU%U%)!<%^%C%H$K$D$$$F$O!"(B
+曜日入り日付フォーマットについては、
 <http://namazu.org/~satoru/diary/?200301b&to=200301151#200301151>
-$B$r;2>H$5$l$?$$!#(B
+を参照されたい。
 
-$B0J2<$N%U%)!<%^%C%H$O%5%]!<%H$7$F$$$J$$!#(B
+以下のフォーマットはサポートしていない。
 
 	Sat Mar 14 08:48:56 1998  YAMASHITA Tatsuo  <yto@example.com>
 
-$B$7$+$7!"%Q%C%1!<%8$K4^$^$l$F$$$k(B clweek.pl $B$GF|IU%U%)!<%^%C(B
-$B%H$NJQ49$,$G$-$k!#(B
-$B;H$$J}(B: 
+しかし、パッケージに含まれている clweek.pl で日付フォーマッ
+トの変換ができる。
+使い方: 
 	% ./clweek.pl ChangeLog > ChangeLog-new
 
