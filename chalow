@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: chalow,v 1.5 2001-12-01 22:04:39+09 yto Exp yto $
+# $Id: chalow,v 1.7 2001-12-02 17:57:36+09 yto Exp $
 #
 # chalow - CHAngeLog On The Web - convert ChangeLog to HTML files
 #
@@ -47,14 +47,15 @@ my $opt_odir;
 
 ### コマンドライン引数
 Getopt::Long::Configure('bundling');
-my ($opt_topn_tmp, $opt_odir_tmp);
+my ($opt_topn_tmp, $opt_odir_tmp, $quiet_mode);
 GetOptions('n|top-n=n'   => \$opt_topn_tmp,
 	   'o|output-dir=s'   => \$opt_odir_tmp,
-	   'c|configure-file=s' => \$conf_file);
+	   'c|configure-file=s' => \$conf_file,
+	   'q|quiet' => \$quiet_mode);
 
 # ユーザ設定ファイルの読み込み
 open(CONF, "$NKF -e $conf_file |") or die "can't open file: $conf_file\n";
-my $conf = join('', (<CONF>));
+my $conf = join('', <CONF>);
 eval $conf;
 
 # ユーザ設定ファイルよりコマンドライン指定を優先する処理
@@ -68,6 +69,7 @@ usage: prog [options] <file> [file]...
     -n, --top-n=NUM             write NUM days to "index.html"
     -o, --output-dir=DIR        directory to output
     -c, --configure-file=FILE   configure file (default "cl.conf")
+    -q, --quiet                 quiet mode
 USAGE
     ;
 } else {
@@ -76,6 +78,8 @@ USAGE
     my %month_page;
 
     for my $fname (@ARGV) {
+
+	print "reading \"$fname\"\n" if (!defined $quiet_mode);
 
 	### クリーニングのためにChangeLogファイル一気に読み込む
 	my $fh = new FileHandle;
@@ -118,6 +122,10 @@ USAGE
     write_index_page(\%month_page, \$top_n_str);
 }
 
+print "done.\n" if (!defined $quiet_mode);
+
+exit;
+
 
 ### 文字列の置き換え
 sub okikae {
@@ -158,6 +166,7 @@ sub okikae {
 sub write_month_page {
     my ($month_page) = @_;
     for my $i (reverse sort keys %$month_page) {
+	print "output to \"$opt_odir/$i.html\"\n" if (!defined $quiet_mode);
 	my $fname = "| $NKF -e > $opt_odir/$i.html";
 	my $fh = new FileHandle;
 	$fh->open($fname) || die "$fname: $!";
@@ -175,7 +184,7 @@ sub write_month_page {
 ### インデックスページ(index.html)を作る
 sub write_index_page {
     my ($month_page, $top_n_str) = @_;
-
+    print "output to \"$opt_odir/index.html\"\n" if (!defined $quiet_mode);
     my $fname = "| $NKF -e > $opt_odir/index.html";
     my $fh = new FileHandle;
     $fh->open($fname) || die "$fname: $!";

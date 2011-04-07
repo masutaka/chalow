@@ -1,5 +1,16 @@
 2001-12-02  YAMASHITA Tatsuo  <yto@nais.to>
 
+	* version 0.3: 公開
+
+	* README: 手直し。
+
+	* chalow: New option '-q'. quiet mode. 標準出力に進捗情報を出すこ
+	とにしたので、quiet mode も作った。
+
+	* ファイル移動: ChangeLog-sample → sample/ChangeLog, 
+	cl-simple.conf → sample/cl-simple.conf
+	(thanks to satoru-t)
+
 	* version 0.2: 公開してみる。
 
 	* cl-simple.conf: パッケージに追加。README の実行例で使用。
