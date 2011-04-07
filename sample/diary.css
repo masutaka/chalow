@@ -94,15 +94,15 @@ item header の設定
 /*
 イメージアンカーの設定
 */
-/*div.day span.panchor {
-        background-image: url(clover_anchor.png);
+div.day span.sanchor {
+        background-image: url(check-tr.png);
         background-position: bottom right;
         background-repeat: no-repeat;
         padding: 16px 16px 0px 0px;
         color: #fff;
         background-color: transparent;
         font-size: 1px;
-}*/
+}
 
 /*
 サブタイトルを含むセクション (item) の設定
@@ -175,6 +175,52 @@ div.body p {
 p.footer a {
 	font-weight: bold;
 }
+
+/* ツッコミ関連 */
+
+div.comment {
+        border-style: solid;
+        border-color: #ffd0ff;
+        border-width: 1px;
+        margin: 0.5em;
+        padding: 0.5em;
+        font-size: 0.9em;
+        background-color: #fff0ff;
+}
+
+div.comment p {
+	margin: 0.5em;
+}
+
+div.day span.canchor {
+        background-image: url(check-tr.png);
+        background-position: bottom right;
+        background-repeat: no-repeat;
+        padding: 16px 16px 0px 0px;
+        color: #fff;
+        background-color: transparent;
+        font-size: 1px;
+}
+
+div.form {
+        border-style: solid;
+        border-color: #ffd0ff;
+        border-width: 1px;
+        margin: 0.5em;
+        padding: 0.5em;
+        background-color: #fff0ff;
+}
+
+div.commentshort {
+        margin: 0.3em;
+}
+
+div.commentbody {
+
+}
+
+
+
 
 /*
 いろいろ

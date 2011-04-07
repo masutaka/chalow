@@ -1,3 +1,97 @@
+2003-07-12  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* p:TODO:
+	- 日本語コードの選択
+	- # ではじまる行は消す
+
+	* version 0.17: 
+	公開
+
+	* memo:
+	くっつき BBS = <http://nais.to/~yto/tools/kuttukibbs/>
+
+2003-07-08 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (parse_entry): 
+	くっつき BBS にあわせて、TUKKOMI_DATE の仕様を変更。
+	old: $template =~ s/TUKKOMI_DATE/$day/g;
+	new: $template =~ s/TUKKOMI_DATE/$mon.html%23$day/g;
+
+	old:
+	> 本日のツッコミ [<a href='./kuttukibbs.cgi?date=TUKKOMI_DATE'>全部
+	> 見る / ツッコミを入れる</a>]
+
+	new:
+	> 本日のツッコミ [<a href='./kuttukibbs.cgi?url=TUKKOMI_DATE'>全部
+	> 見る / ツッコミを入れる</a>]
+	
+2003-07-01 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* {chalow,cl.conf}:
+	mod $item_header_mark (ref. [2003-06-26-1])
+	> # item header の先頭の記号の指定
+	> # 『日記のセクションの先頭(サブタイトルの行頭)に挿入される、リンク用の
+	> # アンカー文字列を指定します。なお「<span class="panchor">_</span>」を
+	> # 指定すると、テーマによっては自動的に画像アンカーがつくようになりま
+	> # す。』(tDiary の skel/conf.rhtml より)
+	> $item_header_mark = "<span class="sanchor">*</span>";
+
+	version 0.15 以降、panchor に決め打ちにしてしまっていたが、sanchor 
+	もあるわけなので、設定できるようにした。
+
+2003-06-29 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* sample/diary.css: 
+	update
+
+	* check-tr.png:
+	New for sample CSS
+
+	* {chalow,cl.conf}:
+	新たな設定項目を追加
+	> # ツッコミ機能を使用するか (1:YES, 0:NO)
+	> my $use_tukkomi = 1;
+	> # ツッコミのテンプレート = <div class="comment">...</div> の中味。
+	> # TUKKOMI_DATE はそのエントリの日付 (例: 2003-06-25) に変換される
+	> my $tukkomi_template = qq(
+	> <div class="caption">
+	> 本日のツッコミ [<a href='./kuttukibbs.cgi?date=TUKKOMI_DATE'>全部
+	> 見る / ツッコミを入れる</a>]
+	> </div>
+	> <script language="JavaScript" src="kblog/TUKKOMI_DATE.js"></script>
+	> );
+
+	* chalow: 
+	試験的にツッコミ機能を使えるようにした。ツッコミ機能自体は外部のシ
+	ステムを利用。この部分については今後大幅な変更の可能性大。
+
+2003-06-26  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* README (usage):
+	add
+
+	* chalow (okikae): 
+	- リンク付き画像張り付けをできるようにした。サムネイルと拡大画像な
+	  どに。画像からの URL へのリンクも可能。
+	  > [IMG：image/hello-s.jpg image/hello.jpg]
+	  > [IMG：image/hello-s.jpg http：//example.com/hoge.html]
+	  (正しい表記は、半角コロンです)
+	
+	- URL 文字列のマッチパターンをいじる。
+	
+	* chalow (parse_entry): item header の処理のところのロジック変更。
+
+	* {chalow,cl.cong}:
+	新たな設定項目を追加
+	> # item header の先頭の記号の指定
+	> my $item_header_mark = "*";
+
+2003-06-24  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* README: 
+	mod. 
+	ref. <http://cgi14.plala.or.jp/imaishi/changelog/2003-06.html#2003-06-24>
+
 2003-06-23 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.16:
@@ -23,9 +117,6 @@
 	> my $descending_order_item_num = 1;
 
 2003-06-22  YAMASHITA Tatsuo  <yto@nais.to>
-
-	* p:TODO:
-	- 日本語コードの選択
 
 	* version 0.15:
 	公開

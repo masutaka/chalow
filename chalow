@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.37 2003/06/23 11:09:05 yto Exp $
+# $Id: chalow,v 1.41 2003/07/12 03:26:53 yto Exp $
 #
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
@@ -82,10 +82,22 @@ my $item_header_style = 0;
 my $remove_quote_mark = 0;
 # item header に h3 タグを足すか (1:YES, 0:NO) - tDiary との互換性のため
 my $use_h3_for_item_header = 0;
-# item header の先頭の "*" にアンカーをつけるか (1:YES, 0:NO)
+# item header の先頭の記号にアンカーをつけるか (1:YES, 0:NO)
 my $use_item_anchor = 1;
-# item header の先頭の "*" のアンカー番号を降順にするか (1:YES, 0:NO)
+# item header の先頭の記号のアンカー番号を降順にするか (1:YES, 0:NO)
 my $descending_order_item_num = 1;
+# item header の先頭の記号の指定
+# 『日記のセクションの先頭(サブタイトルの行頭)に挿入される、リンク用の
+# アンカー文字列を指定します。なお「<span class="panchor">_</span>」を
+# 指定すると、テーマによっては自動的に画像アンカーがつくようになりま
+# す。』(tDiary の skel/conf.rhtml より)
+my $item_header_mark = '<span class="sanchor">*</span>';
+# ツッコミ機能を使用するか (1:YES, 0:NO)
+my $use_tukkomi = 0;
+# ツッコミのテンプレート = <div class="comment">...</div> の中味。
+# TUKKOMI_DATE はそのエントリの日付 (例: 2003-06-25) に変換される
+my $tukkomi_template = "";
+
 
 ### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
 my $signature = qq(<p class="footer">Powered by 
@@ -114,6 +126,16 @@ if ($conf_file ne "") {
 $opt_topn = $opt_topn_tmp if (defined $opt_topn_tmp);
 $opt_odir = $opt_odir_tmp if (defined $opt_odir_tmp);
 $css_file = $opt_css_file if (defined $opt_css_file);
+
+# ツッコミ機能を使う
+if ($use_tukkomi == 1) {
+    my $s = qq(<script language="JavaScript" src="kuttukibbs.js"></script>
+<script language="JavaScript">
+function CallFunc() {KbShowCommentShort(num, 5, 50)}</script>);
+
+    $month_page_head_plus .= $s;
+    $index_page_head_plus .= $s;
+}
 
 # 処理停止日付: 文字列だったものを数値にする。後で数値として日付の比較
 # に使うから。
@@ -171,6 +193,7 @@ for my $fname (@ARGV) {
 	$all_month{$month} = 1;
 
 	### stop date
+	# 月別一覧などに影響がでる。DEBUG 用ですな。
 	if ($stop_date != 0) {
 	    $day =~ (/^(\d+)-(\d+)-(\d+)/);
 	    my $cdate = $1 * 10000 + $2 * 100 + $3;
@@ -182,7 +205,7 @@ for my $fname (@ARGV) {
 	### 日付の後ろをどうするか
 	if ($show_day_of_week == 1) {
 	    # 曜日(Mon, Tue, ...)を追加;
-	    # "2000-10-19" --> "2000-10-19  Thu"
+	    # "2000-10-19" --> "2000-10-19 Thu"
 	    my $dow = get_day_of_week($day);
 	    s/^($day)\s.+/$1 $dow/;
 	} else {
@@ -207,8 +230,8 @@ for my $fname (@ARGV) {
     }
 }
 
-write_month_page(\%month_page);
 write_index_page(\%all_month, \$top_n_str);
+write_month_page(\%month_page);
 
 
 print "done.\n" if (!defined $quiet_mode);
@@ -255,31 +278,33 @@ sub parse_entry {
 
 	    # (4) item header とそれ以外に分解
 	    my ($ih, $s, $c) = ($item =~ /^\t\* (.+?):(\s)(.*)\Z/sm);
+	    # (\s) には、スペース、タブ、改行がマッチ　↑
 	    #print "ih[$ih] c[$c]\n";
 
 	    if (defined $ih) {
 		# (5) item header の処理
 		$ih = okikae($ih);
 
-		if ($item_header_style == 0) {
-		    $ih = qq(\t* <span class="clitemheader">$ih</span>:$s);
-		} elsif ($item_header_style == 1) {
-		    $ih = qq(\t* <span class="clitemheader">$ih</span>$s);
-		} elsif ($item_header_style == 2) {
-		    $ih = qq(\t<span class="clitemheader">$ih</span>:$s);
-		} elsif ($item_header_style == 3) {
-		    $ih = qq(\t<span class="clitemheader">$ih</span>$s);
+		# 前に足すもの
+		my $ihb = "";
+		if ($item_header_style == 0 or $item_header_style == 1) {
+		    $ihb = $item_header_mark;
+		    if ($use_item_anchor == 1) {
+			$ihb = qq(<a name="$day-$num" href="$mon.html#$day-$num">$ihb</a>);
+		    }
+		    $ihb .= " ";
 		}
-
-		$ih =~ s|^\t\*|\t<span class="panchor">*</span>|;
-
-		if ($use_item_anchor == 1) {
-		    $ih =~ s|^\t(<.+?>\*</.+?>)|\t<a name="$day-$num" href="$mon.html#$day-$num">$1</a>|;
-		}
-
+		# タグで囲む
+		$ih = qq($ihb<span class="clitemheader">$ih</span>);
 		if ($use_h3_for_item_header == 1) {
-		    $ih =~ s|(<span.+</span>)|<h3 class="subtitle">$1</h3>|;
+		    $ih = qq(<h3 class="subtitle">$ih</h3>);
 		}
+		# 後ろに足すもの
+		if ($item_header_style == 0 or $item_header_style == 2) {
+		    $ih .= ":";
+		}
+		$ih = "\t".$ih."$s";
+
 	    } else {
 		$ih = "";
 		$c = $item;
@@ -299,7 +324,15 @@ sub parse_entry {
 	
 	    $items_new .= $item;
 	}
+
+	if ($use_tukkomi == 1) { # ツッコミ機能を使う
+	    my $template = $tukkomi_template;
+	    $template =~ s/TUKKOMI_DATE/$mon.html%23$day/g;
+	    $items_new .= qq(<div class="comment">$template</div>);
+	}
+
     }
+
 
     # エントリの組み上げ
     $_ = $eh.$items_new;
@@ -332,7 +365,14 @@ sub okikae {
 
     ### 画像張り付け
     # image : [IMG:image/2000-06-20-08-32-57.m.jpg]
-    s!\[IMG:([^\]]+)\]!get_img_str($1)!ge;
+    s!\[IMG:([^\]\s]+)\]!get_img_str($1)!ge;
+
+    ### リンク付き画像張り付け
+    # サムネイルと拡大画像などに
+    # image : [IMG:image/hello-s.jpg image/hello.jpg]
+    # image : [IMG:image/hello-s.jpg http://example.com/hoge.html]
+    s!\[IMG:([^\]\s]+)\s+([^\]\s]+)\]!
+	qq(<a href="$2">).get_img_str($1).'</a>'!gesm;
 
     ### 日付で参照リンク
     # date ref : [YYYY-MM-DD]
@@ -345,9 +385,9 @@ sub okikae {
     #my $URLCHARS = "[-_.!~*'()a-zA-Z0-9;/?:@&=+,%\#\$]";
     my $URLCHARS = "[-_.!~*'a-zA-Z0-9;/?:@&=+,%\#\$]";
     my $URLDELIM = "\\\\\\n[\\t ]+";
-    s{((s?https?|ftp)://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
+    s{(?<!")((s?https?|ftp)://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
      {'<a href="'.join('', split(/$URLDELIM/, $1)).'">'.
-      join('', split(/\\/, $1)).'</a>'}gem;
+      join('', split(/\\/, $1)).'</a>'}gem; #")};
 #    s{([^,"])((s?https?|ftp)://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
 #     {$1.'<a href="'.join('', split(/$URLDELIM/, $2)).'">'.
 #      join('', split(/\\/, $2)).'</a>'}gem; #"])}

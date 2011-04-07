@@ -4,7 +4,7 @@ ChangeLog を HTML に変換するツール
 
 README
 
-$Id: README,v 1.19 2003/06/22 03:21:34 yto Exp $
+$Id: README,v 1.21 2003/06/26 12:48:30 yto Exp $
 
 ----------------------------------------------------------------------
 まずは、やってみよう!
@@ -179,6 +179,13 @@ ChangeLog の特殊な記法
 	↓
 	今日の写真 → <img src="image/2000-06-20-08-32-57.m.jpg">
 
+  リンク付き画像張り付けも可能。
+
+	[IMG:image/hello-s.jpg image/hello.jpg]
+	[IMG:image/hello-s.jpg http://example.com/hoge.html]
+	↓
+	<a href="image/hello.jpg"><img src="image/hello-s.jpg"></a>
+	<a href="http://nais.to/~yto/"><img src="image/hello-s.jpg"></a>
 
 - HTML タグ: ChangeLog 中に書かれた、HTML タグ、例えば、
   "<u>" は、"&lt;u&gt;" に変換される。ただし、コメントアウトの
@@ -189,9 +196,8 @@ ChangeLog の特殊な記法
 	&lt;u&gt;Hello&lt;/u&gt; <!-- こんにちは -->
 
 
-- 引用 (citation): タブの後に "|" か ">" が来る行は引用とみなし、CSS
-  の clquote  クラスの span で囲まれる。
-  <span class="clquote">| ...</span>
+- 引用 (citation): タブの後に "|" か ">" が来る行は引用とみなし、
+  blockquote で囲まれる。
 
 	> 引用
 	> 引用
