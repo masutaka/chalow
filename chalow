@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.65 2003/11/04 12:12:26 yto Exp $
+# $Id: chalow,v 1.68 2004/01/10 05:29:41 yto Exp $
 #
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
@@ -55,7 +55,7 @@ ___INDEX_PAGE_TEMPLATE
     ;
 # 月ページのテンプレート
 my $month_page_template = << "___MONTH_PAGE_TEMPLATE"
-CLNAVI <a href="index.html">Index</a>
+CLNAVI <a href="index.html">最新</a>
  / <a href="$home_page_url">$home_page_name</a>
 <h1>$changelog_name YEARMONTH</h1>
 <p class="calendar">MONTHPAGELIST</p>
@@ -63,13 +63,13 @@ CLNAVI <a href="index.html">Index</a>
 DAYSINTHEMONTH
 <p class="calendar">DAYLIST</p>
 <p class="calendar">MONTHPAGELIST</p>
-CLNAVI <a href="index.html">Index</a>
+CLNAVI <a href="index.html">最新</a>
  / <a href="$home_page_url">$home_page_name</a>
 ___MONTH_PAGE_TEMPLATE
     ;
 # 日ページのテンプレート
 my $day_page_template = << "___DAY_PAGE_TEMPLATE"
-CLNAVI <a href="index.html">Index</a>
+CLNAVI <a href="index.html">最新</a>
  / <a href="YEARMONTH.html">今月の一覧</a>
  / <a href="$home_page_url">$home_page_name</a>
 <h1>$changelog_name YEARMONTHDAY</h1>
@@ -77,7 +77,7 @@ CLNAVI <a href="index.html">Index</a>
 DAYSINTHEMONTH
 <p class="calendar"><a href="YEARMONTH.html">YEARMONTH</a> / DAYLIST</p>
 <p class="calendar">MONTHPAGELIST</p>
-CLNAVI <a href="index.html">Index</a>
+CLNAVI <a href="index.html">最新</a>
  / <a href="YEARMONTH.html">今月の一覧</a>
  / <a href="$home_page_url">$home_page_name</a>
 ___DAY_PAGE_TEMPLATE
@@ -116,9 +116,10 @@ my $use_tukkomi = 0;
 my $tukkomi_template = "";
 # RSS を出力するか (1:YES, 0:NO)
 my $output_rss = 1;
-# ChangeLog を公開する URL (相対 URL 不可) - RSS に必要
-# 末尾の "/" は不要
-my $clog_url = "http://nais.to/~yto/clog";
+# 日記の説明 for RSS : 例: "日々のあれこれ。"
+my $changelog_description = "";
+# ChangeLog を公開する URL (絶体 URL を強く推奨) - RSS に必要
+my $clog_url = "http://nais.to/~yto/clog/";
 # 他の年の同じ日付 (月日) へのリンクを張るか (1:YES, 0:NO)
 my $same_date_jump = 1;
 # 各アイテムに記述者名を表示するか (1:YES, 0:NO)
@@ -129,8 +130,8 @@ my $output_itemlist = 1;
 my $day_page_mode = 0;
 # 出力先ファイルとサイズが異なる場合のみ出力する (0:NO, 1:YES) : "-u" で指定
 my $update_by_size = 0;
-# 日記の説明 for RSS : 例: "日々のあれこれ。"
-my $changelog_description = "";
+# JavaScript ファイルとして出力する日数
+my $latest_titles_num = 10;
 
 ### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
 my $signature = qq(<p class="footer">Powered by 
@@ -210,7 +211,7 @@ for my $fname (@ARGV) {
     print "reading \"$fname\"\n" if (!defined $quiet_mode);
 
     ### クリーニングのためにChangeLogファイル一気に読み込む
-    open(F, $fname) || die "$fname: $!";
+    open(F, $fname) || die "file open error $fname : $!";
     binmode(F);
     my $tmp .= join('', <F>);
     close(F);
@@ -222,21 +223,22 @@ for my $fname (@ARGV) {
     $all .= $tmp."\n";
 }
 
-{
-    $all = Jcode->new($all)->euc; # 文字コードを euc にしておく
-    clean_changelog(\$all);	# ChangeLog をあらかじめクリーニング
+$all = Jcode->new($all)->euc; # 文字コードを euc にしておく
+my @lines;
+clean_changelog(\@lines, \$all); # ChangeLog をあらかじめクリーニング
 
+{   
     ### クリーニングされたChangeLogを処理
-
-    my @lines = split(/(?=^\d+-\d+-\d+)/m, $all); # 日付 (entry) 単位に分解
-
-    foreach (@lines) {/^(\d+-\d+-\d+)/; $same_ymd{$1}++;}
+    foreach (@lines) {
+	$same_ymd{$1}++ if (/^(\d+-\d+-\d+)/);
+    }
     #print map {"$_ $same_ymd{$_}\n"} sort keys %same_ymd; exit;
-
     my ($day, $month) = ("", "");
     foreach (@lines) {
+	next if (/^$/);
 	my $user;		# このエントリを書いた人
 	($day, $month, $user) = (/^((\d+-\d+)-\d+).*?\s\s(.+)\n/);
+	die "format error [$_]\n" if (not defined $user);
 
 	### stop date
 	# 月別一覧などに影響がでる。DEBUG 用ですな。
@@ -268,6 +270,8 @@ for my $fname (@ARGV) {
 ### RSS ファイルを作る
 write_rss_file() if ($output_rss);
 
+### JavaScript ファイル を作る
+write_js_file();
 
 ### 検索用ファイル (itemlist) を作る
 write_itemlist_file() if ($output_itemlist);
@@ -295,10 +299,8 @@ foreach my $ymd (sort keys %all_entries) {
 	}
 
 	# 各 item を <div class="section"></div> で囲む
-	$items_new .= qq(<div class="section"><p>
-<pre style="background-color:transparent;border:none;line-height:inherit;
-font-size:100%;margin:0;padding:0;">$item</pre>
-</p>$inside_ref_str</div><!--eos-->\n);
+	$items_new .= qq(<div class="section"><p>$item</p>).
+	    qq($inside_ref_str</div><!--eos-->\n);
     }
 
     ### 他の年の同じ日付 (月日) へのリンクを張る
@@ -338,8 +340,6 @@ font-size:100%;margin:0;padding:0;">$item</pre>
     $month_page{"$y-$m"}{$ymd} = qq(<div class="day">$ttt</div></div>\n);
     # 各 entry を <div class="day"></div> で囲む↑
 }
-
-
 
 
 ### 月別一覧を作成
@@ -389,7 +389,8 @@ sub parse_entry {
 
     # (3) 個々の item に分解し、各 item ごとに処理
     my @itemlist;
-    while ($items =~ /^(\t\* .+?\n(?=\s*(\t\* |\Z)))/gsm) {
+#    while ($items =~ /^(\t\* .+?\n(?=\s*(\t\* |\Z)))/gsm) {
+    while ($items =~ /^(\* .+?\n(?=\s*(\* |\Z)))/gsm) {
 	push @itemlist, $1;
     }
 
@@ -400,8 +401,9 @@ sub parse_entry {
 	$num += $same_ymd{$ymd} * 100; # for 複数人利用
 
 	# (4) item header とそれ以外に分解
-	my ($ih, $s, $c) = ($item =~ /^\t\* (.+?):(\s)(.*)\Z/sm);
-	# (\s) には、スペース、タブ、改行がマッチ　↑
+	my ($ih, $s, $c) = ($item =~ /^\* (.+?):(\s)(.*)\Z/sm);
+	# (\s) には、スペース、タブがマッチ　↑
+	# 改行は存在しない see clean_changelog().
 	#print "ih[$ih] c[$c]\n";
 
 	# (5) item header の処理
@@ -432,7 +434,8 @@ sub parse_entry {
 	    if ($item_header_style == 0 or $item_header_style == 2) {
 		$ih .= ":";
 	    }
-	    $ih = "\t".$ih."$s";
+#	    $ih = "\t".$ih."$s";
+	    $ih .= $s;
 	    
 	} else {
 	    $ih = "";
@@ -450,12 +453,6 @@ sub parse_entry {
 	# 各アイテムに記述者名を表示するモード
 	if ($show_author_name == 1) {
 	    $c .= qq(<div class="itemauthor"><span>$user</span></div>);
-	}
-
-	# タブによるインデントをどうするか
-	if ($no_indent == 1) {
-	    $ih =~ s!^(<.+?>|)\t!$1!gsm;
-	    $c =~ s!^(<.+?>|)\t!$1!gsm;
 	}
 
 	# ハッシュに格納
@@ -487,22 +484,28 @@ sub okikae {
     s!'''(.+?)'''!<strong>$1</strong>!gms;
     s!''(.+?)''!<em>$1</em>!gms;
     s!==(\S.+?)==!<s>$1</s>!gms;
-    s!^\t\-{4}!<hr>!gms;
+#    s!^\t\-{4}!<hr>!gms;
+    s!^\-{4}!<hr>!gms;
 
     ### URL。Hiki の記法を採用。
     s!\[\[(.+?)\s*\|\s*(.+?)\]\]!get_link_str($1, $2)!gmse;
 
     ### 引用 (quote): ">>" と "<<" で囲む
-    s!^\t>>\n!<blockquote>!gm;
-    s!^\t<<\n!</blockquote>!gm;
+#    s!^\t>>\n!<blockquote>!gm;
+#    s!^\t<<\n!</blockquote>!gm;
+    s!^>>\n!<blockquote>!gm;
+    s!^<<\n!</blockquote>!gm;
 
     ### 引用 (quote): "| ..." か "> ..."
     if ($remove_quote_mark == 1) {
 	my $a;
-	s!((^\t((\||>)[^\n]*)\n)+)!'<blockquote>'.($a = $1,
-	    $a =~ s{^\t(\||>)\s?}{\t}gm, $a).'</blockquote>'!gme;
+#	s!((^\t((\||>)[^\n]*)\n)+)!'<blockquote>'.($a = $1,
+#	    $a =~ s{^\t(\||>)\s?}{\t}gm, $a).'</blockquote>'!gme;
+	s!((^((\||>)[^\n]*)\n)+)!'<blockquote>'.($a = $1,
+	    $a =~ s{^(\||>)\s?}{}gm, $a).'</blockquote>'!gme;
     } else {
-	s!((^\t((\||>)[^\n]*)\n)+)!<blockquote>$1</blockquote>!gmx;
+#	s!((^\t((\||>)[^\n]*)\n)+)!<blockquote>$1</blockquote>!gmx;
+	s!((^((\||>)[^\n]*)\n)+)!<blockquote>$1</blockquote>!gmx;
     }
 
     {				# 昔の画像貼り付け記法 (しばらく残す)
@@ -526,21 +529,33 @@ sub okikae {
     # バックスラッシュを用いたURL中での改行に対応 021025
     #my $URLCHARS = "[-_.!~*'()a-zA-Z0-9;/?:@&=+,%\#\$]";
     my $URLCHARS = "[-_.!~*'a-zA-Z0-9;/?:@&=+,%\#\$]";
-    my $URLDELIM = "\\\\\\n[\\t ]+";
-    s{(?<!["\=|])((s?https?|ftp)://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
-     {'<a href="'.join('', split(/$URLDELIM/, $1)).'">'.
-      join('', split(/\\/, $1)).'</a>'}gem; #")};
-#    s{([^,"])((s?https?|ftp)://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
-#     {$1.'<a href="'.join('', split(/$URLDELIM/, $2)).'">'.
-#      join('', split(/\\/, $2)).'</a>'}gem; #"])}
+    my $URLDELIM = "\\\\\\n *";
+    s{(?<![\"\=|])((s?https?|ftp)://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
+    {'<a href="'.join('', split(/$URLDELIM/, $1)).'">'.
+	 join('', split(/\\/, $1)).'</a>'}gem; #")};
+
+    ### 行頭のスペースは &nbsp; に置き換える。
+    s!^( +)!{"&nbsp;" x length($1)}!gme;
+    s!^(</?blockquote>)( +)!{"$1" . ("&nbsp;" x length($2))}!gme;
 
     ### 自動文字列置換適用
     eval $auto_replace;
 
-    unescape_string(\$_);
+    # タブによるインデントを消さない場合 (一度消したのをまた追加する)
+    if ($no_indent == 0) {
+	s!^(</?blockquote>|)!$1\t!gsm;
+    }
 
-    ### プラグイン
-    s!{{(.+?)}}!eval($1)!gems;
+    # 各行の行末に <br> を付ける
+    # memo: 昔は pre で囲んでいたが、v0.23 からやめた
+#print "1[$_]\n";
+    s!$!<br>!gsm;
+    s!<br>$!!;
+#print "2[$_]\n";
+
+    unescape_string(\$_);	# プラグイン呼び出しも行なう
+
+    s!</pre><br>!</pre>!g;	# ad hoc
 
     return $_;
 }
@@ -635,10 +650,13 @@ sub write_month_page {
 	    @cont = sort keys %{$month_page{$ym}};
 	}
 	my $content = join('', map {$month_page{$ym}{$_}} @cont);
+
+	### ↓機能しない！ 031229
 	if ($day_page_mode == 2) { # 日モード (月ページヘッダのみモード)
 	    $content =~ s!(<pre.*?>|</pre>)!!gsm;
 	    $content =~ s|(<div\sclass="section">.*?<span\sclass="clitemheader">.*?</span>(</h3>)?).*?<!--eos-->|$1</p></div>|gsm;
 	}
+
 	$content = "\n$content\n";
 
 	### 内部置き換え文字列
@@ -799,14 +817,22 @@ sub write_rss_file {
     my $rdfseq;
     my $rdfitem;
 
+    my $clog_url_pref = $clog_url;
+    $clog_url_pref =~ s!/[^/]+html?$!/!;
+    $clog_url_pref .= "/" unless ($clog_url_pref =~ m!/$!);
+    # SPEC:       $clog_url                    $clog_url_pref
+    # http://nais.to/~yto/clog/           -> http://nais.to/~yto/clog/
+    # http://nais.to/~yto/clog/index.html -> http://nais.to/~yto/clog/
+    # http://nais.to/~yto/clog            -> http://nais.to/~yto/clog/
+
     # YEARMONTH, ITEMID
     my $rdfseq_template =
-	qq(<rdf:li resource="$clog_url/YEARMONTH.html#ITEMID"/>\n);
+	qq(<rdf:li resource="${clog_url_pref}YEARMONTH.html#ITEMID"/>\n);
     # YEARMONTH, ITEMID, ITEMHEADER
     my $rdfitem_template = qq(
-<item rdf:about="$clog_url/YEARMONTH.html#ITEMID">
+<item rdf:about="${clog_url_pref}YEARMONTH.html#ITEMID">
  <title>ITEMID  ITEMHEADER</title>
- <link>$clog_url/YEARMONTH.html#ITEMID</link>
+ <link>${clog_url_pref}YEARMONTH.html#ITEMID</link>
  <description>CONTENT</description>
  <dc:date>DCDATE</dc:date>
 </item>);
@@ -816,7 +842,7 @@ sub write_rss_file {
 	$rdfitem_template =~ s/YEARMONTH/YEARMONTHDAY/g;
     }
 
-    my $ctr = $top_n_ctr;
+    my $ctr = ($top_n_ctr > 7) ? 7 : $top_n_ctr;
     foreach my $ymd (sort {$b cmp $a} keys %all_entries) {
 	$ctr--;
 	last if ($ctr < 0);
@@ -878,12 +904,14 @@ sub write_rss_file {
  xmlns="http://purl.org/rss/1.0/"
  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
  xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:admin="http://webns.net/mvcb/"
  xmlns:lang="ja">
-<channel rdf:about="$clog_url/cl.rdf">
+<channel rdf:about="${clog_url_pref}cl.rdf">
 <title>$changelog_name</title>
 <link>$clog_url</link>
 <description>$changelog_description</description>
 <dc:date>$dcdate</dc:date>
+<admin:generatorAgent rdf:resource="http://nais.to/~yto/tools/chalow/?v=0.23" />
 <items>
 <rdf:Seq>\n$rdfseq</rdf:Seq>
 </items>
@@ -897,6 +925,43 @@ RDFSTR
     open(F, "> $fn") || die "$fn: $!\n";
     binmode(F);
     print F $rdfstr;
+    close(F);
+}
+
+
+### JavaScript feed ファイルを出力する
+sub write_js_file {
+#    my $ostr = "document.writeln('<dl><ul>');\n";
+    my $ostr;
+    my $date;
+    my $ctr = $latest_titles_num;
+    foreach my $ymd (sort {$b cmp $a} keys %all_entries) {
+	$ctr--;
+	last if ($ctr < 0);
+	foreach my $i (sort {$b <=> $a} keys %{$all_entries{$ymd}}) {
+	    next if ($i !~ /^\d/);
+	    my ($ym) = ($ymd =~ /^(\d{4}-\d\d)-\d\d/);
+	    my $c = $all_entries{$ymd}{$i}{h};
+            $c =~ s/[\n\t]+//g; # 改行消し
+	    $c =~ s/\s\s+/ /g;
+	    $c =~ s/\s*$//;
+            $c =~ s/<.+?>//g; # タグ抜き
+	    $c =~ s/^\*\s+//;
+	    $c =~ s/\'/&\#x27;/g;
+	    if ($date ne $ymd) {
+#		$ostr .= "document.writeln('</ul><dt>$ymd<dd><ul>');\n";
+		$ostr .= "document.writeln('$ymd<br>');\n";
+		$date = $ymd;
+	    }
+	    $ostr .= "document.writeln('- <a href=\"".
+		datestr2url("$ymd-$i")."\">$c</a><br>');\n";
+	}
+    }
+#    $ostr .= "document.writeln('</dl>');\n";
+    my $fn = "$opt_odir/cl.js";
+    open(F, "> $fn") || die "$fn: $!\n";
+    binmode(F);
+    print F $ostr;
     close(F);
 }
 
@@ -936,40 +1001,92 @@ sub datestr2anchor {
     return $d;
 }
 
+sub datestr2url {
+    my ($d) = @_;
+    if ($day_page_mode) {	# 日モード
+	$d =~ s!((\d{4}-\d\d-\d\d)(-\d+)?)!$2.html#$1!;
+    } else {			# 月モード
+	$d =~ s!((\d{4}-\d\d)-\d\d(-\d+)?)!$2.html#$1!;
+    }
+    return $d;
+}
 
-### 文字列置き換えから一時的に退避し、後に復帰する
+
+### 文字列置き換えから一時的に退避し、後に復帰させる
 my $num_of_escaped_string;
 my %escaped_string;
+my $num_of_escaped_src;
+my %escaped_src;
+my $num_of_escaped_plugin;
+my %escaped_plugin;
+
 sub escape_string {
     my ($strp) = @_;
-    my $btag = '\t_HTML_START_\n'; # 開始マーク
-    my $atag = '\t_HTML_END_\n'; # 終了マーク
+
+    ### HTML エスケープ - 文字列そのまま
+    my $btag = '_HTML_START_\n'; # 開始マーク
+    my $atag = '_HTML_END_\n'; # 終了マーク
     $num_of_escaped_string = 0;
     $$strp =~ s!$btag(.*?)$atag!
 	$escaped_string{++$num_of_escaped_string} = $1,
 	sprintf("\x5\x13%d\x3", $num_of_escaped_string)!gsmxe;
+    $$strp =~ s!\[(literal|sic|esc)\](.*?)\[/\1\]!
+	$escaped_string{++$num_of_escaped_string} = $2,
+	sprintf("\x5\x13%d\x3", $num_of_escaped_string)!gsmxe;
+
+    ### ソースエスケープ - "&" や "<" などを置換し pre を付ける
+    $num_of_escaped_src = 0;
+    $$strp =~ s!\[src\](.*?)\[/src\]!
+	$escaped_src{++$num_of_escaped_src} = $1,
+	$escaped_src{$num_of_escaped_src} =~ s/&/&amp;/g,
+	$escaped_src{$num_of_escaped_src} =~ s/</&lt;/g,
+	sprintf("\x6\x13%d\x3", $num_of_escaped_src)!gsmxe;
+
+    ### プラグインエスケープ
+    $num_of_escaped_plugin = 0;
+    $$strp =~ s!{{(.*?)}}!
+	$escaped_plugin{++$num_of_escaped_plugin} = $1,
+	sprintf("\x7\x13%d\x3", $num_of_escaped_plugin)!gsmxe;
 }
+
 sub unescape_string {
     my ($strp) = @_;
+
+    ### プラグインエスケープ - 実行！
+    $$strp =~ s|\x7\x13(\d+)\x3|eval($escaped_plugin{$1})|ge;
+    ### ソースエスケープ - pre 追加
+    $$strp =~ s|\x6\x13(\d+)\x3|<pre>$escaped_src{$1}</pre>|g;
+    ### HTML エスケープ
     $$strp =~ s|\x5\x13(\d+)\x3|$escaped_string{$1}|g;
 }
 
 
 ### ChangeLog のクリーニング
+# 日付単位に分割してリストに入れる
 sub clean_changelog {
-    my ($strp) = @_;
-    # 行頭がタブではなくスペースになっているたら置き換える
-    $$strp =~ s/^( {8}| {1,7}\t)/\t/gsm;
-    # \n(\s+)\n2001-09... の $1 を消す
-    $$strp =~ s/\n[\s\t]+(\n\S)/\n$1/gm;
-    # \n(\s+)\n\t* ほげ: ... の $1 を消す
-    $$strp =~ s/\n[\s\t]+(\n[\s\t]+\*\s+)/\n$1/gm;
-    # 項目内での段落区切り表す空行をタブ行にする。ついでに連続空行を詰める。
-#    $$strp =~ s/\n(\n\t[^\*])/\n\t$1/gm;
-    $$strp =~ s/\n+(\n\t[^\*])/\n\t$1/gm;
-    # 秘密の項目を外に出さないように削除
-    # 例: * p:秘密メモ: YTがまたやらかした。しょうもないやつだ。
-    $$strp =~ s/\n\t+\* p:.+?^(\t+\*|$)/$1/gms;
-    # 秘密の項目を削除した結果、空になったエントリを削除
-    $$strp =~ s/^\d{4}-\d{2}-\d{2}.*?\n+(?=(\d{4}-\d{2}-\d{2}.*?\n)|\Z)//gm;
+    my ($linesp, $strp) = @_;
+
+    @$linesp = split(/(?=^\d{4}-\d\d-\d\d)/m, $$strp); # 日付(entry)単位に分解
+    foreach (@$linesp) {
+	s/\r//g;
+ 	s/^( {8}| {0,7}\t)//gsm; # 行頭のタブ or タブ相当を消す
+	s/^([ \t]+)\n/\n/gsm;	# スペース、タブだけの行をクリア
+
+	# 秘密の項目を外に出さないように削除
+	# 例: * p:秘密メモ: YTがまたやらかした。しょうもないやつだ。
+	my $secmempat = '(\* p:.+?)^(\* (?!p:)|\Z)';
+	if (1) {			# debug
+	    while (/^($secmempat)/gms) {
+		print "$2($3)\n";
+	    }
+	}
+	s/^$secmempat/$2/gms;
+
+	s/^(\* .+?:)$/$1 /gms; # 「* aaa:\n」→「* aaa: \n」
+
+	# 秘密の項目を削除した結果、空になったエントリを削除
+	s/^\d{4}-\d\d-\d\d.*?\n+\Z//gm;
+
+	s/\n\n+/\n\n/gm;	# 連続空行を詰める
+    }
 }

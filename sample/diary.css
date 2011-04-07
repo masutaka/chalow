@@ -47,8 +47,8 @@ div.day {
         border-style: dotted;
         border-color: #ff80ff;
         border-width: 1px;
-        padding: 1em;
-        margin: 1em;  
+        padding: 1%;
+        margin: 1%;  
 }
 
 /*
@@ -75,8 +75,8 @@ div.body {
         border-style: solid;
         border-color: #ffe0ff;
         border-width: 1px;
-        padding: 0em;
-        margin: 0em;
+        padding: 0;
+        margin: 0;
 }
 
 /*
@@ -112,8 +112,8 @@ div.section {
         border-style: solid;
         border-width: 1px;
 	line-height: 130%;
-        padding: 0.5em;
-	margin: 0.5em;
+        padding: 1%;
+	margin: 1%;
 }
 
 /*
@@ -133,14 +133,14 @@ div.body blockquote {
 /*
 各 item の pre の設定 (各 item は pre で囲まれている)
 */
-/*div.body pre {
+div.body pre {
 	font-family: monospace;
 	white-space: pre;
-	line-height: 130%;
+	line-height: 100%;
 	font-size: 100%;
 	margin: 0;
 	padding: 0;
-}*/
+}
 
 div.body p {
 	margin: 0;

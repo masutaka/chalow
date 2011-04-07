@@ -1,3 +1,147 @@
+2004-01-11  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.23: 
+	作業途中だけどとりあえず公開。
+	パワーユーザ以外にはおすすめしません。
+
+	* p:TODO:
+	- HTML::Template や XML などのモジュールを使う
+	  - $*_page_head_plus の廃止
+	  - $use_tukkomi の廃止
+	  - $tukkomi_template の廃止
+	  - $css_file の廃止
+        
+	- 日本語コードの選択
+        - chalowlib?
+        - くっつき BBS との連携まわりをすっきりさせる
+	- ページ単位だけど、リンク元表示
+          参考: <http://www.ijn-jp.net/user8/report/svchat13.html>
+          要調査: JavaScript で #2003... も取れるか?
+
+2004-01-09 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (clean_changelog): 
+	日付単位に分割してリストに入れるのをこの段階で行なうようにした。
+
+	削除した秘密の項目を stdout に出力する処理を実装。
+	この出力を行なうためのモードは後で作る。当面はデフォルト。
+
+2003-12-29 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (okikae): 
+	行頭のスペースは &nbsp; に置き換えるようにした。
+
+	* chalow (escape_string): 
+	文字列のエスケープ。順番。
+	1. HTML エスケープ - 文字列そのまま
+	2. ソースエスケープ - "&" や "<" などを置換し pre を付ける (インデ
+	  ントが重要なときに) --- あまり使わないかも
+	3. プラグインエスケープ
+	戻すときは逆。
+
+	* chalow (okikae): 
+	タブを最初に消す方針にしたのでバグが出た。修正。
+	OLD: my $URLDELIM = "\\\\\\n[\\t ]+";
+	NEW: my $URLDELIM = "\\\\\\n *";
+
+	* cl.conf (amazon_link): 
+	プラグインと <br> の関係でごちゃごちゃと。
+	引数の "..\n..\n.." という文字列には <br> を再度足す。
+
+	* chalow (write_js_file): 
+	New write_js_file().
+	JavaScript feed ファイルを出力する関数
+
+	* chalow:
+	pre 囲みをやめる。各行の行末に <br> を付けるようにした。
+	pre 指定は別に行なう。
+	ソースの表示は [esc][src][/src][/esc] を使う→エンティティ置換＆pre。
+
+	例： [literal][esc][/literal]<pre>...</pre>[literal][/esc][/literal]
+
+	[sic][esc][/sic]<pre>
+	┏━━━┓　
+	┃　　　┣━━━━━┓
+	┗┳━━┛　　　　　┃
+	　┃　　　　　　　　┃
+	　┗━━━━━━━━┛
+	</pre>[sic][/esc][/sic]
+	  ↓
+	[esc]<pre>
+	┏━━━┓　
+	┃　　　┣━━━━━┓
+	┗┳━━┛　　　　　┃
+	　┃　　　　　　　　┃
+	　┗━━━━━━━━┛
+	</pre>[/esc]
+
+	[sic][src][/sic]
+	sub test {
+	    my ($k) = @_;
+	    return qq(<a href="http://example.com/search?q=$k">$o</a>);
+	}
+	[sic][/src][/sic]
+	  ↓
+	[src]
+	sub test {
+	    my ($k) = @_;
+	    return qq(<a href="http://example.com/search?q=$k">$o</a>);
+	}
+	[/src]
+
+2003-12-28 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow: 
+	最初のクリーン時 (clean_changelog) に行頭のタブを全部なくすように
+	した。これにともなって全体を修正。
+	他フォーマットのプレインテキスト対応への布石。
+	(例えば、Windows のメモ帳の .LOG のフォーマット)
+
+	* chalow: 
+	$clog_url の「# 末尾の "/" は不要」って条件を無くす。
+	(write_rss_file): RSS の出力エントリ数の上限を決めた。7 日分以上は
+	出さない。
+	(escape_string): 処理回避ブロック[2003-09-05-1]の記法の追加。
+	「Wiki Way」を参考に。
+	> [sic][literal]{{g}}[/literal][/sic], [literal][sic]{{g}}[/sic], [esc]{{g}}[/esc][/literal]
+	  ↓	
+	> [literal]{{g}}[/literal], [sic]{{g}}[/sic], [esc]{{g}}[/esc]
+
+	* cl.conf (blukfeeds): 
+	Bulkfeeds キーワード検索プラグイン
+
+2003-12-25  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (write_rss_file): 
+	RSS に以下の記述を追加。
+	>>
+	xmlns:admin="http://webns.net/mvcb/"
+	<admin:generatorAgent rdf:resource="http://nais.to/~yto/tools/chalow/" />
+	<<
+
+2003-11-07  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* cl.conf (amazon_link): 
+	プラグイン。普通のアマゾンアソシエイトリンクの作成。
+
+2003-11-06 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* cl.conf (wiki_link): 
+	プラグイン。Wiki へのリンクの作成。
+	usage: [esc]{{wiki_link('WIKINAME')}}[/esc]
+	{{wiki_link('ゲトマネ戦隊アサマシ８')}}
+	
+	* cl.conf (qualmish_amazon_link): 
+	プラグイン。後ろめたい amazon アソシエイトリンクの作成
+	usage [esc]{{qualmish_amazon_link('ASIN', 'ID', 'STR')}}[/esc]
+	{{qualmish_amazon_link('4756102816','ytoshomepage-22',
+	"TEST:Perl書法
+	image/gazou.png")}}
+
+	{{qualmish_amazon_link('4756102816','',"TEST:Perl書法")}}
+
+	ref. <http://nais.to/~yto/clog/2003-11-06.html#2003-11-06->
+
 2003-11-04  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.22: 
@@ -6,7 +150,7 @@
 
 2003-11-03  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* chawlo (write_rss_file), cl.conf: 
+	* chalow (write_rss_file), cl.conf: 
 	channel/description の中身を設定できるようにした。
 	>>
 	# 日記の説明 for RSS : 例: "日々のあれこれ。"
@@ -22,16 +166,6 @@
 	* version 0.21: 
 	公開。
 	バグ修正や小さな変更のみ。機能の追加などはなし。
-
-        * p:TODO:
-        - 日本語コードの選択
-        - # ではじまる行は消す
-        - 日付ごとだけでなく、アイテムごとに「くっつき BBS」
-        - chalowlib?
-        - くっつき BBS との連携まわりをすっきりさせる
-        - ページ単位だけど、リンク元表示
-          参考: <http://www.ijn-jp.net/user8/report/svchat13.html>
-          要調査: JavaScript で #2003... も取れるか?
 
 	* chalow: 
 	- h4rss をなくす (all_entries のキー)。
@@ -118,7 +252,7 @@
 	* clkeitai.cgi (output_simple_list): 
 	アイテムのサイズが大きすぎるとバグるので修正。
 
-	* chalow (write_day_page,write_month_page,write_index_page): 
+	* chalow (write_day_page, write_month_page, write_index_page): 
 	出力先ファイルとサイズが異なる場合のみ出力するモードを設けた。
 	> # 出力先ファイルとサイズが異なる場合のみ出力する (0:NO, 1:YES)
 	> $update_by_size = 1;
@@ -190,7 +324,7 @@
 
 2003-09-10  YAMASHITA Tatsuo  <yto@nais.to>
 
-	* {dot-pink.png,dot-gray.png}:
+	* {dot-pink.png, dot-gray.png}:
 	New for item header
 
 2003-09-05 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
@@ -206,7 +340,7 @@
 	* chalow (clean_changelog): 
 	New. ChangeLog のクリーニング、を独立関数化。
 
-	* chalow (escape_string,unescape_string): 
+	* chalow (escape_string, unescape_string): 
 	New.  文字列置き換えから一時的に退避し、後に復帰するための関数たち。
 	開始マーク '\t_HTML_START_\n' と終了マーク '\t_HTML_END_\n' に囲ま
 	れた領域はそのまま HTML ファイルへ出力する。
@@ -251,8 +385,8 @@
 	* 変更点のまとめ: 
 
 	- プラグイン機能
-	  例：(記号は全角で表記していますが、実際は半角)
-	  ｛｛google_search('海老名 映画館')｝｝ → {{google_search('海老名 映画館')}}
+	  例：
+	  [esc]{{google_search('海老名 映画館')}}[/esc] → {{google_search('海老名 映画館')}}
 
 	- 自分の日記内だけでのリファラー機能
 	  ref. <http://nais.to/~yto/clog/2002-06.html#2002-06-28-2>
@@ -289,7 +423,7 @@
 	ます。あんまり多くのことはできませんが...。
 
 	例：(記号は全角で表記していますが、実際は半角)
-	> ｛｛google_search('海老名 映画館')｝｝ → {{google_search('海老名 映画館')}}
+	> [esc]{{google_search('海老名 映画館')}}[/esc] → {{google_search('海老名 映画館')}}
 
 	プラグインは cl.conf に足して置けば使えます。
 
