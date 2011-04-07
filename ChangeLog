@@ -1,3 +1,125 @@
+2004-12-24  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* version 1.0rc4[リリース]:
+	公開。
+
+	* sample/diary.css: 
+	シンプル化。画像指定を止めた。
+
+	* chalow: 
+	> # RSS の description を CDATA で囲むか (1:YES, 0:NO)
+	> my $rss_cdata = 0;
+	を廃止。ref. [2004-11-28-2]
+	リリース前に導入してすぐに廃止したゆえ影響なし。
+
+	* chalow (write_rss_file): 
+	dc:creator も出せるようにした。
+
+	* cl.conf: 
+	調整。
+
+	* chalow (okikae): 
+	> s/\]>/\]&gt;/go;
+	ad hoc!!
+
+2004-12-23  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* chalow (escape_string): 
+	Add.
+	> $escaped_src{$num_of_escaped_src} =~ s/>/&gt;/g,
+
+	テキスト中に「]]>」があると「<![CDATA[」の終わりと認識されRSSがエ
+	ラーになるので。
+
+2004-12-22 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* chalow (write_rss_file): 
+	RSSファイルのテンプレート化！
+
+	HTML::Templateを使うようにした。
+	新設定項目。
+	>>
+	# RSSファイルのテンプレート
+	my $rss_template = << "RDFSTR"
+	...
+	RDFSTR
+	<<
+
+	あと、RSSをちょっと修整。
+	xmlns:lang=>xml:lang, resource=>rdf:resource, content:encoded
+
+	* ChangeLogReader.pm (store_changelog): 
+	仕様変更。
+	旧： } elsif (/^\t?__DATA__.*$/) {
+	新： } elsif (/^__DATA__\s*$/) {
+
+	* README: 
+	- typo 時下書き→直書き 
+	- typo [src]...[/esc] -> [src]...[/src]
+	- サンプル提示のときの「>」はやめて行頭タブに統一した。
+
+	など。
+
+2004-12-11  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* conf/yto/diary.css: 
+	New. sample/ にあるのとは別。
+
+2004-11-30  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* chalow (write_rss_file): 
+	RSS を Bloglines で見てみると、相対URLがおかしくなっている。
+	2004-11-27-3.html を http://nais.to/2004-11-27-3.html にしちゃってる。
+	そこで、RSS 中で相対パスを絶対パスにするようにした。 ad hoc
+	ref. http://nais.to/~yto/clog/2004-11-28-1.html
+
+2004-11-29  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* ChangeLogReader.pm (store_changelog): 
+	ゴミ("close F;"が残ってた)を消した。
+
+2004-11-28  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* chalow (write_rss_file): 
+	RSS の description で CDATA を出すモード作成。
+	> # RSS の description を CDATA で囲むか (1:YES, 0:NO)
+	> my $rss_cdata = 0;
+
+	* chalow: 
+	認識している問題：
+	非公開itemだけの空エントリが %entry_statistics に残っちゃう問題。
+
+2004-11-27  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* chalow: 
+	itemページ作成のためのいろいろ作業。
+	> # 作成するページの単位 (0:月, 1:日, 2:アイテム)
+	> my $page_mode = 0;
+	(datestr2anchor): あわせる。
+	(datestr2url): あわせる。
+	(write_item_page): New. 
+
+	$item_page_template も用意した。
+	itemのテンプレート要素にcatを追加。
+	今まで
+	> <TMPL_VAR name=header>
+	これから
+	> <TMPL_VAR name=header><TMPL_VAR name=cat>
+	他には、header_text というものも。head/title タグなどに使う。
+
+	* chalow: 
+	ChangeLogReader.pm を使うように改造。
+
+	* ChangeLogReader.pm (store_entry): 
+	Add.
+
+2004-11-12  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* chalow (write_rss_file): 
+	[2004-10-25-2]のをちょっと改造。今日のもの以外は
+	T23:59:59+9:00 を足すことにした。
+	> <dc:date>2004-10-25T23:59:59+9:00</dc:date>
+
 2004-11-07  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 1.0rc3[リリース]:
@@ -8,7 +130,7 @@
 	* chalow (write_rss_file): 
 	RSS の各 item の dc:date について。
 	今まではすべて日付のみであった。
-	> <dc:date>2004-10-25</dc/date>
+	> <dc:date>2004-10-25</dc:date>
 	方針を変更。今日のものだけ時間まで入れることにした。
 	> <dc:date>2004-10-25T23:00:00+9:00</dc/date>
 	追加したロジック：

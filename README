@@ -4,7 +4,7 @@ ChangeLog を HTML に変換するツール
 
 README
 
-$Id: README,v 1.31 2004/06/06 15:45:31 yto Exp $
+$Id: README,v 1.32 2004/12/24 07:50:53 yto Exp $
 
 ----------------------------------------------------------------------
 インストール
@@ -84,13 +84,13 @@ usage: chalow [options] <file> [file]...
 実行例:
 
 - カレントディレクトリに HTML ファイルを出力する
-  | % ./chalow ChangeLog
+	% ./chalow ChangeLog
 
 - インデックスページに最近 2 日分だけ出力する
-  | % ./chalow -n 2 -o sample sample/ChangeLog
+	% ./chalow -n 2 -o sample sample/ChangeLog
 
 - ユーザ設定ファイルを使う
-  | % ./chalow -c cl.conf -o ~/www/tools/chalow/cl ChangeLog
+	% ./chalow -c cl.conf -o ~/www/tools/chalow/cl ChangeLog
 
 
 ----------------------------------------------------------------------
@@ -127,11 +127,10 @@ $index_page_template, $month_page_template
   例: "NAISTO" を "<a href="http://nais.to/">NAISTO</a>" に、
   "google" を "<a href="http://www.google.com/">google</a>" 
   に変換する。
-
-  $auto_replace = '
-  s!(NAISTO)!<a href="http://nais.to/">$1</a>!g;
-  s!(\sgoogle\s)!<a href="http://www.google.com/">$1</a>!g;
-  ';
+	$auto_replace = '
+	s!(NAISTO)!<a href="http://nais.to/">$1</a>!g;
+	s!(\sgoogle\s)!<a href="http://www.google.com/">$1</a>!g;
+	';
 
 ※7 tDiary のテーマ (CSS ファイル) をそのまま使うために必要。
 tDiary のテーマを使うには以下のような設定を行うと良い。
@@ -167,23 +166,19 @@ ChangeLog の特殊な記法
 - 任意の URL へのリンク
 
   「単語|URL」を 2 つの半角カギカッコで囲むとを任意の URL へのリンク
-  になります。
-
-  例： [[Yahoo!|http://www.yahoo.co.jp/]]
+  になります。例： 
+	[[Yahoo!|http://www.yahoo.co.jp/]]
 	
   このとき URL の末尾が jpg,jpeg,png,gif だと IMG タグに展開されます。
-  （指定した単語がALTに設定される）
-
-  例： [[図|image/gazou.png]]
+  （指定した単語がALTに設定される）。例：
+	[[図|image/gazou.png]]
 	
   「単語」の末尾が jpg,jpeg,png,gif だとクリック可能な IMG タグに展
-  開されます。IMG が URL へのリンクになります。
-	
-  例： [[image/gazou.png|http://nais.to/~yto/]]
+  開されます。IMG が URL へのリンクになります。例：
+	[[image/gazou.png|http://nais.to/~yto/]]
 
-  また、URL っぽいものがあると勝手にリンクがはられます。
-
-  例： http://www.yahoo.co.jp/
+  また、URL っぽいものがあると勝手にリンクがはられます。例：
+	http://www.yahoo.co.jp/
 
   長い URL は、バックスラッシュ('\')で途中改行することができる。下記の
   例のように変換される。
@@ -219,16 +214,14 @@ ChangeLog の特殊な記法
 - 文字修飾の記法
 
   「'」2個ではさんだ部分は強調されます。「'」3個ではさんだ部分はさら
-  に強調されます。「=」2個ではさんだ部分は取消線になります。
+  に強調されます。「=」2個ではさんだ部分は取消線になります。例：
 
-  例： ==ABC==  ''ABC''  '''ABC'''
+	==ABC==  ''ABC''  '''ABC'''
 
 - 水平線の記法
 
   マイナス記号「-」を行の先頭のタブの後から 4 つ書くと水平線になりま
-  す。
-
-  例：
+  す。例：
 	あはは
 	----
 	いひひ
@@ -237,8 +230,8 @@ ChangeLog の特殊な記法
 - 表(table)の記法
 
   以下のように記述します。
-  > ||項目1-1||項目1-2||項目1-3
-  > ||項目2-1||項目2-2||項目2-3
+	||項目1-1||項目1-2||項目1-3
+	||項目2-1||項目2-2||項目2-3
 
 
 - プラグイン機能
@@ -255,16 +248,14 @@ ChangeLog の特殊な記法
 
   item header でカテゴリを指定すると、カテゴリ別ページに出力されます。
   カテゴリの指定の仕方：
-  > * タイトル [カテゴリ名][カテゴリ名][カテゴリ名]...: ...
+	* タイトル [カテゴリ名][カテゴリ名][カテゴリ名]...: ...
 
   例：
-  > * ウヒョの購入方法 [KnowHow]: まずはコンビニへ行って...
-  > * うまい！[酒][コンビニ]: 昨日、コンビニで見つけた...
+	* ウヒョの購入方法 [KnowHow]: まずはコンビニへ行って...
+	* うまい！[酒][コンビニ]: 昨日、コンビニで見つけた...
 
   カテゴリを指定すると、自動的にそのカテゴリのページが生成されます。
-  カテゴリページのファイル名は以下のようになります。
-  > cat_[カテゴリ名].html
-
+  カテゴリページのファイル名は「cat_[カテゴリ名].html」のようになります。
 
 - 日々のメッセージ埋め込み
 
@@ -272,21 +263,26 @@ ChangeLog の特殊な記法
   以下のような item を書きます。
   item の中の HTML タグはエスケープされません。
 
-  > * message-top:
-  > <p>美食家の末は乞食 --- ベンジャミン・フランクリン</p>
-
-  > * message-bottom:
-  > <span style="font-size:small">♪ Jeith Jarrett / La Scala</span>
+	* message-top:
+	<p>美食家の末は乞食 --- ベンジャミン・フランクリン</p>
+	
+	* message-bottom:
+	<span style="font-size:small">♪ Jeith Jarrett / La Scala</span>
 
 
 - エスケープ
-  以下の記法でHTMLを時下書きすることができます。
-  [literal]...[/literal], [sic]...[/sic], [esc]...[/esc]
+  以下の記法でHTMLを直書きすることができます。
+	[literal]...[/literal], [sic]...[/sic], [esc]...[/esc]
 
 
 - ソース
-  ソースの表示は [src]...[/esc] を使います。
+  ソースの表示は [src]...[/src] を使います。
   内部ではエンティティ置換とpre囲みを行います。
+
+
+- ChangeLogの末尾
+  行頭が「__DATA__」で始まる行があると、それ以降の記述は無視されます。
+  タブが入っていれば大丈夫です。
 
 
 ----------------------------------------------------------------------
@@ -295,9 +291,9 @@ ChangeLog の特殊な記法
 
 ChengaLog ファイルの日付行は、以下のフォーマットでなければならない。
 
-|  2001-11-21  YAMASHITA Tatsuo  <yto@nais.to>
-or
-|  2001-11-21 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+	2001-11-21  YAMASHITA Tatsuo  <yto@nais.to>
+	or
+	2001-11-21 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
 
 曜日入り日付フォーマットについては、
 <http://namazu.org/~satoru/diary/?200301b&to=200301151#200301151>
@@ -305,10 +301,10 @@ or
 
 以下のフォーマットはサポートしていない。
 
-|  Sat Mar 14 08:48:56 1998  YAMASHITA Tatsuo  <yto@nais.to>
+	Sat Mar 14 08:48:56 1998  YAMASHITA Tatsuo  <yto@nais.to>
 
 しかし、パッケージに含まれている clweek.pl で日付フォーマッ
 トの変換ができる。
 使い方: 
-| % ./clweek.pl ChangeLog > ChangeLog-new
+	% ./clweek.pl ChangeLog > ChangeLog-new
 

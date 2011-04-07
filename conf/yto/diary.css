@@ -35,7 +35,7 @@ a:visited {
 */
 h1 {
 	text-align: left;
-        border-color: #808080;
+        border-color: #ff80ff;
         border-style: solid;
         border-width: 1px 0 1px 0;
         padding: 0.5em;
@@ -45,6 +45,7 @@ h1 {
 1日の日記全体を囲む枠の設定 (entry)
 */
 div.day { 
+/* border-style: dotted; border-color: #ff80ff; border-width: 1px; */
         padding: 5px 0px 5px 0px;
 	margin: 5px 0px 5px 0px;
 }
@@ -55,16 +56,19 @@ div.day {
 h2 {
         margin: 0.0em 0.0em 0.5em 0.0em;
         padding: 0.5em 0.0em 0.5em 0.0em;
-        border-color: #808080;
+        border-color: #ff80ff;
         border-style: solid;
         border-width: 1px 10px 1px 10px;
-	background-color: #d0d0d0;
+	background-color: #ffd0ff;
 }
 
 /*
 日付の設定 (in enrty header)
 */
 span.date {
+/*        border-color: #ff80ff;
+        border-style: solid;
+        border-width: 0px 0 0 32px;*/
         padding: 0em 0.5em 0em 0.5em;
 }
 
@@ -72,6 +76,9 @@ span.date {
 タイトルを除いた1日の日記本文全体の設定 (items)
 */
 div.body { 
+/*        border-style: solid;
+        border-color: #ffe0ff;
+        border-width: 1px;*/
         padding: 0em;
         margin: 0em;
 }
@@ -81,13 +88,14 @@ item header の設定
 */
 /* memo: tDiary だと h3。chalow でも設定によって h3 を出すことが可能 */
 .clitemheader { 
-        color: #606060;
+        color: red;
 	font-weight: bold;
+/*	background-color: #ffe8ff;*/
         padding: 3px 3px 0px 3px;
 }
 
 h3 { 
-        color: #606060;
+        color: red;
 	font-weight: bold;
 	margin: 0px;
 }
@@ -97,21 +105,21 @@ h3 {
 */
 /*div.day span.sanchor {*/
 span.sanchor {
-/*        background-image: url(dot-pink-16.png);
+        background-image: url(dot-pink-16.png);
         background-position: bottom left;
 	background-repeat: no-repeat;
-        padding: 0px 0px 0px 0px;
+        padding: 16px 16px 0px 0px;
         margin: 0px 0px 0px 0px;
         color: #fff;
         background-color: transparent;
-*/
-        font-size: xx-small;
+        font-size: 0px;
 }
 
 /*
 サブタイトルを含むセクション (item) の設定
 */
 div.section { 
+/*        border-color: #ffd0ff;*/
         border-color: #ffffff;
         border-style: solid;
         border-width: 1px;
@@ -182,12 +190,12 @@ p.footer a {
 
 div.comment {
         border-style: solid;
-        border-color: #d0d0d0;
+        border-color: #ffd0ff;
         border-width: 1px;
         margin: 0.5em;
         padding: 0.5em;
         font-size: small;
-        background-color: #f0f0f0;
+        background-color: #fff0ff;
 }
 
 div.comment p {
@@ -195,23 +203,22 @@ div.comment p {
 }
 
 div.day span.canchor {
-/*        background-image: url(dot-gray.png);
+        background-image: url(dot-gray.png);
         background-position: bottom right;
         background-repeat: no-repeat;
-        padding: 0px 16px 0px 0px;
+        padding: 16px 16px 0px 0px;
         color: #fff;
         background-color: transparent;
-*/
-        font-size: small;
+        font-size: 1px;
 }
 
 div.form {
         border-style: solid;
-        border-color: #d0d0d0;
+        border-color: #ffd0ff;
         border-width: 1px;
         margin: 0.5em;
         padding: 0.5em;
-        background-color: #f0f0f0;
+        background-color: #fff0ff;
 }
 
 div.commentshort {
@@ -245,7 +252,7 @@ for chalow: Referrer by 日付リンク
 div .referer { 
   font-size: x-small;
   color: #808080;
-  background-color: #f8f8f8;
+  background-color: #fff8ff;
   margin-top: 0.5em;
   padding: 0.2em;
 }
@@ -261,7 +268,7 @@ div .itemauthor {
 }
 div .itemauthor span {
   font-size: small;
-  border-color: #b0b0b0;
+  border-color: #ffb0ff;
   border-style: solid;
   border-width: 0px 5px 1px 0px;
   color: #606060;
@@ -285,6 +292,17 @@ div .itemauthor span {
   padding: 0px;	
 }
 
+#linksright {
+  position:absolute;
+  top:8.5em;	
+  right:5px;
+  width: 175px;	
+/*  float: right;
+  margin-left: 5px;*/
+  margin: 0px;
+  padding: 0px;	
+  background-color: white;
+}
 
 #footer {
   clear: both;
@@ -294,12 +312,12 @@ div .itemauthor span {
 
 .stdbox table {width: 100%; margin: 0;}
 .stdbox a {text-decoration: none;}
-.stdbox td {border: solid 1px #808080; padding: 3px; font-size: x-small;line-height: 130%;}
+.stdbox td {border: solid 1px #ff80ff; padding: 3px; font-size: x-small;line-height: 130%;}
 .stdbox ul {margin: 0; padding: 0}
 .stdbox li {margin: 0 0 0 1em}
 .stdbox dl {margin: 0;}
 .stdbox dd {margin: 0 0 0 1em; padding: 0;}
-.funcbox {border:solid 1px #808080;font-size:x-small;padding:3px;margin:2px;
+.funcbox {border:solid 1px #ff80ff;font-size:x-small;padding:3px;margin:2px;
       line-height: 120%;
 }
 
