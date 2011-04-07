@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.14 2002/06/23 03:38:28 yto Exp $
+# $Id: chalow,v 1.18 2002/06/29 03:37:25 yto Exp $
 #
 # chalow - CHAngeLog On The Web - convert ChangeLog to HTML files
 #
@@ -155,8 +155,8 @@ exit;
 
 ### 文字列の置き換え
 sub okikae {
-    ### '<', '>' は置き換える。ただし、コメントに関わる場合は無視
-    s/([^\-])>/$1&gt;/g; s/<([^!])/&lt;$1/g;
+    ### "<" は置き換える。ただし、コメントに関わる場合は無視
+    s/<([^!])/&lt;$1/g;
 
     ### 自動文字列置換適用
     eval $auto_replace;
@@ -167,15 +167,13 @@ sub okikae {
 
     ### URL表記を href で
     # URL : http://....
+    # 正規表現は http://www.din.or.jp/~ohzaki/perl.htm#httpURL より。
     # 直前が "," だったら画像リンクなのでここでは処理しない
-    s!([^,"])(http:[^\s\n\)]+)!$1<a href="$2">$2</a>!g; #"
+    s|([^,"])(s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#,]+)
+     |$1<a href="$2">$2</a>|gx; # "])|;
 
     ### 画像張り付け
     # image : [IMG:image/2000-06-20-08-32-57.m.jpg]
-    # image : [IMG:image/aa.jpg,http://aa.jp/]            --- 画像リンク
-    # image : [IMG:image/aa.jpg,Hoge Photo]               --- ALT属性
-    # image : [IMG:image/aa.jpg,http://aa.jp/,Hoge Photo] --- 両方(順序非依存)
-    #                          ↑カンマの前後にスペースあったらダメ
     s!\[IMG:([^\]]+)\]!get_img_str($1)!ge;
 
     ### 日付部分に name (URLで直接リンクがはれるように)
@@ -268,24 +266,15 @@ sub write_month_page_list {
 
 # img タグ文字列を生成。
 sub get_img_str {
-    my ($str) = @_;
-    my (@tmp) = split(/\s*,\s*/, $str);
-    my $fn = shift @tmp;
+    my ($fn) = @_;
     die "file not found: $opt_odir/$fn\n" unless (-e $opt_odir."/".$fn);
-    my $rv = "<img src=\"$fn\"";
+    my $rv = qq(<img src="$fn" alt="画像");
 
-    if ($IDENTIFY ne "") {
+    if ($IDENTIFY ne "") {	# 隠しモード。自分用。
 	my ($w, $h) = (`$IDENTIFY $opt_odir/$fn` =~ /(\d+)x(\d+)/);
-	$rv .= " width=\"$w\" height=\"$h\"";
+	$rv .= qq( width="$w" height="$h");
     }
 
-    foreach (@tmp) {
-	if (/^http/) {		# 画像リンク
-	    $rv = "<a href=\"$_\">$rv></a";
-	} else {		# ALT属性
-	    $rv =~ s/<img\s/<img alt="$_" /;
-	}
-    }
     return $rv.">";	
 }
 

@@ -1,3 +1,27 @@
+2002-06-29  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.8: 公開
+
+	* clsearch.cgi: new. パッケージに追加してみた。
+
+	* chalow (okikae): URL 用正規表現を修正。
+	s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+ →
+	s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#,]+
+
+	こんな URL があるもんだから。
+	http://k-tai.impress.co.jp/cda/article/todays_goods/0,,9722,00.html
+
+2002-06-28  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (get_img_str): add alt. 他にもいろいろ機能ダウン。
+
+2002-06-24  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (okikae): "<http://www.example.com/>" といった "<", ">" 
+	でくくった URL 表記に対応。修正の手順: 
+	(1) "<" と ">" をエスケープしていたのを、 "<" だけにする。
+	(2) URL にマッチする正規表現を変更。
+
 2002-06-23  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.7: 公開
