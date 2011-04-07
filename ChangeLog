@@ -1,8 +1,107 @@
-2003-07-12  YAMASHITA Tatsuo  <yto@nais.to>
+2003-08-03  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* p:TODO:
 	- 日本語コードの選択
 	- # ではじまる行は消す
+	- 日付ごとだけでなく、アイテムごとに「くっつき BBS」
+	- chalowlib?
+	- くっつき BBS との連携まわりをすっきりさせる
+	- ページ単位だけど、リンク元表示
+	  参考: <http://www.ijn-jp.net/user8/report/svchat13.html>
+	  要調査: JavaScript で #2003... も取れるか?
+	- RSS
+	- トラックバック
+	- 自分の日記内だけでのトラックバック[2002-06-28-2]
+
+	* version 0.18: 
+	公開
+
+	* add-extent.pl: 
+	毎回 extent 情報を調べるのは時間がかかるので cache ファイルを採用。
+
+2003-07-31  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* RSS (RDF):
+	<script type="text/javascript" src="http://rss-jp.net/x/read_rss.cgi?url=http://nais.to/~yto/clog/cl.rdf&style=js&encode=euc&num=10"></script>
+
+	RSS を出力するようにした。
+
+	今のところ、RDF の文字コードは euc-jp。utf-8 でないと正しく動かな
+	い RSS 処理ソフトがあるらしい。どうしたものか。
+	(ref. RSS -- サイト情報の要約と公開 
+	<http://www.kanzaki.com/docs/sw/rss.html>)
+
+	→ nkf -w でなんとかする。しかし、nkf は新しいのじゃなきゃならぬ。
+
+	* chalow:
+	(parse_entry): mod for RSS
+	%all_items というハッシュに全アイテム情報を詰め込む。
+	(write_rdf_file): New.  for RSS output.
+	(parse_entry): パーズして結果をハッシュに詰め込むようにした。
+	パーズと生成を別パスにした。
+
+	* {chalow,cl.conf}:
+	新たな設定項目を追加
+	> # RSS を出力するか (1:YES, 0:NO)
+	> my $output_rss = 1;
+	> # ChangeLog を公開する URL (相対 URL 不可)
+	> my $clog_url = "http://nais.to/~yto/clog";
+	> # 他の年の同じ日付 (月日) へのリンクを張るか (1:YES, 0:NO)
+	> my $same_date_jump = 1;
+
+	* cl2moneycsv.pl:
+	New.  
+	ChangeLog メモで家計簿っぽいことをするためのもの。
+	ChangeLog メモから買物ログを抜きだして CSV にする。
+	(ref. <http://nais.to/~yto/doc/zb/0016.html#kakeibo>)
+
+2003-07-30 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow:
+	他の年の同じ日付 (月日) へのリンクを付ける機能 (same date jump) を
+	テスト的に実装。例えば、日付 (エントリヘッダー) の下に過去数年の 
+	7/30 の記述へのリンクが表示される。
+
+	ぱくり元: <http://kitaj.no-ip.com/tdiary/20021112.html#p07>
+	> 凹 n年日記
+	> 他の年の同じ月に日記をつけている場合のみ[n年日記]というリンクが
+	> 現れるようになりました．[n年日記]が現れるまで頑張って日記をつけ
+	> 続けてください．それからn年日記モードでは[n年日記]のリンクを表示
+	> しないようにしました．
+
+	* chalow: 
+	「最近の何日かだけインデックスページに載せるための処理」を全体ルー
+	プの外へ出した。 $top_n_ctr が関係する。
+
+2003-07-23 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* {chalow,cl.conf}: 
+	Add 「type="text/javascript"」
+	ref. <http://oikaze.com/~tamada/Diary/2003-07.html#2003-07-12-4>
+
+2003-07-15 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (parse_entry): 
+	item header 以外の行が「\t*」で始まると、それ以降が消えてしまうと
+	いうバグ [chalow:23] に対処。
+
+	例: 
+	a
+	b
+	*
+	c
+
+	原因は item を認識する正規表現。
+
+	> # (3) 個々の item に分解し、各 item ごとに処理
+	> my @itemlist;
+	> while ($items =~ /^(\t\* .+?\n(?=\s*(\t\*|\Z)))/gsm) {
+	>     push @itemlist, $1;
+	> }
+	↓
+	> while ($items =~ /^(\t\* .+?\n(?=\s*(\t\* |\Z)))/gsm) {	
+	
+2003-07-12  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.17: 
 	公開

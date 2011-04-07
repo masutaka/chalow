@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: add-extent.pl,v 1.1 2003/06/09 13:47:07 yto Exp $
+# $Id: add-extent.pl,v 1.2 2003/08/03 04:01:10 yto Exp $
 # HTML の img タグに width と height を足す
 
 use strict;
@@ -24,6 +24,23 @@ USAGE
 	my $all = join('', <IN>);
 	close(IN);
 
+	# cache ファイル
+	my $cfn = $fname;
+	$cfn =~ s!/[^/]*$!!;	# パス
+	$cfn .= "/cache_extent-info";
+	my %file_info;
+	my $file_info_update_flag = 0;
+	if (open(F, $cfn)) {
+	    while(<F>) {
+		next if (/^\#/ or /^\s*$/);
+		my @c = split(/\s/);
+		if (@c == 3) {
+		    $file_info{$c[0]} = [@c[1..2]];
+		}
+	    }
+	    close(F);
+	}
+
 	# img タグの部分を取りだす。
 	my @con = split(/(<img.+?>)/ims, $all);
 
@@ -47,12 +64,28 @@ USAGE
 
 		# identify で width と height を取得
 		die unless (-e $imgfn);
-		my ($w, $h) = (`$IDENTIFY $imgfn` =~ /(\d+)x(\d+)/);
+		my ($w, $h);
+		if (defined $file_info{$imgfn}) {
+		    ($w, $h) = @{$file_info{$imgfn}};
+		} else {
+		    ($w, $h) = (`$IDENTIFY $imgfn` =~ /(\d+)x(\d+)/);
+		    $file_info{$imgfn} = [$w, $h];
+		    $file_info_update_flag = 1;
+#		    print join("----", @{$file_info{$imgfn}}),"\n";
+		}
 		die if $?;
 
 		# img タグ内に width と height を追加
 		$con[$i] =~ s|>$| width="$w" height="$h">|ims;
 		$num++;
+	    }
+
+	    # cache ファイルの書き込み
+	    if ($file_info_update_flag and open(F, "> $cfn")) {
+		foreach my $f (sort keys %file_info) {
+		    print F "$f @{$file_info{$f}}\n";
+		}
+		close(F);
 	    }
 	}
 

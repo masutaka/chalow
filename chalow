@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.41 2003/07/12 03:26:53 yto Exp $
+# $Id: chalow,v 1.46 2003/08/03 04:01:10 yto Exp $
 #
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
@@ -97,6 +97,12 @@ my $use_tukkomi = 0;
 # ツッコミのテンプレート = <div class="comment">...</div> の中味。
 # TUKKOMI_DATE はそのエントリの日付 (例: 2003-06-25) に変換される
 my $tukkomi_template = "";
+# RSS を出力するか (1:YES, 0:NO)
+my $output_rss = 1;
+# ChangeLog を公開する URL (相対 URL 不可)
+my $clog_url = "http://nais.to/~yto/clog";
+# 他の年の同じ日付 (月日) へのリンクを張るか (1:YES, 0:NO)
+my $same_date_jump = 1;
 
 
 ### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
@@ -129,8 +135,9 @@ $css_file = $opt_css_file if (defined $opt_css_file);
 
 # ツッコミ機能を使う
 if ($use_tukkomi == 1) {
-    my $s = qq(<script language="JavaScript" src="kuttukibbs.js"></script>
-<script language="JavaScript">
+    my $s = qq(<script language="JavaScript" type="text/javascript" 
+src="kuttukibbs.js"></script>
+<script language="JavaScript" type="text/javascript">
 function CallFunc() {KbShowCommentShort(num, 5, 50)}</script>);
 
     $month_page_head_plus .= $s;
@@ -161,6 +168,13 @@ my %month_page;
 my %all_month;
 my $month_page_list = "";
 
+my %all_items;			# for RSS
+my %same_date;			# for same date jump
+
+my %all_entries;		# 全エントリを格納
+# all_entrries{ymd}{eh} - エントリヘッダ
+# all_entrries{ymd}{1,2,3,...}{ih,c} - アイテム No., アイテムヘッダ, 中味
+
 for my $fname (@ARGV) {
 
     print "reading \"$fname\"\n" if (!defined $quiet_mode);
@@ -188,7 +202,6 @@ for my $fname (@ARGV) {
     my @lines = split(/(?=^\d+-\d+-\d+)/m, $all); # 日付 (entry) 単位に分解
     my ($day, $month) = ("", "");
     foreach (@lines) {
-	$top_n_ctr--;
 	($day, $month) = (/^((\d+-\d+)-\d+)/);
 	$all_month{$month} = 1;
 
@@ -216,20 +229,73 @@ for my $fname (@ARGV) {
 
 	# 秘密の項目を外に出さないように削除
 	# 例: * p:秘密メモ: YTがまたやらかした。しょうもないやつだ。
-        s/\n\t+\* p:.+?^(\t+\*|$)/$1/gms; # renew 030105
-
-	parse_entry();		# エントリをパーズして、文字列置き換え
-
-	s/^\s+//; s/\s+$//;			     
-
-	$month_page{$month}{$day} = qq(<div class="day">$_</div></div>\n);
-	# 各 entry を <div class="day"></div> で囲む↑
-
-	# 最近の何日かだけインデックスページに載せるための処理
-	$top_n_str .= $month_page{$month}{$day} if ($top_n_ctr >= 0);
+        s/\n\t+\* p:.+?^(\t+\*|$)/$1/gms;
+			 
+	# エントリをパーズして、文字列置き換え
+	parse_entry($_, \%{$all_entries{$day}});
     }
 }
 
+
+### RSS ファイルを作る
+write_rss_file() if ($output_rss);
+
+
+### 追加情報のためのループ
+foreach my $ymd (sort keys %all_entries) {
+
+    my ($y, $m, $d) = ($ymd =~ /^(\d{4})-(\d\d)-(\d\d)$/);
+
+    my $items_new;
+    foreach my $i (sort {$b <=> $a} keys %{$all_entries{$ymd}}) {
+	next if ($i !~ /^\d/);
+
+	# item の組み上げ
+	my $item = $all_entries{$ymd}{$i}{h}.$all_entries{$ymd}{$i}{c};
+
+	# 各 item を <div class="section"></div> で囲む
+	$items_new .= qq(<div class="section"><p>
+<pre style="background-color:transparent;border:none;line-height:inherit;
+font-size:100%;margin:0;padding:0;">$item</pre></p></div>\n);
+    }
+
+    ### 他の年の同じ日付 (月日) へのリンクを張る
+    if ($same_date_jump == 1) {
+	if (defined $same_date{"$m-$d"} and @{$same_date{"$m-$d"}} != 1) {
+	    my $t = join(' ', map {
+		($_ == $y) ? "" : qq(<a href="$_-$m.html\#$_-$m-$d">$_</a>)}
+			 reverse @{$same_date{"$m-$d"}});
+	    $items_new = qq(<div class="calendar">$t</div>).$items_new;
+	}
+    }
+
+    ### ツッコミ機能を使う
+    if ($use_tukkomi == 1) {
+	my $template = $tukkomi_template;
+	$template =~ s/TUKKOMI_DATE/$y-$m.html%23$ymd/g;
+	$items_new .= qq(<div class="comment">$template</div>);
+    }
+
+    ### 各エントリの HTML 組み上げ
+    my $ttt = $all_entries{$ymd}{eh}.$items_new;
+    $month_page{"$y-$m"}{$ymd} = qq(<div class="day">$ttt</div></div>\n);
+    # 各 entry を <div class="day"></div> で囲む↑
+}
+
+
+### 最近の何日かだけインデックスページに載せるための処理
+my $ctr = $top_n_ctr;
+foreach my $ym (sort {$b cmp $a} keys %month_page) {
+    last if ($ctr < 0);
+    foreach my $ymd (sort  {$b cmp $a} keys %{$month_page{$ym}}) {
+	$ctr--;
+	last if ($ctr < 0);
+	$top_n_str .= $month_page{$ym}{$ymd};
+    }
+}
+
+
+### HTML ファイルの出力
 write_index_page(\%all_month, \$top_n_str);
 write_month_page(\%month_page);
 
@@ -241,102 +307,99 @@ exit;
 
 ### エントリをパーズし、文字列の置き換え関数を呼ぶ
 sub parse_entry {
-    my ($eh, $items, $items_new);
+    my ($e, $enthashp) = @_;
 
     # (1) entry header とそれ以外に分解
-    if (/\A(\d{4}-\d\d-\d\d.+?\n)(.+)\Z/sm) {
-	($eh, $items) = ($1, $2);
-	#print "($eh, $items)\n";
+    die "parse error" unless ($e =~ /\A(\d{4}-\d\d-\d\d.+?\n)(.+)\Z/sm);
 
-	# (2) entry header への処理
+    my ($eh, $items) = ($1, $2);
 
-	### 日付部分に name (URLで直接リンクがはれるように)
-	# anchor : ^YYYY-MM-DD
-	my ($day, $mon) = ($eh =~ /^((\d\d\d\d-\d\d)-\d\d)/); # 後で使う
-	$eh =~ s!^(((\d\d\d\d-\d\d)-\d\d).*)\n!<h2><span class="date"><a name="$2" href="$3.html#$2">$1</a></span></h2>\n<div class="body">!;
-	# ↑なぜ href="#$2" ではないのか? -> index.html#$2 になると困るから
+    # (2) entry header への処理
 
-	### item anchor へのアクセスを日付へ変換する ad hoc な方法
-	# 一度 item anchor を使ってたけどもうやめたときなど用。
-	# 0000-00-00-1 から 0000-00-00-9 までへのリンクは entry header へ行く。
-	if ($use_item_anchor == 0) {
-	    for (my $i = 1; $i <= 9; $i++) {
-		$eh =~ s|</h2>|<a name="$day-$i"></a></h2>|;
-	    }
+    ### 日付部分に name (URLで直接リンクがはれるように)
+    # anchor : ^YYYY-MM-DD
+    my ($ymd, $y, $m, $d) = ($eh =~ /^((\d\d\d\d)-(\d\d)-(\d\d))/); # 後で使う
+    $eh =~ s!^(((\d\d\d\d-\d\d)-\d\d).*)\n!<h2><span class="date"><a name="$2" href="$3.html#$2">$1</a></span></h2>\n<div class="body">!;
+    # ↑なぜ href="#$2" ではないのか? -> index.html#$2 になると困るから
+
+    push @{$same_date{"$m-$d"}}, $y; # 同じ日付 (月日) を持つ年のリスト
+
+    ### item anchor へのアクセスを日付へ変換する ad hoc な方法
+    # 一度 item anchor を使ってたけどもうやめたときなど用。
+    # 0000-00-00-1 から 0000-00-00-9 までへのリンクは entry header へ行く。
+    if ($use_item_anchor == 0) {
+	for (my $i = 1; $i <= 9; $i++) {
+	    $eh =~ s|</h2>|<a name="$ymd-$i"></a></h2>|;
 	}
-
-	# (3) 個々の item に分解し、各 item ごとに処理
-	my @itemlist;
-	while ($items =~ /^(\t\* .+?\n(?=\s*(\t\*|\Z)))/gsm) {
-	    push @itemlist, $1;
-	}
-
-	for (my $i = 0; $i < @itemlist; $i++) {
-	    my $item = $itemlist[$i];
-	    my $num = ($descending_order_item_num == 1) ?
-		(scalar(@itemlist) - $i) : ($i + 1);
-
-	    # (4) item header とそれ以外に分解
-	    my ($ih, $s, $c) = ($item =~ /^\t\* (.+?):(\s)(.*)\Z/sm);
-	    # (\s) には、スペース、タブ、改行がマッチ　↑
-	    #print "ih[$ih] c[$c]\n";
-
-	    if (defined $ih) {
-		# (5) item header の処理
-		$ih = okikae($ih);
-
-		# 前に足すもの
-		my $ihb = "";
-		if ($item_header_style == 0 or $item_header_style == 1) {
-		    $ihb = $item_header_mark;
-		    if ($use_item_anchor == 1) {
-			$ihb = qq(<a name="$day-$num" href="$mon.html#$day-$num">$ihb</a>);
-		    }
-		    $ihb .= " ";
-		}
-		# タグで囲む
-		$ih = qq($ihb<span class="clitemheader">$ih</span>);
-		if ($use_h3_for_item_header == 1) {
-		    $ih = qq(<h3 class="subtitle">$ih</h3>);
-		}
-		# 後ろに足すもの
-		if ($item_header_style == 0 or $item_header_style == 2) {
-		    $ih .= ":";
-		}
-		$ih = "\t".$ih."$s";
-
-	    } else {
-		$ih = "";
-		$c = $item;
-	    }
-
-	    # (6) item の中味の処理
-	    $c = okikae($c);
-
-	    # item の組み上げ
-	    $item = $ih.$c;
-
-	    # タブによるインデントをどうするか
-	    $item =~ s!^(<.+?>|)\t!$1!gsm if ($no_indent == 1);
-
-	    # 各 item を <div class="section"></div> で囲む
-	    $item = qq(<div class="section"><p><pre style="background-color:transparent;border:none;line-height:inherit;font-size:100%;margin:0;padding:0;">$item</pre></p></div>\n);
-	
-	    $items_new .= $item;
-	}
-
-	if ($use_tukkomi == 1) { # ツッコミ機能を使う
-	    my $template = $tukkomi_template;
-	    $template =~ s/TUKKOMI_DATE/$mon.html%23$day/g;
-	    $items_new .= qq(<div class="comment">$template</div>);
-	}
-
     }
 
+    # ハッシュに格納
+    $enthashp->{eh} = $eh;
 
-    # エントリの組み上げ
-    $_ = $eh.$items_new;
-    return $_;
+    # (3) 個々の item に分解し、各 item ごとに処理
+    my @itemlist;
+    while ($items =~ /^(\t\* .+?\n(?=\s*(\t\* |\Z)))/gsm) {
+	push @itemlist, $1;
+    }
+
+    for (my $i = 0; $i < @itemlist; $i++) {
+	my $item = $itemlist[$i];
+	my $num = ($descending_order_item_num == 1) ?
+	    (scalar(@itemlist) - $i) : ($i + 1);
+
+	# (4) item header とそれ以外に分解
+	my ($ih, $s, $c) = ($item =~ /^\t\* (.+?):(\s)(.*)\Z/sm);
+	# (\s) には、スペース、タブ、改行がマッチ　↑
+	#print "ih[$ih] c[$c]\n";
+
+	if (defined $ih) {
+
+	    # ハッシュに格納
+	    $enthashp->{$num}{h4rss} = $ih; # for RSS
+
+	    # (5) item header の処理
+	    $ih = okikae($ih);
+
+	    # 前に足すもの
+	    my $ihb = "";
+	    if ($item_header_style == 0 or $item_header_style == 1) {
+		$ihb = $item_header_mark;
+		if ($use_item_anchor == 1) {
+		    $ihb = qq(<a name="$ymd-$num" href="$y-$m.html#$ymd-$num">$ihb</a>);
+		}
+		$ihb .= " ";
+	    }
+	    # タグで囲む
+	    $ih = qq($ihb<span class="clitemheader">$ih</span>);
+	    if ($use_h3_for_item_header == 1) {
+		$ih = qq(<h3 class="subtitle">$ih</h3>);
+	    }
+	    # 後ろに足すもの
+	    if ($item_header_style == 0 or $item_header_style == 2) {
+		$ih .= ":";
+	    }
+	    $ih = "\t".$ih."$s";
+	    
+	} else {
+	    $ih = "";
+	    $c = $item;
+	}
+
+	# (6) item の中味の処理
+	$c = okikae($c);
+	
+	# タブによるインデントをどうするか
+	if ($no_indent == 1) {
+	    $ih =~ s!^(<.+?>|)\t!$1!gsm;
+	    $c =~ s!^(<.+?>|)\t!$1!gsm;
+	}
+
+	# ハッシュに格納
+	$enthashp->{$num}{h} = $ih;
+	$enthashp->{$num}{c} = $c;
+    }
+
+    return;
 }
 
 
@@ -385,7 +448,7 @@ sub okikae {
     #my $URLCHARS = "[-_.!~*'()a-zA-Z0-9;/?:@&=+,%\#\$]";
     my $URLCHARS = "[-_.!~*'a-zA-Z0-9;/?:@&=+,%\#\$]";
     my $URLDELIM = "\\\\\\n[\\t ]+";
-    s{(?<!")((s?https?|ftp)://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
+    s{(?<!["\=])((s?https?|ftp)://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
      {'<a href="'.join('', split(/$URLDELIM/, $1)).'">'.
       join('', split(/\\/, $1)).'</a>'}gem; #")};
 #    s{([^,"])((s?https?|ftp)://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
@@ -543,6 +606,7 @@ sub get_day_of_week {
     return ("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")[$WEEKDAY];
 }
 
+
 ### 年月を入力としその月の最終日を出力する関数 since 030105
 # EXAMPLES
 #     get_last_day_of_month(12, 2002), get_last_day_of_month("2002-12")
@@ -551,4 +615,78 @@ sub get_last_day_of_month {
     ($y, $m) = split("-", $m) unless (defined $y);
     return (31, ((($y % 4 == 0) and ($y % 100)) or ($y % 400 == 0)) ? 29 : 28,
 	    31, 30, 31, 30, 31, 31, 30, 31, 30, 31)[$m - 1];
+}
+
+
+### RSS ファイルを出力する
+sub write_rss_file {
+
+    my $rdfseq;
+    my $rdfitem;
+
+    # YEARMONTH, ITEMID
+    my $rdfseq_template =
+	qq(<rdf:li resource="$clog_url/YEARMONTH.html#ITEMID"/>\n);
+    # YEARMONTH, ITEMID, ITEMHEADER
+    my $rdfitem_template = qq(
+<item rdf:about="$clog_url/YEARMONTH.html#ITEMID">
+ <title>ITEMID  ITEMHEADER</title>
+ <link>$clog_url/YEARMONTH.html#ITEMID</link>
+ <description></description>
+</item>);
+
+    my $ctr = $top_n_ctr;
+    foreach my $ymd (sort {$b cmp $a} keys %all_entries) {
+	$ctr--;
+	last if ($ctr < 0);
+	
+	foreach my $i (sort {$b <=> $a} keys %{$all_entries{$ymd}}) {
+	    next if ($i !~ /^\d/);
+
+	    my ($ym) = ($ymd =~ /^(\d{4}-\d\d)-\d\d/);
+
+	    my $ih = $all_entries{$ymd}{$i}{h4rss};
+	    $ih =~ s/&/&amp;/go;
+	    $ih =~ s/>/&gt;/go;
+	    $ih =~ s/</&lt;/go;
+	    $ih =~ s/"/&quot;/go; # ";
+
+	    my $seqtmp = $rdfseq_template;
+	    my $itemtmp = $rdfitem_template;
+
+	    $seqtmp =~ s|YEARMONTH|$ym|;
+	    $seqtmp =~ s|ITEMID|$ymd-$i|;
+	    $itemtmp =~ s|YEARMONTH|$ym|g;
+	    $itemtmp =~ s|ITEMID|$ymd-$i|g;
+	    $itemtmp =~ s|ITEMHEADER|$ih|;
+
+	    $rdfseq .= $seqtmp;
+	    $rdfitem .= $itemtmp;
+	}
+    }
+
+    my $rdfstr = << "RDFSTR"
+<?xml version="1.0" encoding="utf-8"?>
+
+<rdf:RDF
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:lang="ja">
+<channel rdf:about="$clog_url/cl.rdf">
+<title>$changelog_name</title>
+<link>$clog_url</link>
+<description></description>
+<items>
+<rdf:Seq>\n$rdfseq</rdf:Seq>
+</items>
+</channel>$rdfitem
+</rdf:RDF>
+RDFSTR
+	;
+
+    my $fh = new FileHandle;
+    my $fn = "| $NKF -wd > $opt_odir/cl.rdf";
+    $fh->open($fn) || die "$fn: $!";
+    print $fh $rdfstr;
+    $fh->close();
 }
