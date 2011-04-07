@@ -1,12 +1,12 @@
 #!/usr/bin/perl
-# $Id: chalow,v 1.103 2005/08/21 05:35:31 yto Exp $
+# $Id: chalow,v 1.1 2007-10-19 22:07:25+09 tatsuoyamashita Exp tatsuoyamashita $
 #
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
 # This is free software with ABSOLUTELY NO WARRANTY.
 # 無償・無保証・著作権放棄 (see http://nais.to/~yto/doc/zb/0002.html)
 #
-# chalow ホームページ: http://nais.to/~yto/tools/chalow
+# chalow ホームページ: http://chalow.org/
 use strict;
 use Getopt::Long;
 use POSIX qw(strftime ceil);
@@ -14,7 +14,7 @@ use Time::Local;		# for 曜日
 use HTML::Template;
 use ChangeLogReader;
 
-my $version = '1.0rc6';
+my $version = '1.0';
 
 # 現在時刻の獲得
 my $what_time_is_it_now = strftime "%Y-%m-%d %H:%M", localtime;
@@ -24,7 +24,7 @@ my ($current_ym) = ($what_time_is_it_now =~ /^(\d+-\d+)/); # 今月
 ### ユーザ設定項目 obsolete
 
 # 自分の home page URL --- 廃止予定。テンプレートに直接書く方針で
-my $home_page_url = "http://nais.to/~yto/tools/chalow/";
+my $home_page_url = "http://chalow.org/";
 # 自分のホームーページの呼び名 --- 廃止予定。同上
 my $home_page_name = "chalow home page";
 
@@ -285,7 +285,7 @@ my $output_rss = 1;
 # 日記の説明 for RSS : 例: "日々のあれこれ。"
 my $changelog_description = "";
 # ChangeLog を公開する URL (絶体 URL を強く推奨) - RSS に必須
-#my $clog_url = "http://nais.to/~yto/clog/";
+#my $clog_url = "http://chalow.net/";
 my $clog_url = "./";
 
 # 検索用ファイル (cl.itemlist) を作るか (1:YES, 0:NO)
@@ -321,7 +321,7 @@ my $readmore_tag = "====";
 
 ### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
 my $signature = qq(<p class="footer">Powered by 
-<a href="http://nais.to/~yto/tools/chalow/">chalow</a></p>);
+<a href="http://chalow.org/">chalow</a></p>);
 
 ### コマンドライン引数
 Getopt::Long::Configure('bundling');
@@ -380,10 +380,10 @@ my $category_list;
 my $clog_url_pref = $clog_url;
 $clog_url_pref =~ s!/[^/]+html?$!/!;
 $clog_url_pref .= "/" unless ($clog_url_pref =~ m!/$!);
-# SPEC:       $clog_url                    $clog_url_pref
-# http://nais.to/~yto/clog/           -> http://nais.to/~yto/clog/
-# http://nais.to/~yto/clog/index.html -> http://nais.to/~yto/clog/
-# http://nais.to/~yto/clog            -> http://nais.to/~yto/clog/
+# SPEC:   $clog_url                 $clog_url_pref
+# http://chalow.net/           -> http://chalow.net/
+# http://chalow.net/index.html -> http://chalow.net/
+# http://chalow.net            -> http://chalow.net/
 
 my %month_page;			# 月別のページ
 my %category_item;		# カテゴリ別ページ用 item
@@ -1106,7 +1106,7 @@ sub write_rss_file {
     $t->param(clog_url => $clog_url);
     $t->param(clog_url_pref => $clog_url_pref);
     $t->param(rss_file => $rss_filename); # 050821
-    $t->param(generatoragent=>"http://nais.to/~yto/tools/chalow/?v=$version");
+    $t->param(generatoragent=>"http://chalow.org/?v=$version");
     my $ostr = $t->output();
     to_utf8_cl(\$ostr) if (not $utf8_mode);
     output_to_file("$outputdir/$rss_filename", \$ostr);
@@ -1312,7 +1312,8 @@ sub unescape_string {
     ### プラグインアンエスケープ - 実行！
     $$strp =~ s|\x7\x13(\d+)\x3|eval($escaped_plugin{$1})|ge;
     ### ソースアンエスケープ - pre 追加
-    $$strp =~ s|\x6\x13(\d+)\x3|<pre>$escaped_src{$1}</pre>|g;
+    #$$strp =~ s|\x6\x13(\d+)\x3|<pre>$escaped_src{$1}</pre>|g;
+    $$strp =~ s|\x6\x13(\d+)\x3|</p><pre>$escaped_src{$1}</pre><p>|g;
     ### HTML アンエスケープ
     $$strp =~ s|\x5\x13(\d+)\x3|$escaped_string{$1}|g;
 }

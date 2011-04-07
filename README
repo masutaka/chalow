@@ -4,7 +4,7 @@ ChangeLog を HTML に変換するツール
 
 README
 
-$Id: README,v 1.33 2005/08/10 02:31:46 yto Exp $
+$Id: README,v 1.1 2007-10-19 22:07:48+09 tatsuoyamashita Exp tatsuoyamashita $
 
 ----------------------------------------------------------------------
 インストール
@@ -300,9 +300,9 @@ ChangeLog の特殊な記法
 
 ChengaLog ファイルの日付行は、以下のフォーマットでなければならない。
 
-	2001-11-21  YAMASHITA Tatsuo  <yto@nais.to>
+	2001-11-21  YAMASHITA Tatsuo  <yto@example.com>
 	or
-	2001-11-21 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+	2001-11-21 (Wed)  YAMASHITA Tatsuo  <yto@example.com>
 
 曜日入り日付フォーマットについては、
 <http://namazu.org/~satoru/diary/?200301b&to=200301151#200301151>
@@ -310,7 +310,7 @@ ChengaLog ファイルの日付行は、以下のフォーマットでなければならない。
 
 以下のフォーマットはサポートしていない。
 
-	Sat Mar 14 08:48:56 1998  YAMASHITA Tatsuo  <yto@nais.to>
+	Sat Mar 14 08:48:56 1998  YAMASHITA Tatsuo  <yto@example.com>
 
 しかし、パッケージに含まれている clweek.pl で日付フォーマッ
 トの変換ができる。

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: clsearch.cgi,v 1.22 2005/01/13 00:34:28 yto Exp $
+# $Id: clsearch.cgi,v 1.1 2007-10-19 22:08:03+09 tatsuoyamashita Exp tatsuoyamashita $
 # clsearch.cgi - chalow により HTML 化された ChangeLog を検索する CGI
 use strict;
 
@@ -209,7 +209,7 @@ my $page_template = << "__TEMPLE"
 <p>$navip $bar $navin</p>
 <a href="./">ChangeLog INDEX</a>
 <div style="text-align:right">Powered by 
-<a href="http://nais.to/~yto/tools/chalow/"><strong>chalow</strong></a></div>
+<a href="http://chalow.org/"><strong>chalow</strong></a></div>
 </body></html>
 __TEMPLE
 

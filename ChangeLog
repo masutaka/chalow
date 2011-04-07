@@ -1,3 +1,29 @@
+2007-10-19  YAMASHITA Tatsuo  <yto at nais.to>
+
+	* version 1.0[リリース]: 
+	chalow 1.0 を公開します。
+	長いことほったらかしなのが気がかりだったので、
+	最低限の修正でとりあえず1.0を出しておくことにします。
+	ソースも oldtype で人様に見せれるものではないですが、
+	使えればよいや、ということで。
+	現在は、1.0とかなりかけ離れた新バージョンを作っています。
+	というか、いじっていると結構かけ離れてしまった、というのが真相です。
+
+	* clsearch.cgi: 
+	URLなどを修正。
+
+	* conf/utf8/cl.conf: 
+	URLなどを修正。
+
+	* cl.conf: 
+	URLなどを修正。
+
+	* README: 
+	ちょろっと修正。
+
+	* chalow (unescape_string): 
+	Tatsuya Kinoshita パッチを適用。
+
 2005-08-21  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 1.0rc6[リリース]:
@@ -244,7 +270,7 @@
 	RSS を Bloglines で見てみると、相対URLがおかしくなっている。
 	2004-11-27-3.html を http://nais.to/2004-11-27-3.html にしちゃってる。
 	そこで、RSS 中で相対パスを絶対パスにするようにした。 ad hoc
-	ref. http://nais.to/~yto/clog/2004-11-28-1.html
+	ref. http://chalow.net/2004-11-28-1.html
 
 2004-11-29  YAMASHITA Tatsuo  <yto at nais.to>
 
@@ -344,7 +370,7 @@
 	がおかしくなる。clsearch.cgiでの検索で発見したバグ。
 	ロジックがおかしかったので修整した。
 
-2004-07-31 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+2004-07-31 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_itemlist_file): 
 	--stop-date のとき、 cl.itemlist を差分更新するようにした。
@@ -435,7 +461,7 @@
 	s!\[IMG:([^\]\s]+)\s+([^\]\s]+)\]!get_link_str($1, $2);die!gesm;
 	<<
 
-2004-07-26 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
+2004-07-26 (Mon)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 1.0rc2[リリース]:
 	公開。
@@ -447,7 +473,7 @@
 	* cl.conf (clsearch): 
 	[2004-05-12-1]にともない update.
 
-2004-07-22 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+2004-07-22 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf: 
 	細かく変更。
@@ -457,12 +483,12 @@
 	OLD: <title>$ymd-$i  $ih</title>
 	NEW: <title>$ih</title>
 
-2004-06-27  YAMASHITA Tatsuo  <yto@nais.to>
+2004-06-27  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf: 
 	タイポ： blukfeeds --> bulkfeeds
 
-2004-06-13  YAMASHITA Tatsuo  <yto@nais.to>
+2004-06-13  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (output_to_file): 
 	Replace Once 機能。1行追加しただけ。
@@ -473,7 +499,7 @@
 	> # ファイルの最初に出てくる「<!-- ReplaceOnce -->」を置き換える文字列
 	> $replace_once = "";
 
-2004-06-04  YAMASHITA Tatsuo  <yto@nais.to>
+2004-06-04  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (make_calendar_table): 
 	typo. alisgn --> align
@@ -488,12 +514,12 @@
 	<!-- start:<TMPL_VAR name=ymdi> -->
 	<!-- end:<TMPL_VAR name=ymdi> -->
 
-2004-05-18  YAMASHITA Tatsuo  <yto@nais.to>
+2004-05-18  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 
 	$version でバージョン番号管理です。
 
-2004-05-12 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+2004-05-12 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi: 
 	$home_page_url, $home_page_nameを廃止。
@@ -510,7 +536,7 @@
 	(get_item): New.
 	ファイルから、IDにより指定されたitemを取りだす関数。
 
-2004-05-09  YAMASHITA Tatsuo  <yto@nais.to>
+2004-05-09  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 1.0rc1[リリース]:
 	公開。
@@ -532,12 +558,12 @@
 	||項目1-1||項目1-2||項目1-3
 	||項目2-1||項目2-2||項目2-3
 
-2004-04-24 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+2004-04-24 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf: 
 	調整。
 
-2004-04-14 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+2004-04-14 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* sample/dot-pink-16.png: 
 	New!
@@ -565,11 +591,11 @@
 
 	* sample/diary.css: mod.
 
-2004-04-01 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+2004-04-01 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf: mod.
 
-2004-02-27 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+2004-02-27 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_category_page): 
 	カテゴリページ中のエントリが多いときは複数ページにするようにした。
@@ -582,7 +608,7 @@
 	↓↓↓↓↓↓↓↓↓↓
 	> if (defined $entry_statistics{ymd}{$ym."-".$day}) {
 
-2004-02-26 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+2004-02-26 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf (amazon_search): 
 	New. プラグイン。amazon サーチ結果リンクの作成。
@@ -597,7 +623,7 @@
 	→ {{amazon_search('トトロ','dvd-jp')}}
 	<<
 
-2004-02-17 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+2004-02-17 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow:
 	HTML::Template 化
@@ -623,7 +649,7 @@
 	New プラグイン。amazon リンクの作成。これだけありゃいいじゃん的。
 	[2004-02-16-1]
 
-2004-02-16  YAMASHITA Tatsuo  <yto@nais.to>
+2004-02-16  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.24[リリース]:
 	公開。
@@ -643,7 +669,7 @@
           参考: <http://www.ijn-jp.net/user8/report/svchat13.html>
           要調査: JavaScript で #2003... も取れるか?
 
-2004-02-15  YAMASHITA Tatsuo  <yto@nais.to>
+2004-02-15  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 
 	細かい修整作業いろいろ。
@@ -655,7 +681,7 @@
 	> # {ym} : 各年月に含まれている日付エントリ数
 	> # {md} : 同じ月日を持つ年 for same date jump
 
-2004-02-14  YAMASHITA Tatsuo  <yto@nais.to>
+2004-02-14  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf: 
 	新設定項目。
@@ -674,7 +700,7 @@
 	* README: 
 	mod.
 
-2004-02-13  YAMASHITA Tatsuo  <yto@nais.to>
+2004-02-13  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (parse_entry)[メモ]: 
 	item header の後に続けて何も書かずに改行するスタイルのとき、
@@ -698,12 +724,12 @@
 	置き換えの方針：ハッシュに格納するときに okikae()。
 	置き換えた文字列をRSSなどに流用するので。
 
-2004-02-12  YAMASHITA Tatsuo  <yto@nais.to>
+2004-02-12  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* README: 
 	Mod.
 
-2004-02-11  YAMASHITA Tatsuo  <yto@nais.to>
+2004-02-11  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (parse_entry): 
 	プラグマ pragma の処理。
@@ -735,7 +761,7 @@
 	> <msg_top>美食家の末は乞食 --- ベンジャミン・フランクリン</msg_top>
 	> <msg_btm>♪ Jeith Jarrett / La Scala</msg_btm>
 
-2004-02-08  YAMASHITA Tatsuo  <yto@nais.to>
+2004-02-08  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf (cat): 
 	New. カテゴリページへのリンクを生成するプラグイン。
@@ -785,29 +811,29 @@
 	New.  HTML::Template を採用したらなくなるかも。
 	inside referrer の重複を無くした。
 
-2004-01-25  YAMASHITA Tatsuo  <yto@nais.to>
+2004-01-25  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 
 	デバグモード ($debug_mode) 作った。ref. [2004-01-09-1]
 
-2004-01-23  YAMASHITA Tatsuo  <yto@nais.to>
+2004-01-23  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf (wiki_link): 
 	update.
 
-2004-01-16  YAMASHITA Tatsuo  <yto@nais.to>
+2004-01-16  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_js_file): 
 	js ファイルの url に $clog_url_pref を足すようにした。
 
-2004-01-14 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+2004-01-14 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
         * cl.conf,sample/diary.css:
         サイドメニューは id="links" (CSS だと #links) で、
         本体は id="content" (CSS だと #content) で囲む方針にした。
         これは MovableType の方式をまねた。
 
-2004-01-13 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+2004-01-13 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
         * cl.conf (shorten_url): New.  URL を短く表示するプラグイン。
         使い方：以下の様に書くと、
@@ -825,13 +851,13 @@
         0123456789/0123456789/0123456789/0123456789-b.html')}}
         <<
 
-2004-01-11  YAMASHITA Tatsuo  <yto@nais.to>
+2004-01-11  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.23[リリース]: 
 	作業途中だけどとりあえず公開。
 	パワーユーザ以外にはおすすめしません。
 
-2004-01-09 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+2004-01-09 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (clean_changelog): 
 	日付単位に分割してリストに入れるのをこの段階で行なうようにした。
@@ -839,7 +865,7 @@
 	削除した秘密の項目を stdout に出力する処理を実装。
 	この出力を行なうためのモードは後で作る。当面はデフォルト。
 
-2003-12-29 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-12-29 (Mon)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (okikae): 
 	行頭のスペースは &nbsp; に置き換えるようにした。
@@ -902,7 +928,7 @@
 	}
 	[/src]
 
-2003-12-28 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-12-28 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 
 	最初のクリーン時 (clean_changelog) に行頭のタブを全部なくすように
@@ -923,7 +949,7 @@
 	* cl.conf (blukfeeds): 
 	Bulkfeeds キーワード検索プラグイン
 
-2003-12-25  YAMASHITA Tatsuo  <yto@nais.to>
+2003-12-25  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
 	RSS に以下の記述を追加。
@@ -932,12 +958,12 @@
 	<admin:generatorAgent rdf:resource="http://nais.to/~yto/tools/chalow/" />
 	<<
 
-2003-11-07  YAMASHITA Tatsuo  <yto@nais.to>
+2003-11-07  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf (amazon_link): 
 	プラグイン。普通のアマゾンアソシエイトリンクの作成。
 
-2003-11-06 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-11-06 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf (wiki_link): 
 	プラグイン。Wiki へのリンクの作成。
@@ -953,15 +979,15 @@
 
 	{{qualmish_amazon_link('4756102816','',"TEST:Perl書法")}}
 
-	ref. <http://nais.to/~yto/clog/2003-11-06.html#2003-11-06->
+	ref. <http://chalow.net/2003-11-06.html>
 
-2003-11-04  YAMASHITA Tatsuo  <yto@nais.to>
+2003-11-04  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.22[リリース]: 
 	公開。
 	バグ修正と小さな変更のみ。
 
-2003-11-03  YAMASHITA Tatsuo  <yto@nais.to>
+2003-11-03  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file), cl.conf: 
 	channel/description の中身を設定できるようにした。
@@ -974,7 +1000,7 @@
 	RSS の itemheader が出ないというしょうもないバグをなおしました。
 	http://apollo.u-gakugei.ac.jp/~sunaoka/clog/2003-11.html#2003-11-02-9
 
-2003-11-02  YAMASHITA Tatsuo  <yto@nais.to>
+2003-11-02  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.21[リリース]: 
 	公開。
@@ -983,12 +1009,12 @@
 	* chalow: 
 	- h4rss をなくす (all_entries のキー)。
 
-2003-11-01  YAMASHITA Tatsuo  <yto@nais.to>
+2003-11-01  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
 	全体の dc:date に日付だけじゃなく時間も入れるようにした。
 
-2003-10-30  YAMASHITA Tatsuo  <yto@nais.to>
+2003-10-30  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf: 
 	clsearch プラグインを追加。
@@ -1010,12 +1036,12 @@
 	OLD  $$strp =~ s/\n(\n\t[^\*])/\n\t$1/gm;
 	NEW  $$strp =~ s/\n+(\n\t[^\*])/\n\t$1/gm;
 
-2003-10-28  YAMASHITA Tatsuo  <yto@nais.to>
+2003-10-28  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi: 
 	検索結果にリンク出来るようにデフォルトとして GET を指定。
 
-2003-10-27  YAMASHITA Tatsuo  <yto@nais.to>
+2003-10-27  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
 	> <dc:data>$today</dc:data>　→　<dc:date>$today</dc:date>
@@ -1030,7 +1056,7 @@
 
 	バグフィックス２つ。
 
-2003-10-23  YAMASHITA Tatsuo  <yto@nais.to>
+2003-10-23  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (okikae): 
 	コメントを残す、というデフォルト設定をやめた。
@@ -1041,14 +1067,14 @@
 	[chalow:60] プライベートアイテムだけのエントリでparse error 
 	http://mailarc.namazu.org/htmlmail/chalow/60
 
-2003-10-22 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-10-22 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* p:秘密です: [2003-10-23-1]のテスト。
 	ほほう。
 
 	へへへ
 
-2003-10-21 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-10-21 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.20[リリース]: 
 	公開
@@ -1090,12 +1116,12 @@
 	<<
 	となります。
 
-2003-09-29 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-09-29 (Mon)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
 	RSS の description で改行がスペースになってしまっていたのを修正。
 
-2003-09-25 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-09-25 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 
 	TrackBack を使うための改造。
@@ -1108,7 +1134,7 @@
 	↓
 	> $items_new .= $template;
 
-2003-09-17 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-09-17 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clkeitai.cgi: 
 	New!!!
@@ -1135,12 +1161,12 @@
 	* chalow: 
 	use binmode(). 全てのファイル IO に。
 
-2003-09-10  YAMASHITA Tatsuo  <yto@nais.to>
+2003-09-10  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* {dot-pink.png, dot-gray.png}:
 	New for item header
 
-2003-09-05 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-09-05 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi: 
 	複数キーでも検索できるようにした。
@@ -1165,7 +1191,7 @@
 	}}})();">フォントサイズ指定の解除</a>
 	_HTML_END_
 
-2003-09-04 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-09-04 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_day_page):
 	New. 日ページ作成。
@@ -1190,7 +1216,7 @@
 	> # 検索用ファイル (itemlist) を作るか (1:YES, 0:NO)
 	> my $output_itemlist = 1;
 
-2003-08-30 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-08-30 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.19[リリース]: 
 	公開
@@ -1202,7 +1228,7 @@
 	  [esc]{{google_search('海老名 映画館')}}[/esc] → {{google_search('海老名 映画館')}}
 
 	- 自分の日記内だけでのリファラー機能
-	  ref. <http://nais.to/~yto/clog/2002-06.html#2002-06-28-2>
+	  ref. <http://chalow.net/2002-06-28-2.html>
 
 	- Hiki の記法を==パクる==採用
 	  任意の URL へのリンク、文字修飾、水平線
@@ -1228,7 +1254,7 @@
 	検索がしやすいように、各 item (section) の終わりをあらわすマーク 
 	<!--eos--> を入れる方針にした。最初からこうすれば良かった...。
 
-2003-08-29 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-08-29 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* プラグイン機能[メモ]:
 	プラグイン機能が登場!
@@ -1255,7 +1281,7 @@
 	* chalow: 
 	日付リンクによるリファラー、つまり、自分の日記内だけでのリファラー
 	機能を実装。
-	ref. <http://nais.to/~yto/clog/2002-06.html#2002-06-28-2>
+	ref. <http://chalow.net/2002-06-28-2.html>
 
 	<div class="referer"><span> </span></div> で囲む。
 	sample/diary.css にそのクラスを追加した。
@@ -1324,7 +1350,7 @@
 	----
 	いひひ
 
-2003-08-25  YAMASHITA Tatsuo  <yto@nais.to>
+2003-08-25  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow:
         日付だけでなく記述者も考慮するようにしなくちゃ本来の ChangeLog (複
@@ -1341,7 +1367,7 @@
         「author name」
         ref. <http://www.jurta.org/emacs/ee/text/changelog.en.html>
 
-2003-08-16  YAMASHITA Tatsuo  <yto@nais.to>
+2003-08-16  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* README: 
 	mod.  nkf が必要、との記述を削除。
@@ -1349,7 +1375,7 @@
 	* clsearch.cgi: 
 	検索で日付が出て来なくなっていたのを修正。
 
-2003-08-11 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-08-11 (Mon)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi:
 	nkf はやめて、Jcode.pm を使うようにした。
@@ -1363,20 +1389,20 @@
 	- FileHandle も使うのやめた。
 
 	- memo: Cygwin へ Jcode.pm 
-	<http://nais.to/~yto/w3buf/clog/2003-08.html#2003-08-12-1>
+	<http://chalow.net/2003-08-12-1.html>
 
-2003-08-09  YAMASHITA Tatsuo  <yto@nais.to>
+2003-08-09  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi:
 	CSS がらみでちょっと修正。
 
-2003-08-08 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-08-08 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file):
 	RSS に <dc:date> も足すようにした。日付だけで、時間はなし。
 	例: <dc:date>2003-08-03</dc:date>
 
-2003-08-03  YAMASHITA Tatsuo  <yto@nais.to>
+2003-08-03  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.18[リリース]: 
 	公開
@@ -1384,7 +1410,7 @@
 	* add-extent.pl: 
 	毎回 extent 情報を調べるのは時間がかかるので cache ファイルを採用。
 
-2003-07-31  YAMASHITA Tatsuo  <yto@nais.to>
+2003-07-31  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* RSS (RDF):
 	<script type="text/javascript" src="http://rss-jp.net/x/read_rss.cgi?url=http://nais.to/~yto/clog/cl.rdf&style=js&encode=euc&num=10"></script>
@@ -1420,7 +1446,7 @@
 	ChangeLog メモから買物ログを抜きだして CSV にする。
 	(ref. <http://nais.to/~yto/doc/zb/0016.html#kakeibo>)
 
-2003-07-30 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-07-30 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow:
 	他の年の同じ日付 (月日) へのリンクを付ける機能 (same date jump) を
@@ -1438,13 +1464,13 @@
 	「最近の何日かだけインデックスページに載せるための処理」を全体ルー
 	プの外へ出した。 $top_n_ctr が関係する。
 
-2003-07-23 (Wed)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-07-23 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* {chalow,cl.conf}: 
 	Add 「type="text/javascript"」
 	ref. <http://oikaze.com/~tamada/Diary/2003-07.html#2003-07-12-4>
 
-2003-07-15 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-07-15 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (parse_entry): 
 	item header 以外の行が「\t*」で始まると、それ以降が消えてしまうと
@@ -1466,7 +1492,7 @@
 	↓
 	> while ($items =~ /^(\t\* .+?\n(?=\s*(\t\* |\Z)))/gsm) {	
 	
-2003-07-12  YAMASHITA Tatsuo  <yto@nais.to>
+2003-07-12  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.17[リリース]: 
 	公開
@@ -1474,7 +1500,7 @@
 	* memo:
 	くっつき BBS = <http://nais.to/~yto/tools/kuttukibbs/>
 
-2003-07-08 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-07-08 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (parse_entry): 
 	くっつき BBS にあわせて、TUKKOMI_DATE の仕様を変更。
@@ -1489,7 +1515,7 @@
 	> 本日のツッコミ [<a href='./kuttukibbs.cgi?url=TUKKOMI_DATE'>全部
 	> 見る / ツッコミを入れる</a>]
 	
-2003-07-01 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-07-01 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* {chalow,cl.conf}:
 	mod $item_header_mark (ref. [2003-06-26-1])
@@ -1503,7 +1529,7 @@
 	version 0.15 以降、panchor に決め打ちにしてしまっていたが、sanchor 
 	もあるわけなので、設定できるようにした。
 
-2003-06-29 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-06-29 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* sample/diary.css: 
 	update
@@ -1529,7 +1555,7 @@
 	試験的にツッコミ機能を使えるようにした。ツッコミ機能自体は外部のシ
 	ステムを利用。この部分については今後大幅な変更の可能性大。
 
-2003-06-26  YAMASHITA Tatsuo  <yto@nais.to>
+2003-06-26  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* README (usage):
 	add
@@ -1550,13 +1576,13 @@
 	> # item header の先頭の記号の指定
 	> my $item_header_mark = "*";
 
-2003-06-24  YAMASHITA Tatsuo  <yto@nais.to>
+2003-06-24  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* README: 
 	mod. 
 	ref. <http://cgi14.plala.or.jp/imaishi/changelog/2003-06.html#2003-06-24>
 
-2003-06-23 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-06-23 (Mon)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.16[リリース]:
 	公開
@@ -1580,7 +1606,7 @@
 	> # item header の先頭の "*" のアンカー番号を降順にするか (1:YES, 0:NO)
 	> my $descending_order_item_num = 1;
 
-2003-06-22  YAMASHITA Tatsuo  <yto@nais.to>
+2003-06-22  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.15[リリース]:
 	公開
@@ -1619,7 +1645,7 @@
 	> - 階層２
 	> - 階層３
 
-2003-06-21  YAMASHITA Tatsuo  <yto@nais.to>
+2003-06-21  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* README:
 	tDiary のテーマを使うための設定について。
@@ -1651,7 +1677,7 @@
 	  $item_header_style の設定で、"* HOGE:" か "* HOGE" にしておく必
 	  要あり。
 	
-2003-06-20 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-06-20 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* README:
 	mod
@@ -1684,7 +1710,7 @@
 	- 引用を blockquote にするようにした。 "div.body blockquote" で指
 	  定。
 
-2003-06-19 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-06-19 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow:
 	ユーザ設定ファイルの読み込み時のエラーを出力するようにした。(use $@)
@@ -1730,23 +1756,23 @@
 	- URL 変換で、ftp:// も変換するようにした。(ishii-k さんからのフィー
 	  ドバック (030616))
 
-2003-06-14  YAMASHITA Tatsuo  <yto@nais.to>
+2003-06-14  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.14[リリース]: 公開
 
 	* README: mod
 
-2003-06-12  YAMASHITA Tatsuo  <yto@nais.to>
+2003-06-12  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi: 
 	検索結果で、月ページでトップに表示されるエントリの日付が表示されな
 	いバグを修正。(ad hoc. 全体的に手を入れなおす必要があるかも)
 
-2003-06-11  YAMASHITA Tatsuo  <yto@nais.to>
+2003-06-11  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi: "nkf -e" --> "nkf -ed" (\r\n 問題)
 
-2003-06-09  YAMASHITA Tatsuo  <yto@nais.to>
+2003-06-09  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (make_month_page_list): 何回も呼び出されても効率に影響な
 	いように cache するようにした。
@@ -1761,11 +1787,11 @@
 	クリプト。これにより、同じことを行う秘密の expert-mode が不要になっ
 	た。
 
-2003-05-31  YAMASHITA Tatsuo  <yto@nais.to>
+2003-05-31  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: "nkf -e" --> "nkf -ed" (念のため)
 
-2003-05-30 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-05-30 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* {cl.conf,chalow}: ユーザ設定用の変数 $index_page_header,
 	$index_page_footer, $month_page_header, $month_page_footer を削除。
@@ -1801,7 +1827,7 @@
 	  NDAYS: 「最近 N 日分」の N
 	  CLLASTUPDATE: 最終更新時間
 
-2003-05-29  YAMASHITA Tatsuo  <yto@nais.to>
+2003-05-29  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (okikae): 引用 (citation)。
 	タブの後に "|" か ">" が来る行は引用とみなし、CSS の clquote クラ
@@ -1819,19 +1845,19 @@
 
 	(→[2003-06-20]) <blockquote> に変更 "div.body blockquote" で指定
 
-2003-03-31  YAMASHITA Tatsuo  <yto@nais.to>
+2003-03-31  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 新オプション。処理停止日付 ($stop_date)。この日付まで処
 	理する。
 	例: --stop-date "2002-01-01"
 	未指定なら最後まで処理する
 
-2003-03-13  YAMASHITA Tatsuo  <yto@nais.to>
+2003-03-13  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi: 文字化け対策。 HTTP header
-	ref. <http://nais.to/~yto/clog/2002-08.html#2002-08-06>
+	ref. <http://chalow.net/2002-08-06.html>
 
-2003-01-18 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-01-18 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.13[リリース]: 公開
 
@@ -1845,7 +1871,7 @@
 	例: 2000-06-12 (Mon)  YAM Tat  <yto@example.com>
 	ref. <http://namazu.org/~satoru/diary/?200301b&to=200301151#200301151>
 
-2003-01-05 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
+2003-01-05 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.12[リリース]: 公開
 
@@ -1866,7 +1892,7 @@
 	- 月ページで、日付を降順 (新しい日付が上) で表示するか (1:yes or 0:no)
 	  $reverse_order_days = 1;
 
-2002-12-28 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-12-28 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (okikae): (030105: 機能廃止。「自動文字列置換」でやっても
 	らう方針にした。[[README に解説]]を書いた。以下の記述は obsolete)
@@ -1881,7 +1907,7 @@
 	また、"<" を変換する正規表現を書き換えた。残したいタグをカスタマイ
 	ズしやすくなったかな。詳しくはソースを。
 
-2002-12-27 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-12-27 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.11[リリース]: 公開
 
@@ -1891,20 +1917,20 @@
 	- 改造のきっかけは 12/17 の高久さんからのバグ報告メール。12 月の記
 	  述がないと次の年が改行されずにつづくというバグ。
 
-2002-11-24 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-11-24 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* sample/diary.css: ちょっと修正。行間をあけたり。
 
-2002-10-29 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-10-29 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* README: 
 	URL 改行についての解説を書き忘れていたので書く。
 
-2002-10-26 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-10-26 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.10[リリース]: 公開
 
-2002-10-25 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-10-25 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (okikae): バックスラッシュを用いたURL中での改行に対応。
 	例:
@@ -1913,11 +1939,11 @@
 
 	URL 用正規表現も修正。
 
-2002-10-19 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-10-19 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.9[リリース]: 公開
 
-2002-10-18 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-10-18 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (okikae): "&" を "&amp;amp;" に置き換えるようにした。
 	IEで「&amp;region」が「(R)ion」になってしまったから。
@@ -1927,7 +1953,7 @@
 	とかも使えなくなっちゃうし。変になったらその都度「&amp;amp;region」
 	みたいにして下さい。
 
-2002-10-01 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-10-01 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* README: 月ページのヘッダとフッタについての記述を追加。
 
@@ -1946,11 +1972,11 @@
 	* chalow (get_day_of_week): New. 年月日を入力とし曜日を出力する関
 	数
 
-2002-08-09 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-08-09 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* README: はずかしい間違いをこっそり修正。その他追加。
 
-2002-06-29 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-06-29 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.8[リリース]: 公開
 
@@ -1963,18 +1989,18 @@
 	こんな URL があるもんだから。
 	http://k-tai.impress.co.jp/cda/article/todays_goods/0,,9722,00.html
 
-2002-06-28 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-06-28 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (get_img_str): add alt. 他にもいろいろ機能ダウン。
 
-2002-06-24 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-06-24 (Mon)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (okikae): "<http://www.example.com/>" といった "<", ">" 
 	でくくった URL 表記に対応。修正の手順: 
 	(1) "<" と ">" をエスケープしていたのを、 "<" だけにする。
 	(2) URL にマッチする正規表現を変更。
 
-2002-06-23 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-06-23 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.7[リリース]: 公開
 
@@ -1982,7 +2008,7 @@
 	いう文字列を、"年-月" 文字列 (例えば、"2002-06") に置き換えるよう
 	にした。ad hoc で嫌なんだけど、良い方法が思いつかない...。
 
-2002-06-22 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+2002-06-22 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* diary.css: New. サンプル。taku-ku のをパクる。
 
@@ -1996,7 +2022,7 @@
 
 	* cvs: CVS による管理開始。
 
-2001-12-16 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-16 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.6[リリース]: 公開
 
@@ -2007,7 +2033,7 @@
 	masata-y 氏の意見に従って、「#!/usr/local/bin/perl」を
 	「#!/usr/bin/env perl」に変更 (感謝!)。
 
-2001-12-13 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-13 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.5[リリース]: 公開
 
@@ -2023,11 +2049,11 @@
 	「s!\t\* ([^:\n]+): !\...」に変更 (コロン後にスペースを追加)。これ
 	で、見出しのない項目も安心。
 
-2001-12-09 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-09 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.4[リリース]: 公開
 
-2001-12-08 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-08 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: New option '-e'. expert-mode. ソース見て処理内容が分かる
 	人向けモード。[2001-12-07]の identify がらみの処理など。README に
@@ -2035,7 +2061,7 @@
 	(write_month_page): Add <meta> in <head>
 	(write_index_page): Add <meta> in <head>
 
-2001-12-07 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-07 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (get_img_str): 自分用に、ImageMagick の identify で、
 	画像の extent を得る処理を付け加えた。identify がなければ何もしな
@@ -2049,12 +2075,12 @@
 	問題点: 変換処理が遅くなる。まあ、しょうがない。いそぐもんじゃない
 	からいいかな。
 
-2001-12-04 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-04 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: ユーザ設定ファイル名が存在しないときエラーで中止するよう
 	にした。
 
-2001-12-02 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-02 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.3[リリース]: 公開
 
@@ -2079,11 +2105,12 @@
 
 	* README: 誤り訂正。
 
-2001-12-01 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-01 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* version 0.1[リリース]: 
 	公開してみる。Web ページも作る。
-	http://nais.to/~yto/tools/chalow/
+	==http://nais.to/~yto/tools/chalow/==
+	http://chalow.net/
 
 	* chalow: 軽く手入れ。
 
