@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: chalow,v 1.7 2001-12-02 17:57:36+09 yto Exp $
+# $Id: chalow,v 1.9 2001-12-09 21:47:05+09 yto Exp $
 #
 # chalow - CHAngeLog On The Web - convert ChangeLog to HTML files
 #
@@ -21,7 +21,7 @@ my $what_time_is_it_now =
 # nkf 自動設定
 my $NKF = `which nkf`;
 chomp $NKF;
-die "NO NKF!" if ($NKF !~ /nkf$/); 
+die "NO NKF!" unless ($NKF =~ /nkf$/);
 
 ### ユーザ設定項目
 
@@ -47,14 +47,25 @@ my $opt_odir;
 
 ### コマンドライン引数
 Getopt::Long::Configure('bundling');
-my ($opt_topn_tmp, $opt_odir_tmp, $quiet_mode);
+my ($opt_topn_tmp, $opt_odir_tmp, $quiet_mode, $expert_mode);
 GetOptions('n|top-n=n'   => \$opt_topn_tmp,
 	   'o|output-dir=s'   => \$opt_odir_tmp,
 	   'c|configure-file=s' => \$conf_file,
+	   'e|expert-mode' => \$expert_mode,
 	   'q|quiet' => \$quiet_mode);
 
+# expert mode 
+# identify 自動設定
+my $IDENTIFY = "";
+if (defined $expert_mode) {
+    $IDENTIFY = `which identify`;
+    die "NO identify!" unless ($IDENTIFY =~ /identify$/);
+    chomp $IDENTIFY;
+}
+
 # ユーザ設定ファイルの読み込み
-open(CONF, "$NKF -e $conf_file |") or die "can't open file: $conf_file\n";
+die "can't open file: $conf_file\n" unless (-e $conf_file);
+open(CONF, "$NKF -e $conf_file |") or die;
 my $conf = join('', <CONF>);
 eval $conf;
 
@@ -170,13 +181,17 @@ sub write_month_page {
 	my $fname = "| $NKF -e > $opt_odir/$i.html";
 	my $fh = new FileHandle;
 	$fh->open($fname) || die "$fname: $!";
-	print $fh "<html><head><title>$i</title></head><body>\n";
-	print $fh $month_page_header;
-	print $fh "<hr><pre>\n";
-	print $fh $$month_page{$i};
-	print $fh "</pre><hr>\n";
-	print $fh $month_page_footer;
-	print $fh "</body></html>\n";
+	print $fh "<html><head><title>$i</title>\n";
+	print $fh "<meta http-equiv=\"Content-Type\"
+                   content=\"text/html;charset=EUC-JP\">\n";
+	print $fh "</head><body>\n";
+        print $fh $month_page_header;
+        print $fh "<hr><pre>\n";
+        print $fh $$month_page{$i};
+        print $fh "</pre><hr>\n";
+        print $fh $month_page_footer;
+        print $fh "</body></html>\n";
+
     }
 }
 
@@ -188,7 +203,11 @@ sub write_index_page {
     my $fname = "| $NKF -e > $opt_odir/index.html";
     my $fh = new FileHandle;
     $fh->open($fname) || die "$fname: $!";
-    print $fh "<html><head><title>$changelog_name</title></head><body>\n";
+    print $fh "<html><head><title>$changelog_name</title>\n";
+    print $fh "<meta http-equiv=\"Content-Type\" 
+               content=\"text/html;charset=EUC-JP\">\n";
+    print $fh "</head><body>\n";
+
     print $fh $index_page_header;
 
     ### 月別一覧を表示
@@ -227,12 +246,18 @@ sub write_month_page_list {
 
 
 # img タグ文字列を生成。
-sub get_img_str($) {
+sub get_img_str {
     my ($str) = @_;
     my (@tmp) = split(/\s*,\s*/, $str);
     my $fn = shift @tmp;
     die "file not found: $opt_odir/$fn\n" unless (-e $opt_odir."/".$fn);
     my $rv = "<img src=\"$fn\"";
+
+    if ($IDENTIFY ne "") {
+	my ($w, $h) = (`$IDENTIFY $opt_odir/$fn` =~ /(\d+)x(\d+)/);
+	$rv .= " width=\"$w\" height=\"$h\"";
+    }
+
     foreach (@tmp) {
 	if (/^http/) {		# 画像リンク
 	    $rv = "<a href=\"$_\">$rv></a";

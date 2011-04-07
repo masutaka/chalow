@@ -1,3 +1,34 @@
+2001-12-09  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.4: 公開
+
+2001-12-08  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow: New option '-e'. expert-mode. ソース見て処理内容が分かる
+	人向けモード。[2001-12-07]の identify がらみの処理など。README に
+	は載せないつもり。
+	(write_month_page): Add <meta> in <head>
+	(write_index_page): Add <meta> in <head>
+
+2001-12-07  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (get_img_str): 自分用に、ImageMagick の identify で、
+	画像の extent を得る処理を付け加えた。identify がなければ何もしな
+	い。
+
+	extent が必要な理由: IE で日付参照リンクをクリックすると、きちんと
+	その日付のとこに飛ぶ。しかし、しばらくして画像が全部読み込まれてレ
+	イアウトしなおされると、飛んだ場所がずれちゃう。結果として、正しい
+	日付へジャンプできないことがあるわけ。
+
+	問題点: 変換処理が遅くなる。まあ、しょうがない。いそぐもんじゃない
+	からいいかな。
+
+2001-12-04  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow: ユーザ設定ファイル名が存在しないときエラーで中止するよう
+	にした。
+
 2001-12-02  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.3: 公開
