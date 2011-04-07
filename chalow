@@ -1,22 +1,20 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.11 2001-12-16 19:33:38+09 yto Exp $
+# $Id: chalow,v 1.14 2002/06/23 03:38:28 yto Exp $
 #
 # chalow - CHAngeLog On The Web - convert ChangeLog to HTML files
 #
 # This is free software with ABSOLUTELY NO WARRANTY.
-# 無償・無保証・著作権放棄
-# (see http://nais.to/~yto/doc/zb/0002.html)
+# 無償・無保証・著作権放棄 (see http://nais.to/~yto/doc/zb/0002.html)
 #
 # chalow ホームページ: http://nais.to/~yto/tools/chalow
 
 use strict;
 use FileHandle;
 use Getopt::Long;
+use POSIX qw(strftime);
 
 # 現在時刻の獲得
-my ($sec, $mi, $h, $dm, $mo, $y) = localtime(time);
-my $what_time_is_it_now =
-    sprintf "%4s-%02s-%02s %02s:%02s", $y + 1900, $mo + 1, $dm, $h, $mi;
+my $what_time_is_it_now = strftime "%Y-%m-%d %H:%M", localtime;
 
 # nkf 自動設定
 my $NKF = `which nkf`;
@@ -38,7 +36,7 @@ my $home_page_name = "chalow home page";
 # 各項目の見出しの文字の色
 my $label_color = "#a00000";
 # インデックスページのヘッダ、フッタ
-my $index_page_header = "<a href=\"$home_page_url\">$home_page_name</a><hr>
+my $index_page_header = "<a href=\"$home_page_url\">$home_page_name</a>
 <h1>$changelog_name</h1>最終更新時刻: $what_time_is_it_now<br>\n";
 my $index_page_footer = "<a href=\"$home_page_url\">$home_page_name</a>\n";
 # 月ページのヘッダ、フッタ
@@ -48,10 +46,17 @@ my $month_page_footer = "<a href=\"index.html\">$changelog_name Index Page</a>
  / <a href=\"$home_page_url\">$home_page_name</a>\n";
 # 自動文字列置換
 my $auto_replace = '';
+# CSS ファイル
+my $css_file;
 # インデックスページ(index.html)で最近何日分を表示するか
 my $opt_topn = 5;
 # 作成された HTML ファイルの出力先ディレクトリ ("-o" でも指定できます)
 my $opt_odir = ".";
+
+### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
+my $signature = 
+    qq(<div align="right">Powered by 
+       <a href="http://nais.to/~yto/tools/chalow/"><b>chalow</b></a></div>);
 
 ### コマンドライン引数
 Getopt::Long::Configure('bundling');
@@ -194,14 +199,20 @@ sub write_month_page {
 	print $fh "<html><head><title>$i</title>\n";
 	print $fh "<meta http-equiv=\"Content-Type\"
                    content=\"text/html;charset=EUC-JP\">\n";
+	print $fh qq(<link rel=stylesheet href="$css_file" media=all>\n)
+	    if defined $css_file;
 	print $fh "</head><body>\n";
-        print $fh $month_page_header;
-        print $fh "<hr><pre>\n";
-        print $fh $$month_page{$i};
-        print $fh "</pre><hr>\n";
-        print $fh $month_page_footer;
-        print $fh "</body></html>\n";
 
+	# ad hoc でいやだなあ... (6/23)
+	my $tmp = $month_page_header;
+	$tmp =~ s!YEARMONTH!$i!g;
+        print $fh $tmp;
+
+        print $fh "<pre>\n";
+        print $fh $$month_page{$i};
+        print $fh "</pre>\n";
+        print $fh $month_page_footer;
+        print $fh "$signature</body></html>\n";
     }
 }
 
@@ -216,13 +227,14 @@ sub write_index_page {
     print $fh "<html><head><title>$changelog_name</title>\n";
     print $fh "<meta http-equiv=\"Content-Type\" 
                content=\"text/html;charset=EUC-JP\">\n";
+    print $fh qq(<link rel=stylesheet href="$css_file" media=all>\n)
+	if defined $css_file;
     print $fh "</head><body>\n";
 
     print $fh $index_page_header;
 
     ### 月別一覧を表示
     write_month_page_list($month_page, $fh); 
-    print $fh "<hr>\n";
 
     ### 最近 N 日分の項目を表示
     if ($opt_topn) {
@@ -232,16 +244,15 @@ sub write_index_page {
 	print $fh "</pre>\n";
     }
 
-    print $fh "<hr>\n";
     print $fh $index_page_footer;
-    print $fh "</body></html>\n";
+    print $fh "$signature</body></html>\n";
 }
 
 
 sub write_month_page_list {
     my ($month_page, $fh) = @_;
 
-    print $fh "<hr><h2>月別一覧</h2>\n";
+    print $fh "<h2>月別一覧</h2>\n";
     my $this_year = 0;
     for my $i (sort keys %{$month_page}) {
 	my ($year, $month) = ($i =~ /^(\d\d\d\d)-(\d\d)/);

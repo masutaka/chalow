@@ -1,9 +1,31 @@
+2002-06-23  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.7: 公開
+
+	* chalow (write_month_page): $month_page_header 中の YEARMONTH と
+	いう文字列を、"年-月" 文字列 (例えば、"2002-06") に置き換えるよう
+	にした。ad hoc で嫌なんだけど、良い方法が思いつかない...。
+
+2002-06-22  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* diary.css: New. サンプル。taku-ku のをパクる。
+
+	* chalow: chalow 普及のため HTML の一番下に chalow home page への
+	リンク表示するようにした。最初からやっておけばよかった...
+
+	* README: 改定
+
+	* chalow: CSS に対応。 $css_file でスタイルシートファイルを指定す
+	る。
+
+	* cvs: CVS による管理開始。
+
 2001-12-16  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.6: 公開
 
 	* chalow:
-	[2001-12-16] にやった「見出しにマッチする正規表	現」の調整の続き。
+	[2001-12-13] にやった「見出しにマッチする正規表現」の調整の続き。
 	「s!\t\* ([^:\n]+): !\...」を「s!\t\* ([^:\n]+):(\s)!\...」に変更。
 	
 	masata-y 氏の意見に従って、「#!/usr/local/bin/perl」を
