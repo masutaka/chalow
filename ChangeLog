@@ -1,3 +1,108 @@
+2003-06-14  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.14: 公開
+
+	* README: mod
+
+2003-06-12  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* clsearch.cgi: 検索結果で、月ページでトップに表示されるエントリの
+	日付が表示されないバグを修正。(ad hoc. 全体的に手を入れなおす必要
+	があるかも)
+
+2003-06-11  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* clsearch.cgi: "nkf -e" --> "nkf -ed" (\r\n 問題)
+
+2003-06-09  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (make_month_page_list): 何回も呼び出されても効率に影響な
+	いように cache するようにした。
+	(write_month_page): MONTHPAGELIST を月ページのテンプレートでも使え
+	るようにした。
+
+	* test-add-extent.html: add-extent.pl のテスト用 HTML ファイル。
+
+	* chalow: こっそり作ってた expert-mode を削除。
+
+	* add-extent.pl: New. HTML の img タグに width と height を足すス
+	クリプト。これにより、同じことを行う秘密の expert-mode が不要になっ
+	た。
+
+2003-06-02  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* TODO:
+	- stop-date 時の "<<<", ">>>"
+	- clsearch.cgi の検索結果に "<<<", ">>>"
+
+2003-05-31  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow: "nkf -e" --> "nkf -ed" (念のため)
+
+2003-05-30 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* {cl.conf,chalow}: ユーザ設定用の変数 $index_page_header,
+	$index_page_footer, $month_page_header, $month_page_footer を削除。
+	代わりに $index_page_template, $monthd_page_template を追加。
+
+	### obsolete
+	my $index_page_header;		# インデックスページのヘッダ
+	my $index_page_footer;		# インデックスページのフッタ
+	my $month_page_header;		# 月ページのヘッダ
+	my $month_page_footer;		# 月ページのフッタ
+
+	* テンプレート方式とは:
+	$index_page_template, $monthd_page_template に body 内部の内容を
+	「内部置き換え文字列」などを用いて表現する方式。
+	カスタマイズ (レイアウト) の自由度を高めるために採用。
+
+	* chalow (make_month_page_list): 
+	- change name from write_month_page_list().
+	- print --> $rv .= "..."
+	(write_month_page): テンプレート方式にする。
+	(write_index_page): テンプレート方式にする。
+
+	* 内部置き換え文字列:
+	- 月ページ用
+	  CLNAVI: 先月来月ページへのリンク
+	  YEARMONTH: YYYY-MM
+	  DAYLIST: 日付リスト
+	  DAYSINTHEMONTH: その月の全エントリ
+
+	- インデックスページ用
+	  MONTHPAGELIST: 月別一覧
+	  LATESTDAYS: 最近 N 日分のエントリ
+	  NDAYS: 「最近 N 日分」の N
+	  CLLASTUPDATE: 最終更新時間
+
+2003-05-29  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow (okikae): 引用 (citation)。
+	タブの後に "|" か ">" が来る行は引用とみなし、CSS の clquote クラ
+	スな span で囲む。
+	<span class="clquote">| ...</span>
+
+	> 引用
+	> 引用
+	> 引用
+		> これは引用ではない
+
+	| 引用
+	| 引用
+	 | これは引用ではない
+
+2003-03-31  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chalow: 新オプション。処理停止日付 ($stop_date)。この日付まで処
+	理する。
+	例: --stop-date "2002-01-01"
+	未指定なら最後まで処理する
+
+2003-03-13  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* clsearch.cgi: 文字化け対策。 HTTP header
+	ref. <http://nais.to/~yto/clog/2002-08.html#2002-08-06>
+
 2003-01-18 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.13: 公開
@@ -254,3 +359,4 @@
 	* chalow: 軽く手入れ。
 
 	* README: 公開にそなえて README を書き始める。
+

@@ -4,7 +4,7 @@ ChangeLog を HTML に変換するツール
 
 README
 
-$Id: README,v 1.12 2003/01/18 01:53:09 yto Exp $
+$Id: README,v 1.14 2003/06/14 03:16:14 yto Exp $
 
 ----------------------------------------------------------------------
 まずは、やってみよう!
@@ -52,12 +52,15 @@ usage: chalow [options] <file> [file]...
     -n, --top-n=NUM             write NUM days to "index.html"
     -o, --output-dir=DIR        directory to output
     -c, --configure-file=FILE   configure file (default "cl.conf")
+    -s, --stop-date             date to stop processing
     -q, --quiet                 quiet mode
 
 -n で、「インデックスページ」に最近の何日分を載せるか指定できる。
 -o で、「出力先ディレクトリ」を指定する。存在しないディレクトリを指定
    してはいけない。
 -c で、「ユーザ設定ファイル」を指定する。指定しないとデフォルトの設定。
+-s で、処理停止日付 ($stop_date) を指定する。この日付まで処理する。
+   未指定なら最後まで処理する。 (例: --stop-date "2002-01-01")
 -q を指定すると、変換作業進捗情報を標準出力に出力しなくなる。
 
 なお、chalow の実行には、nkf が必要。
@@ -86,8 +89,8 @@ usage: chalow [options] <file> [file]...
 - HTML ファイルの出力先ディレクトリ
 - インデックスページ (index.html) で最近何日分を表示するか
 - 各項目 (※4) の見出しの文字の色
-- インデックスページのヘッダ、フッタ
-- 月ページのヘッダ、フッタ (※5) 
+- インデックスページのテンプレート (※5)
+- 月ページのテンプレート (※5)
 - 自動文字列置換 (※6) 
 - CSS ファイル
 - 月ページに表示する日付の順番 (降順 or 昇順) の調整
@@ -97,15 +100,9 @@ usage: chalow [options] <file> [file]...
 
   例: "* これが項目の見出しだ: "
 
-※5 月ページのヘッダとフッタは $month_page_header, $month_page_footer 
-で設定する。そこでは以下にあげる文字列は自動的に置き換えられる。
-
-  YEARMONTH → その月ページの年月を表す文字列 (例: "2002-10")
-  CLNAVI → 月ページ移動ナビ (前後の月ページへのリンク) "<<< >>>"
-  DAYLIST → その月ページ内の日付へのリンク (日付一覧)
-
-  例: $month_page_header = "CLNAVI <a href=\"index.html\">Index</a>
-  <h1>$changelog_name YEARMONTH</h1><p>DAYLIST</p>\n";
+※5 インデックスページと月ページの HTML テンプレートは 
+$index_page_template, $month_page_template
+で設定する。詳しくは cl.conf のコメントを参照されたい。
 
 ※6 「自動文字列置換」は、ChangeLog 中の文字列を任意の文字列に変換して
 いときに用いる。要するに perl のプログラムを書いておくと HTML への変換
@@ -179,6 +176,19 @@ ChangeLog の特殊な記法
 	&lt;u&gt;Hello&lt;/u&gt; <!-- こんにちは -->
 
 
+- 引用 (citation): タブの後に "|" か ">" が来る行は引用とみなし、CSS の clquote  クラスの span で囲まれる。
+  <span class="clquote">| ...</span>
+
+	> 引用
+	> 引用
+	> 引用
+		> これは引用ではない
+
+	| 引用
+	| 引用
+	 | これは引用ではない
+
+
 ----------------------------------------------------------------------
 注意
 ----------------------------------------------------------------------
@@ -197,6 +207,7 @@ or
 
 |  Sat Mar 14 08:48:56 1998  YAMASHITA Tatsuo  <yto@nais.to>
 
-パッケージに含まれている clweek.pl で日付フォーマットの変換ができる。
+しかし、パッケージに含まれている clweek.pl で日付フォーマッ
+トの変換ができる。
 使い方: 
 | % ./clweek.pl ChangeLog > ChangeLog-new

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: clsearch.cgi,v 1.2 2002/10/01 00:49:03 yto Exp $
+# $Id: clsearch.cgi,v 1.5 2003/06/12 11:58:20 yto Exp $
 # clsearch.cgi - HTML 化された ChangeLog (by chalow) を検索するCGI
 use strict;
 
@@ -24,9 +24,9 @@ my $key = $q->param('key');
 my $from = $q->param('from') || 0;
 
 # ■■■ HTML head 出力 ■■■
-print $q->header();
+print "Content-type: text/html; charset=euc-jp\n\n";
 print qq(<html><head><title>CHALOW Search</title>
-<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">);
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-JP">);
 print qq(<link rel=stylesheet href="$css_file" media=all>\n)
     if defined $css_file;
 print qq(</head><body><a href="index.html">ChangeLog INDEX</a>
@@ -40,12 +40,12 @@ my $cnt = 0;
 if (defined $key) {
     my @fl = reverse sort <[0-9][0-9][0-9][0-9]-[0-9][0-9].html>;
     for my $fn (@fl) {
-	open(F, "$NKF -e $fn |") or die "file open error: $fn\n";
+	open(F, "$NKF -ed $fn |") or die "file open error: $fn\n";
 	my $date = "";
 	$/ = "";
 	while (<F>) {
 	    chomp;
-	    s/<pre>\n//;	# for first day on the month
+	    s/^.+?<pre>\n//sm;	# for first day on the month
 	    next unless (/^<a\sname/ or /^[\s\t]+\*/);
 	    if (/^<.+?>(\d\d\d\d-\d\d-\d\d)</) {
 		$date = $_;

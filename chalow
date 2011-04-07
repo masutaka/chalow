@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.26 2003/01/18 01:53:09 yto Exp $
+# $Id: chalow,v 1.31 2003/06/14 03:16:14 yto Exp $
 #
-# chalow - CHAngeLog On The Web - convert ChangeLog to HTML files
+# chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
 # This is free software with ABSOLUTELY NO WARRANTY.
 # 無償・無保証・著作権放棄 (see http://nais.to/~yto/doc/zb/0002.html)
@@ -35,15 +35,6 @@ my $home_page_url = "http://nais.to/~yto/tools/chalow/";
 my $home_page_name = "chalow home page";
 # 各項目の見出しの文字の色
 my $label_color = "#a00000";
-# インデックスページのヘッダ、フッタ
-my $index_page_header = "<a href=\"$home_page_url\">$home_page_name</a>
-<h1>$changelog_name</h1>最終更新時刻: $what_time_is_it_now<br>\n";
-my $index_page_footer = "<a href=\"$home_page_url\">$home_page_name</a>\n";
-# 月ページのヘッダ、フッタ
-my $month_page_header = "CLNAVI <a href=\"index.html\">Index</a>
-\n<h1>$changelog_name YEARMONTH</h1>DAYLIST\n";
-my $month_page_footer = "CLNAVI <a href=\"index.html\">Index</a>
- / <a href=\"$home_page_url\">$home_page_name</a>\n";
 # 自動文字列置換
 my $auto_replace = '';
 # CSS ファイル
@@ -56,6 +47,32 @@ my $opt_odir = ".";
 my $show_day_of_week = 1;
 # 月ページで、日付を降順 (新しい日付が上) で表示するか (1:yes or 0:no)
 my $reverse_order_days = 0;
+# インデックスページのテンプレート
+my $index_page_template = << "___INDEX_PAGE_TEMPLATE"
+<a href="$home_page_url">$home_page_name</a>
+<h1>$changelog_name</h1>
+最終更新時刻: CLLASTUPDATE
+<h2>月別一覧</h2>
+<p>MONTHPAGELIST</p>
+<h2>最近 NDAYS 日分</h2>
+LATESTDAYS
+<a href="$home_page_url">$home_page_name</a>
+___INDEX_PAGE_TEMPLATE
+    ;
+# 月ページのテンプレート
+my $month_page_template = << "___MONTH_PAGE_TEMPLATE"
+CLNAVI <a href="index.html">Index</a>
+ / <a href="$home_page_url">$home_page_name</a>
+<h1>$changelog_name YEARMONTH</h1>
+<center>DAYLIST</center>
+DAYSINTHEMONTH
+CLNAVI <a href="index.html">Index</a>
+ / <a href="$home_page_url">$home_page_name</a>
+___MONTH_PAGE_TEMPLATE
+    ;
+# 処理停止日付: この日付まで処理する (例: "2002-01-01"。0 なら最後まで処理する)
+my $stop_date = 0;
+
 
 ### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
 my $signature = 
@@ -64,26 +81,17 @@ my $signature =
 
 ### コマンドライン引数
 Getopt::Long::Configure('bundling');
-my ($opt_topn_tmp, $opt_odir_tmp, $quiet_mode, $expert_mode);
+my ($opt_topn_tmp, $opt_odir_tmp, $quiet_mode);
 GetOptions('n|top-n=n'   => \$opt_topn_tmp,
 	   'o|output-dir=s'   => \$opt_odir_tmp,
 	   'c|configure-file=s' => \$conf_file,
-	   'e|expert-mode' => \$expert_mode,
-	   'q|quiet' => \$quiet_mode);
-
-# expert mode 
-# identify 自動設定
-my $IDENTIFY = "";
-if (defined $expert_mode) {
-    $IDENTIFY = `which identify`;
-    die "NO identify!" unless ($IDENTIFY =~ /identify$/);
-    chomp $IDENTIFY;
-}
+	   'q|quiet' => \$quiet_mode,
+	   's|stop-date=s' => \$stop_date);
 
 # ユーザ設定ファイルの読み込み (ファイル名が指定されてたときのみ)
 if ($conf_file ne "") {
     die "can't open file: $conf_file\n" unless (-e $conf_file);
-    open(CONF, "$NKF -e $conf_file |") or die;
+    open(CONF, "$NKF -ed $conf_file |") or die;
     my $conf = join('', <CONF>);
     eval $conf;
 }
@@ -92,6 +100,8 @@ if ($conf_file ne "") {
 $opt_topn = $opt_topn_tmp if (defined $opt_topn_tmp);
 $opt_odir = $opt_odir_tmp if (defined $opt_odir_tmp);
 
+# 処理停止日付: 文字列だったものを数値にする (後で比較に使うから)
+$stop_date =~ s/-//g;
 
 if (@ARGV == 0) {
     print << "USAGE";
@@ -99,6 +109,7 @@ usage: prog [options] <file> [file]...
     -n, --top-n=NUM             write NUM days to "index.html"
     -o, --output-dir=DIR        directory to output
     -c, --configure-file=FILE   configure file (default "cl.conf")
+    -s, --stop-date             date to stop processing
     -q, --quiet                 quiet mode
 USAGE
     ;
@@ -106,6 +117,7 @@ USAGE
     my $top_n_ctr = $opt_topn;
     my $top_n_str = "";
     my %month_page;
+    my %all_month;
 
     for my $fname (@ARGV) {
 
@@ -113,7 +125,7 @@ USAGE
 
 	### クリーニングのためにChangeLogファイル一気に読み込む
 	my $fh = new FileHandle;
-	$fh->open("$NKF -e $fname |") || die "$fname: $!";
+	$fh->open("$NKF -ed $fname |") || die "$fname: $!";
 	my $all = join('', <$fh>);
 	$fh->close;
 
@@ -133,6 +145,17 @@ USAGE
 	foreach (@lines) {
 	    $top_n_ctr--;
 	    ($day, $month) = (/^((\d+-\d+)-\d+)/);
+	    $all_month{$month} = 1;
+
+	    ### stop date
+	    if ($stop_date != 0) {
+		$day =~ (/^(\d+)-(\d+)-(\d+)/);
+		my $cdate = $1 * 10000 + $2 * 100 + $3;
+		if ($stop_date > $cdate) {
+		    next;
+		}
+	    }
+
 	    ### 日付の後ろをどうするか
 	    if ($show_day_of_week == 1) {
 		# 曜日(Mon, Tue, ...)を追加;
@@ -149,7 +172,6 @@ USAGE
             s/\n\t+\* p:.+?^(\t+\*|$)/$1/gms; # renew 030105
 	    okikae();		# 文字列置き換え
 
-	    #$month_page{$month} .= $_;
 	    $month_page{$month}{$day} = $_;
 
 	    # 最近の何日かだけインデックスページに載せるための処理
@@ -158,7 +180,7 @@ USAGE
     }
 
     write_month_page(\%month_page);
-    write_index_page(\%month_page, \$top_n_str);
+    write_index_page(\%all_month, \$top_n_str);
 }
 
 print "done.\n" if (!defined $quiet_mode);
@@ -177,6 +199,9 @@ sub okikae {
     ### 自動文字列置換適用
     eval $auto_replace;
 
+    ### 引用 (quote): "| ..." か "> ..."
+    s/^\t([\|>].*)/\t<span class="clquote">$1<\/span>/gm;
+
     ### 日付で参照リンク
     # date ref : [YYYY-MM-DD]
     s!\[((\d\d\d\d-\d\d)-\d\d)\]!<a href="$2.html#$1">[$1]</a>!g;
@@ -184,7 +209,6 @@ sub okikae {
     ### URL表記を href で
     # URL : http://....
     # 正規表現は http://www.din.or.jp/~ohzaki/perl.htm#httpURL より。
-    #  ([廃止] 直前が "," だったら画像リンクなのでここでは処理しない)
     # バックスラッシュを用いたURL中での改行に対応 021025
     my $URLCHARS = "[-_.!~*'()a-zA-Z0-9;/?:@&=+,%\#\$]";
     my $URLDELIM = "\\\\\\n[\\t ]+";
@@ -234,7 +258,7 @@ sub write_month_page {
 	}
 
 	print "output to \"$opt_odir/$i.html\"\n" if (!defined $quiet_mode);
-	my $fname = "| $NKF -e > $opt_odir/$i.html";
+	my $fname = "| $NKF -ed > $opt_odir/$i.html";
 	my $fh = new FileHandle;
 	$fh->open($fname) || die "$fname: $!";
 	print $fh "<html><head><title>$i</title>\n";
@@ -244,28 +268,30 @@ sub write_month_page {
 	    if defined $css_file;
 	print $fh "</head><body>\n";
 
-	# ad hoc でいやだなあ... 020623 → まあいいや(開き直り) 021001
-	my $tmp = $month_page_header;
-	$tmp =~ s!YEARMONTH!$i!g;
-	$tmp =~ s!CLNAVI!$navi!g; # added 021001
-	$tmp =~ s!DAYLIST!$daylist!g; # added 030105
-        print $fh $tmp;
+	my $template = $month_page_template;
 
-        print $fh "<pre>\n";
+	### 日々のエントリ作成
+	my $content = "<pre>\n";
 	my @cont;
 	if ($reverse_order_days) { # 降順: 日付の新しいのが上 (〜v0.11 と同じ)
 	    @cont = reverse sort keys %{$month_page->{$i}};
 	} else {		# 昇順: 日付の古いのが上
 	    @cont = sort keys %{$month_page->{$i}};
 	}
-        print $fh map {$month_page->{$i}{$_}} @cont;
-        print $fh "</pre>\n";
+	$content .= join('', map {$month_page->{$i}{$_}} @cont);
+	$content .= "</pre>\n";
 
-	$tmp = $month_page_footer;
-	$tmp =~ s!YEARMONTH!$i!g;
-	$tmp =~ s!CLNAVI!$navi!g;
-        print $fh $tmp;
+	### 月別一覧を作成
+	my $mpl = make_month_page_list($month_page); 
 
+	### 内部置き換え文字列
+	$template =~ s!YEARMONTH!$i!g;
+	$template =~ s!CLNAVI!$navi!g;
+	$template =~ s!DAYLIST!$daylist!g;
+	$template =~ s!MONTHPAGELIST!$mpl!g;
+	$template =~ s!DAYSINTHEMONTH!$content!g;
+
+        print $fh $template;
         print $fh "$signature</body></html>\n";
     }
 }
@@ -275,7 +301,7 @@ sub write_month_page {
 sub write_index_page {
     my ($month_page, $top_n_str) = @_;
     print "output to \"$opt_odir/index.html\"\n" if (!defined $quiet_mode);
-    my $fname = "| $NKF -e > $opt_odir/index.html";
+    my $fname = "| $NKF -ed > $opt_odir/index.html";
     my $fh = new FileHandle;
     $fh->open($fname) || die "$fname: $!";
     print $fh "<html><head><title>$changelog_name</title>\n";
@@ -285,45 +311,45 @@ sub write_index_page {
 	if defined $css_file;
     print $fh "</head><body>\n";
 
-    print $fh $index_page_header;
+    my $template = $index_page_template;
 
-    ### 月別一覧を表示
-    write_month_page_list($month_page, $fh); 
+    ### 月別一覧を作成
+    my $mpl = make_month_page_list($month_page); 
 
-    ### 最近 N 日分の項目を表示
-    if ($opt_topn) {
-	print $fh "<h2>最近 $opt_topn 日分</h2>\n";
-	print $fh "<pre>\n";
-	print $fh "$$top_n_str";
-	print $fh "</pre>\n";
-    }
+    ### 内部置き換え文字列
+    $template =~ s!CLLASTUPDATE!$what_time_is_it_now!g;
+    $template =~ s!NDAYS!$opt_topn!g;
+    $template =~ s!MONTHPAGELIST!$mpl!g;
+    $template =~ s!LATESTDAYS!<pre>$$top_n_str</pre>!g if ($opt_topn);
+    # ↑ 最近 N 日分
 
-    print $fh $index_page_footer;
+    print $fh $template;
     print $fh "$signature</body></html>\n";
 }
 
 
-sub write_month_page_list {
-    my ($month_page, $fh) = @_;
-
-    print $fh "<h2>月別一覧</h2>\n";
-
+my $month_page_list = "";
+sub make_month_page_list {
+    return $month_page_list if ($month_page_list ne ""); # cache
+    my ($month_page) = @_;
+    my $month_page_list = "";
     my @month_list = sort keys %{$month_page};
     my ($start_year) = ($month_list[0] =~ /^(\d\d\d\d)/);
     my ($end_year) = ($month_list[$#month_list] =~ /^(\d\d\d\d)/);
 
-    for (my $y = $start_year; $y <= $end_year; $y++) { # year loop
-	print $fh "$y : ";
+    for (my $y = $end_year; $y >= $start_year; $y--) { # year loop
+	$month_page_list .= "$y : ";
 	for (my $m = 1; $m <= 12; $m++) { # month loop	
 	    my $m0 = sprintf "%02d", $m;
 	    if (defined $month_page->{"$y-$m0"}) {
-		print $fh "<a href=\"$y-$m0.html\">$m0</a> ";
+		$month_page_list .= "<a href=\"$y-$m0.html\">$m0</a> ";
 	    } else {
-		print $fh "$m0 ";
+		$month_page_list .= "$m0 ";
 	    }
 	}
-	print $fh "<br>\n";
+	$month_page_list .= "<br>\n";
     }
+    return $month_page_list;
 }
 
 
@@ -332,12 +358,6 @@ sub get_img_str {
     my ($fn) = @_;
     die "file not found: $opt_odir/$fn\n" unless (-e $opt_odir."/".$fn);
     my $rv = qq(<img src="$fn" alt="画像");
-
-    if ($IDENTIFY ne "") {	# 隠しモード。自分用。
-	my ($w, $h) = (`$IDENTIFY $opt_odir/$fn` =~ /(\d+)x(\d+)/);
-	$rv .= qq( width="$w" height="$h");
-    }
-
     return $rv.">";	
 }
 

@@ -32,3 +32,13 @@ h2 {
 img {
 	margin: 0.5em;
 }
+
+p {
+        margin-right: 1.0em;
+        margin-left: 1.0em;
+        line-height: 130%;
+}
+
+.clquote { 
+	color: gray;
+}
