@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.63 2003/11/02 13:26:49 yto Exp $
+# $Id: chalow,v 1.65 2003/11/04 12:12:26 yto Exp $
 #
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
@@ -129,6 +129,8 @@ my $output_itemlist = 1;
 my $day_page_mode = 0;
 # 出力先ファイルとサイズが異なる場合のみ出力する (0:NO, 1:YES) : "-u" で指定
 my $update_by_size = 0;
+# 日記の説明 for RSS : 例: "日々のあれこれ。"
+my $changelog_description = "";
 
 ### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
 my $signature = qq(<p class="footer">Powered by 
@@ -405,6 +407,8 @@ sub parse_entry {
 	# (5) item header の処理
 	if (defined $ih) {
 	    $ih = okikae($ih);
+	    # ハッシュに格納
+	    $enthashp->{$num}{ih} = $ih;
 
 	    # 前に足すもの
 	    my $ihb = "";
@@ -878,7 +882,7 @@ sub write_rss_file {
 <channel rdf:about="$clog_url/cl.rdf">
 <title>$changelog_name</title>
 <link>$clog_url</link>
-<description></description>
+<description>$changelog_description</description>
 <dc:date>$dcdate</dc:date>
 <items>
 <rdf:Seq>\n$rdfseq</rdf:Seq>

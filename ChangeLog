@@ -1,3 +1,22 @@
+2003-11-04  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.22: 
+	公開。
+	バグ修正と小さな変更のみ。
+
+2003-11-03  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* chawlo (write_rss_file), cl.conf: 
+	channel/description の中身を設定できるようにした。
+	>>
+	# 日記の説明 for RSS : 例: "日々のあれこれ。"
+	my $changelog_description = "";
+	<<
+
+	* chalow (parse_entry): 
+	RSS の itemheader が出ないというしょうもないバグをなおしました。
+	http://apollo.u-gakugei.ac.jp/~sunaoka/clog/2003-11.html#2003-11-02-9
+
 2003-11-02  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.21: 
@@ -20,7 +39,7 @@
 2003-11-01  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* chalow (write_rss_file): 
-	全体の dc:time に日付だけじゃなく時間も入れるようにした。
+	全体の dc:date に日付だけじゃなく時間も入れるようにした。
 
 2003-10-30  YAMASHITA Tatsuo  <yto@nais.to>
 
