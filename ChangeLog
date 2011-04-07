@@ -1,3 +1,27 @@
+2003-06-23 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.16:
+	公開
+
+	* chalow (parse_entry): 
+	<http://oikaze.com/~tamada/Diary/2003-06.html#2003-06-23>
+
+	> tDiary のテーマも使えるようになると見栄えが全然違いますな。
+	> ただ、惜しむらくは、* に張られるアンカー。
+	> ChangeLog 形式なので、上にどんどん書かれていく。
+	> 一日に何回も更新するとアンカーのラベルが変わってしまう。
+	> その日に書いたエントリから順番に 1, 2 と付けて欲しい。
+
+	確かに。そうなんですよね。ということで、デフォルトを降順にしました。
+	上のアイテムから、5, 4, 3, 2, 1 となります。version 0.15 のように
+	昇順にするには、cl.conf で $descending_order_item_num = 0 とすれば
+	OK。
+
+	* {chalow,cl.conf}:
+	新たな設定項目を追加
+	> # item header の先頭の "*" のアンカー番号を降順にするか (1:YES, 0:NO)
+	> my $descending_order_item_num = 1;
+
 2003-06-22  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* p:TODO:

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.36 2003/06/22 03:04:09 yto Exp $
+# $Id: chalow,v 1.37 2003/06/23 11:09:05 yto Exp $
 #
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
@@ -84,6 +84,8 @@ my $remove_quote_mark = 0;
 my $use_h3_for_item_header = 0;
 # item header の先頭の "*" にアンカーをつけるか (1:YES, 0:NO)
 my $use_item_anchor = 1;
+# item header の先頭の "*" のアンカー番号を降順にするか (1:YES, 0:NO)
+my $descending_order_item_num = 1;
 
 ### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
 my $signature = qq(<p class="footer">Powered by 
@@ -241,11 +243,15 @@ sub parse_entry {
 	}
 
 	# (3) 個々の item に分解し、各 item ごとに処理
-	my $ctr = 0;
+	my @itemlist;
 	while ($items =~ /^(\t\* .+?\n(?=\s*(\t\*|\Z)))/gsm) {
-	    my $item = $1;
-	    #print "item[$item]\n";
-	    $ctr++;		# 何個目の item か (for item anchor)
+	    push @itemlist, $1;
+	}
+
+	for (my $i = 0; $i < @itemlist; $i++) {
+	    my $item = $itemlist[$i];
+	    my $num = ($descending_order_item_num == 1) ?
+		(scalar(@itemlist) - $i) : ($i + 1);
 
 	    # (4) item header とそれ以外に分解
 	    my ($ih, $s, $c) = ($item =~ /^\t\* (.+?):(\s)(.*)\Z/sm);
@@ -268,7 +274,7 @@ sub parse_entry {
 		$ih =~ s|^\t\*|\t<span class="panchor">*</span>|;
 
 		if ($use_item_anchor == 1) {
-		    $ih =~ s|^\t(<.+?>\*</.+?>)|\t<a name="$day-$ctr" href="$mon.html#$day-$ctr">$1</a>|;
+		    $ih =~ s|^\t(<.+?>\*</.+?>)|\t<a name="$day-$num" href="$mon.html#$day-$num">$1</a>|;
 		}
 
 		if ($use_h3_for_item_header == 1) {
