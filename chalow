@@ -1,5 +1,5 @@
-#!/usr/local/bin/perl
-# $Id: chalow,v 1.10 2001-12-13 20:43:14+09 yto Exp $
+#!/usr/bin/env perl
+# $Id: chalow,v 1.11 2001-12-16 19:33:38+09 yto Exp $
 #
 # chalow - CHAngeLog On The Web - convert ChangeLog to HTML files
 #
@@ -179,7 +179,7 @@ sub okikae {
 
     ### 各項目の見出しに色づけ
     # label : * XXXX: ...
-    s!\t\* ([^:\n]+): !\t* <font color="$label_color">$1</font>: !g;
+    s!\t\* ([^:\n]+):(\s)!\t* <font color="$label_color">$1</font>:$2!g;
 }
 
 

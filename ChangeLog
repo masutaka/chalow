@@ -1,3 +1,14 @@
+2001-12-16  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.6: 公開
+
+	* chalow:
+	[2001-12-16] にやった「見出しにマッチする正規表	現」の調整の続き。
+	「s!\t\* ([^:\n]+): !\...」を「s!\t\* ([^:\n]+):(\s)!\...」に変更。
+	
+	masata-y 氏の意見に従って、「#!/usr/local/bin/perl」を
+	「#!/usr/bin/env perl」に変更 (感謝!)。
+
 2001-12-13  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.5: 公開
