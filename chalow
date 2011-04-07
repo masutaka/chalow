@@ -1,0 +1,226 @@
+#!/usr/local/bin/perl
+# $Id: chalow,v 1.5 2001-12-01 22:04:39+09 yto Exp $
+#
+# chalow - CHAngeLog On The Web - convert ChangeLog to HTML files
+#
+# This is free software with ABSOLUTELY NO WARRANTY.
+# 無償・無保証・著作権放棄
+# (see http://nais.to/~yto/doc/zb/0002.html)
+#
+# chalow ホームページ: http://nais.to/~yto/tools/chalow
+
+use strict;
+use FileHandle;
+use Getopt::Long;
+
+# 現在時刻の獲得
+my ($sec, $mi, $h, $dm, $mo, $y) = localtime(time);
+my $what_time_is_it_now =
+    sprintf "%4s-%02s-%02s %02s:%02s", $y + 1900, $mo + 1, $dm, $h, $mi;
+
+# nkf 自動設定
+my $NKF = `which nkf`;
+chomp $NKF;
+die "NO NKF!" if ($NKF !~ /nkf$/); 
+
+### ユーザ設定項目
+
+# ユーザ設定ファイル名
+my $conf_file = "cl.conf";
+
+# cl.conf でユーザ設定を行なって下さい。
+my $changelog_name;		# 日記の名前
+my $home_page_url;		# 自分のホームーページの URL
+my $home_page_name;		# 自分のホームーページの呼び名
+my $label_color;		# 各項目の見出しの文字の色
+my $index_page_header;		# インデックスページのヘッダ
+my $index_page_footer;		# インデックスページのフッタ
+my $month_page_header;		# 月ページのヘッダ
+my $month_page_footer;		# 月ページのフッタ
+my $auto_replace;		# 自動文字列置換
+
+my $opt_topn;
+# ↑インデックスページ(index.html)で最近何日分を表示するか
+my $opt_odir;
+# ↑作成された HTML ファイルの出力先ディレクトリ
+# (コマンドラインオプションでも指定できます)
+
+# ユーザ設定ファイルの読み込み
+open(CONF, "$NKF -e $conf_file |") or die "can't open file: $conf_file\n";
+my $conf = join('', (<CONF>));
+eval $conf;
+
+
+### コマンドライン引数
+Getopt::Long::Configure('bundling');
+GetOptions('n|top-n=n'   => \$opt_topn,
+	   'o|output-dir=s'   => \$opt_odir);
+
+if (@ARGV == 0) {
+    print "usage: prog [options] <file> [file]...\n";
+    print "    -n, --top-n=NUM       write first NUM days to index.html.\n";
+    print "    -o, --output-dir=DIR  directory to output.\n";
+} else {
+    my $top_n_ctr = $opt_topn;
+    my $top_n_str = "";
+    my %month_page;
+
+    for my $fname (@ARGV) {
+
+	### クリーニングのためにChangeLogファイル一気に読み込む
+	my $fh = new FileHandle;
+	$fh->open($fname) || die "$fname: $!";
+	my $all = join('', <$fh>);
+	$fh->close;
+
+	### ChangeLogをあらかじめクリーニング
+	# \n(\s+)\n2001-09... の $1 を消す
+	$all =~ s/\n[\s\t]+(\n\S)/\n$1/gm;
+	# \n(\s+)\n\t* ほげ: ... の $1 を消す
+	$all =~ s/\n[\s\t]+(\n[\s\t]+\*\s+)/\n$1/gm;
+	# 項目内の表す空行をタブ行にする
+	#   あとで、各項目をブロック単位 ("\n\n" 区切り) で処理するため。
+	$all =~ s/\n(\n\t[^\*])/\n\t$1/gm;
+
+	### クリーニングされたChangeLogを処理
+	my @lines = split("\n\n", $all);
+	my ($day, $month) = ("", "");
+	foreach (@lines) {
+	    $_ .= "\n\n";
+	    if (/^\d/) { # 日付行
+		$top_n_ctr--;
+		($day, $month) = (/^((\d+-\d+)-\d+)/);
+		### 日付の後ろの名前などを削除
+		# "2000-10-19  Hoge Hoi  <hh@hhh.com>" --> "2000-10-19"
+		s/\s\s.+//;
+	    }
+	    # 秘密の項目を外に出さないように削除
+	    # 例: * p:秘密メモ: YTがまたやらかした。しょうもないやつだ。
+            next if (/^[\s\t]+\*\s+p:/);
+	    okikae();		# 文字列置き換え
+	    $month_page{$month} .= $_;
+	    # 最近の何日かだけインデックスページに載せるための処理
+	    $top_n_str .= $_ if ($top_n_ctr >= 0);
+	}
+    }
+
+    write_month_page(\%month_page);
+    write_index_page(\%month_page, \$top_n_str);
+}
+
+
+### 文字列の置き換え
+sub okikae {
+    ### '<', '>' は置き換える。ただし、コメントに関わる場合は無視
+    s/([^\-])>/$1&gt;/g; s/<([^!])/&lt;$1/g;
+
+    ### 自動文字列置換適用
+    eval $auto_replace;
+
+    ### 日付で参照リンク
+    # date ref : [YYYY-MM-DD]
+    s!\[((\d\d\d\d-\d\d)-\d\d)\]!<a href="$2.html#$1">[$1]</a>!g;
+
+    ### URL表記を href で
+    # URL : http://....
+    # 直前が "," だったら画像リンクなのでここでは処理しない
+    s!([^,"])(http:[^\s\n\)]+)!$1<a href="$2">$2</a>!g; #"
+
+    ### 画像張り付け
+    # image : [IMG:image/2000-06-20-08-32-57.m.jpg]
+    # image : [IMG:image/aa.jpg,http://aa.jp/]            --- 画像リンク
+    # image : [IMG:image/aa.jpg,Hoge Photo]               --- ALT属性
+    # image : [IMG:image/aa.jpg,http://aa.jp/,Hoge Photo] --- 両方(順序非依存)
+    #                          ↑カンマの前後にスペースあったらダメ
+    s!\[IMG:([^\]]+)\]!get_img_str($1)!ge;
+
+    ### 日付部分に name (URLで直接リンクがはれるように)
+    # anchor : ^YYYY-MM-DD
+    s!^((\d\d\d\d-\d\d)-\d\d)!<a name="$1" href="$2.html#$1">$1</a>!;
+
+    ### 各項目の見出しに色づけ
+    # label : * XXXX: ...
+    s!\t\* ([^:\n]+):!\t* <font color="$label_color">$1</font>:!g;
+}
+
+
+### 月ページ(ex: 2001-01.html)を作る。
+sub write_month_page {
+    my ($month_page) = @_;
+    for my $i (reverse sort keys %$month_page) {
+	my $fname = "| $NKF -e > $opt_odir/$i.html";
+	my $fh = new FileHandle;
+	$fh->open($fname) || die "$fname: $!";
+	print $fh "<html><head><title>$i</title></head><body>\n";
+	print $fh $month_page_header;
+	print $fh "<hr><pre>\n";
+	print $fh $$month_page{$i};
+	print $fh "</pre><hr>\n";
+	print $fh $month_page_footer;
+	print $fh "</body></html>\n";
+    }
+}
+
+
+### インデックスページ(index.html)を作る
+sub write_index_page {
+    my ($month_page, $top_n_str) = @_;
+
+    my $fname = "| $NKF -e > $opt_odir/index.html";
+    my $fh = new FileHandle;
+    $fh->open($fname) || die "$fname: $!";
+    print $fh "<html><head><title>$changelog_name</title></head><body>\n";
+    print $fh $index_page_header;
+
+    ### 月別一覧を表示
+    write_month_page_list($month_page, $fh); 
+    print $fh "<hr>\n";
+
+    ### 最近 N 日分の項目を表示
+    if ($opt_topn) {
+	print $fh "<h2>最近 $opt_topn 日分</h2>\n";
+	print $fh "<pre>\n";
+	print $fh "$$top_n_str";
+	print $fh "</pre>\n";
+    }
+
+    print $fh "<hr>\n";
+    print $fh $index_page_footer;
+    print $fh "</body></html>\n";
+}
+
+
+sub write_month_page_list {
+    my ($month_page, $fh) = @_;
+
+    print $fh "<hr><h2>月別一覧</h2>\n";
+    my $this_year = 0;
+    for my $i (sort keys %{$month_page}) {
+	my ($year, $month) = ($i =~ /^(\d\d\d\d)-(\d\d)/);
+	if ($year != $this_year) { # year changed!
+	    print $fh "$year : \n";
+	    $this_year = $year;
+	}
+	print $fh "<a href=\"$i.html\">$month</a>\n";
+	print $fh "<br>\n" if ($month == 12);
+    }
+}
+
+
+# img タグ文字列を生成。
+sub get_img_str($) {
+    my ($str) = @_;
+    my (@tmp) = split(/\s*,\s*/, $str);
+    my $fn = shift @tmp;
+    die "file not found: $opt_odir/$fn\n" unless (-e $opt_odir."/".$fn);
+    my $rv = "<img src=\"$fn\"";
+    foreach (@tmp) {
+	if (/^http/) {		# 画像リンク
+	    $rv = "<a href=\"$_\">$rv></a";
+	} else {		# ALT属性
+	    $rv =~ s/<img\s/<img alt="$_" /;
+	}
+    }
+    return $rv.">";	
+}
+
