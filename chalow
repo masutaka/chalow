@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# $Id: chalow,v 1.25 2003/01/05 05:53:57 yto Exp $
+# $Id: chalow,v 1.26 2003/01/18 01:53:09 yto Exp $
 #
 # chalow - CHAngeLog On The Web - convert ChangeLog to HTML files
 #
@@ -138,11 +138,11 @@ USAGE
 		# 曜日(Mon, Tue, ...)を追加;
 		# "2000-10-19  Ho Hi  <hh@hh.jp>" --> "2000-10-19  Thu"
 		my $dow = get_day_of_week($_);
-		s/^($day)\s\s.+/\1  $dow/;
+		s/^($day)\s.+/\1  $dow/;
 	    } else {
 		# 日付の後ろの名前などを削除
 		# "2000-10-19  Hoge Hoi  <hh@hhh.com>" --> "2000-10-19"
-		s/^($day)\s\s.+/\1/;
+		s/^($day)\s.+/\1/;
 	    }
 	    # 秘密の項目を外に出さないように削除
 	    # 例: * p:秘密メモ: YTがまたやらかした。しょうもないやつだ。
@@ -155,36 +155,6 @@ USAGE
 	    # 最近の何日かだけインデックスページに載せるための処理
 	    $top_n_str .= $_ if ($top_n_ctr >= 0);
 	}
-	#print join("*" x 20, @lines), "\n";;
-
-#  	### クリーニングされたChangeLogを処理
-#  	my @lines = split("\n\n", $all);
-#  	my ($day, $month) = ("", "");
-#  	foreach (@lines) {
-#  	    $_ .= "\n\n";
-#  	    if (/^\d/) { # 日付行
-#  		$top_n_ctr--;
-#  		($day, $month) = (/^((\d+-\d+)-\d+)/);
-#  		### 日付の後ろをどうするか
-#  		if ($show_day_of_week == 1) {
-#  		    # 曜日(Mon, Tue, ...)を追加;
-#  		    # "2000-10-19  Ho Hi  <hh@hh.jp>" --> "2000-10-19  Thu"
-#  		    my $dow = get_day_of_week($_);
-#  		    s/\s\s.+/  $dow/;
-#  		} else {
-#  		    # 日付の後ろの名前などを削除
-#  		    # "2000-10-19  Hoge Hoi  <hh@hhh.com>" --> "2000-10-19"
-#  		    s/\s\s.+//;
-#  		}
-#  	    }
-#  	    # 秘密の項目を外に出さないように削除
-#  	    # 例: * p:秘密メモ: YTがまたやらかした。しょうもないやつだ。
-#              next if (/^[\s\t]+\*\s+p:/);
-#  	    okikae();		# 文字列置き換え
-#  	    $month_page{$month} .= $_;
-#  	    # 最近の何日かだけインデックスページに載せるための処理
-#  	    $top_n_str .= $_ if ($top_n_ctr >= 0);
-#  	}
     }
 
     write_month_page(\%month_page);
@@ -204,14 +174,6 @@ sub okikae {
     # カスタマイズのヒント: <s></s> を残す→ s|<(/?[a-rt-z]+)|&lt;$1|gi;
     # <b> を残す→ s|<(/?[ac-z]+)|&lt;$1|gi; (副作用 = <br> なども残る)
 
-    ### キーワードの強調
-#    s|\[\[(.+?)\]\]|<b><font size="+1">$1</font></b>|gms;
-#    s|\[\[(.+?)\]\]|<b>$1</b>|gms;
-#    s!\*([\w\x80-\xff].*?[\w\x80-\xff]|[\w\x80-\xff])\*!<b>$1</b>!gms;
-
-    ### "&" --> "&amp;" : IEで「&region」が「(R)ion」になってしまったから
-    #s/&/&amp;/g;		# ←やめた see [ChangeLog:2002-10-18]
-
     ### 自動文字列置換適用
     eval $auto_replace;
 
@@ -229,8 +191,6 @@ sub okikae {
     s{([^,"])(s?https?://($URLCHARS+)($URLDELIM($URLCHARS+))*)}
      {$1.'<a href="'.join('', split(/$URLDELIM/, $2)).'">'.
       join('', split(/\\/, $2)).'</a>'}gem; #"])}
-#    s|([^,"])(s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#,]+)
-#     |$1<a href="$2">$2</a>|gx; # "])|;
 
     ### 画像張り付け
     # image : [IMG:image/2000-06-20-08-32-57.m.jpg]

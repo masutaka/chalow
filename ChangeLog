@@ -1,4 +1,18 @@
-2003-01-05  YAMASHITA Tatsuo  <yto@nais.to>
+2003-01-18 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
+
+	* version 0.13: 公開
+
+	* README (usage): clweek.pl についての記述を追加
+
+	* clweek.pl: New.  日付フォーマットを曜日入りのに変換するフィルタ。
+	ref.
+	<http://namazu.org/~satoru/diary/?200301b&to=200301151S2#200301151S2>
+	
+	* chalow: 曜日入り日付フォーマットに対応。
+	例: 2000-06-12 (Mon)  YAM Tat  <yto@example.com>
+	ref. <http://namazu.org/~satoru/diary/?200301b&to=200301151#200301151>
+
+2003-01-05 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.12: 公開
 
@@ -19,7 +33,7 @@
 	- 月ページで、日付を降順 (新しい日付が上) で表示するか (1:yes or 0:no)
 	  $reverse_order_days = 1;
 
-2002-12-28  YAMASHITA Tatsuo  <yto@nais.to>
+2002-12-28 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* chalow (okikae): (030105: 機能廃止。「自動文字列置換」でやっても
 	らう方針にした。[[README に解説]]を書いた。以下の記述は obsolete)
@@ -34,7 +48,7 @@
 	また、"<" を変換する正規表現を書き換えた。残したいタグをカスタマイ
 	ズしやすくなったかな。詳しくはソースを。
 
-2002-12-27  YAMASHITA Tatsuo  <yto@nais.to>
+2002-12-27 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.11: 公開
 
@@ -44,20 +58,20 @@
 	- 改造のきっかけは 12/17 の高久さんからのバグ報告メール。12 月の記
 	  述がないと次の年が改行されずにつづくというバグ。
 
-2002-11-24  YAMASHITA Tatsuo  <yto@nais.to>
+2002-11-24 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* sample/diary.css: ちょっと修正。行間をあけたり。
 
-2002-10-29  YAMASHITA Tatsuo  <yto@nais.to>
+2002-10-29 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* README: 
 	URL 改行についての解説を書き忘れていたので書く。
 
-2002-10-26  YAMASHITA Tatsuo  <yto@nais.to>
+2002-10-26 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.10: 公開
 
-2002-10-25  YAMASHITA Tatsuo  <yto@nais.to>
+2002-10-25 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* chalow (okikae): バックスラッシュを用いたURL中での改行に対応。
 	例:
@@ -66,11 +80,11 @@
 
 	URL 用正規表現も修正。
 
-2002-10-19  YAMASHITA Tatsuo  <yto@nais.to>
+2002-10-19 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.9: 公開
 
-2002-10-18  YAMASHITA Tatsuo  <yto@nais.to>
+2002-10-18 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* chalow (okikae): "&" を "&amp;amp;" に置き換えるようにした。
 	IEで「&amp;region」が「(R)ion」になってしまったから。
@@ -80,7 +94,7 @@
 	とかも使えなくなっちゃうし。変になったらその都度「&amp;amp;region」
 	みたいにして下さい。
 
-2002-10-01  YAMASHITA Tatsuo  <yto@nais.to>
+2002-10-01 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* README: 月ページのヘッダとフッタについての記述を追加。
 
@@ -99,11 +113,11 @@
 	* chalow (get_day_of_week): New. 年月日を入力とし曜日を出力する関
 	数
 
-2002-08-09  YAMASHITA Tatsuo  <yto@nais.to>
+2002-08-09 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* README: はずかしい間違いをこっそり修正。その他追加。
 
-2002-06-29  YAMASHITA Tatsuo  <yto@nais.to>
+2002-06-29 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.8: 公開
 
@@ -116,18 +130,18 @@
 	こんな URL があるもんだから。
 	http://k-tai.impress.co.jp/cda/article/todays_goods/0,,9722,00.html
 
-2002-06-28  YAMASHITA Tatsuo  <yto@nais.to>
+2002-06-28 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* chalow (get_img_str): add alt. 他にもいろいろ機能ダウン。
 
-2002-06-24  YAMASHITA Tatsuo  <yto@nais.to>
+2002-06-24 (Mon)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* chalow (okikae): "<http://www.example.com/>" といった "<", ">" 
 	でくくった URL 表記に対応。修正の手順: 
 	(1) "<" と ">" をエスケープしていたのを、 "<" だけにする。
 	(2) URL にマッチする正規表現を変更。
 
-2002-06-23  YAMASHITA Tatsuo  <yto@nais.to>
+2002-06-23 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.7: 公開
 
@@ -135,7 +149,7 @@
 	いう文字列を、"年-月" 文字列 (例えば、"2002-06") に置き換えるよう
 	にした。ad hoc で嫌なんだけど、良い方法が思いつかない...。
 
-2002-06-22  YAMASHITA Tatsuo  <yto@nais.to>
+2002-06-22 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* diary.css: New. サンプル。taku-ku のをパクる。
 
@@ -149,7 +163,7 @@
 
 	* cvs: CVS による管理開始。
 
-2001-12-16  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-16 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.6: 公開
 
@@ -160,7 +174,7 @@
 	masata-y 氏の意見に従って、「#!/usr/local/bin/perl」を
 	「#!/usr/bin/env perl」に変更 (感謝!)。
 
-2001-12-13  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-13 (Thu)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.5: 公開
 
@@ -176,11 +190,11 @@
 	「s!\t\* ([^:\n]+): !\...」に変更 (コロン後にスペースを追加)。これ
 	で、見出しのない項目も安心。
 
-2001-12-09  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-09 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.4: 公開
 
-2001-12-08  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-08 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* chalow: New option '-e'. expert-mode. ソース見て処理内容が分かる
 	人向けモード。[2001-12-07]の identify がらみの処理など。README に
@@ -188,7 +202,7 @@
 	(write_month_page): Add <meta> in <head>
 	(write_index_page): Add <meta> in <head>
 
-2001-12-07  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-07 (Fri)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* chalow (get_img_str): 自分用に、ImageMagick の identify で、
 	画像の extent を得る処理を付け加えた。identify がなければ何もしな
@@ -202,12 +216,12 @@
 	問題点: 変換処理が遅くなる。まあ、しょうがない。いそぐもんじゃない
 	からいいかな。
 
-2001-12-04  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-04 (Tue)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* chalow: ユーザ設定ファイル名が存在しないときエラーで中止するよう
 	にした。
 
-2001-12-02  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-02 (Sun)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.3: 公開
 
@@ -232,7 +246,7 @@
 
 	* README: 誤り訂正。
 
-2001-12-01  YAMASHITA Tatsuo  <yto@nais.to>
+2001-12-01 (Sat)  YAMASHITA Tatsuo  <yto@nais.to>
 
 	* version 0.1: 公開してみる。Web ページも作る。
 	http://nais.to/~yto/tools/chalow/
