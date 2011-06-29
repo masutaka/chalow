@@ -53,6 +53,7 @@ my $reverse_order_days = 0;
 
 # インデックスページのテンプレート
 my $index_page_template = << "___INDEX_PAGE_TEMPLATE"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="ja"><head>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <TMPL_IF name=css_file>
@@ -76,6 +77,7 @@ ___INDEX_PAGE_TEMPLATE
 
 # 月ページのテンプレート
 my $month_page_template = << "___MONTH_PAGE_TEMPLATE"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="ja"><head>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <TMPL_IF name=css_file>
@@ -99,6 +101,7 @@ ___MONTH_PAGE_TEMPLATE
 
 # 日ページのテンプレート
 my $day_page_template = << "___DAY_PAGE_TEMPLATE"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="ja"><head>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <TMPL_IF name=css_file>
@@ -123,6 +126,7 @@ ___DAY_PAGE_TEMPLATE
 
 # アイテムページのテンプレート
 my $item_page_template = << "___PAGE_TEMPLATE"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="ja"><head>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <TMPL_IF name=css_file>
@@ -158,6 +162,7 @@ ___PAGE_TEMPLATE
 
 # カテゴリページのテンプレート
 my $cat_page_template = << "TMPL"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="ja"><head>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <TMPL_IF name=css_file>

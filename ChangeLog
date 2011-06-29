@@ -1,5 +1,10 @@
 2011-06-30  Takashi Masuda  <masutaka@nifty.com>
 
+	* 生成される HTML コードを W3C に準拠させた
+
+	The W3C Markup Validation Service http://validator.w3.org/ でエラーにな
+	らない HTML コードを生成するようにした。
+
 	* UTF-8 完全対応
 
 	全ファイルの文字コードを EUC から UTF-8 に変更。
