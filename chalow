@@ -4,57 +4,57 @@
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files
 #
 # This is free software with ABSOLUTELY NO WARRANTY.
-# Ìµ½ş¡¦ÌµÊİ¾Ú¡¦Ãøºî¸¢Êü´ş (see http://nais.to/~yto/doc/zb/0002.html)
+# ç„¡å„Ÿãƒ»ç„¡ä¿è¨¼ãƒ»è‘—ä½œæ¨©æ”¾æ£„ (see http://nais.to/~yto/doc/zb/0002.html)
 #
-# chalow ¥Û¡¼¥à¥Ú¡¼¥¸: http://chalow.org/
+# chalow ãƒ›ãƒ¼ãƒ ãƒšãƒ¼ã‚¸: http://chalow.org/
 use strict;
 use Getopt::Long;
 use POSIX qw(strftime ceil);
-use Time::Local;		# for ÍËÆü
+use Time::Local;		# for æ›œæ—¥
 use HTML::Template;
 use ChangeLogReader;
 
 my $version = '1.0';
 
-# ¸½ºß»ş¹ï¤Î³ÍÆÀ
+# ç¾åœ¨æ™‚åˆ»ã®ç²å¾—
 my $what_time_is_it_now = strftime "%Y-%m-%d %H:%M", localtime;
 my $dcdate = strftime "%Y-%m-%dT%H:%M:%S+09:00", localtime;
-my ($current_ym) = ($what_time_is_it_now =~ /^(\d+-\d+)/); # º£·î
+my ($current_ym) = ($what_time_is_it_now =~ /^(\d+-\d+)/); # ä»Šæœˆ
 
-### ¥æ¡¼¥¶ÀßÄê¹àÌÜ obsolete
+### ãƒ¦ãƒ¼ã‚¶è¨­å®šé …ç›® obsolete
 
-# ¼«Ê¬¤Î home page URL --- ÇÑ»ßÍ½Äê¡£¥Æ¥ó¥×¥ì¡¼¥È¤ËÄ¾ÀÜ½ñ¤¯Êı¿Ë¤Ç
+# è‡ªåˆ†ã® home page URL --- å»ƒæ­¢äºˆå®šã€‚ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã«ç›´æ¥æ›¸ãæ–¹é‡ã§
 my $home_page_url = "http://chalow.org/";
-# ¼«Ê¬¤Î¥Û¡¼¥à¡¼¥Ú¡¼¥¸¤Î¸Æ¤ÓÌ¾ --- ÇÑ»ßÍ½Äê¡£Æ±¾å
+# è‡ªåˆ†ã®ãƒ›ãƒ¼ãƒ ãƒ¼ãƒšãƒ¼ã‚¸ã®å‘¼ã³å --- å»ƒæ­¢äºˆå®šã€‚åŒä¸Š
 my $home_page_name = "chalow home page";
 
 
-### ¥æ¡¼¥¶ÀßÄê¹àÌÜ
-## ¥Ç¥Õ¥©¥ë¥ÈÀßÄê (¥æ¡¼¥¶ÀßÄê¥Õ¥¡¥¤¥ëÌ¾¤¬»ØÄê¤µ¤ì¤Æ¤Ê¤¤¤È¤­)
-# Æüµ­¤ÎÌ¾Á°
+### ãƒ¦ãƒ¼ã‚¶è¨­å®šé …ç›®
+## ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆè¨­å®š (ãƒ¦ãƒ¼ã‚¶è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«åãŒæŒ‡å®šã•ã‚Œã¦ãªã„ã¨ã)
+# æ—¥è¨˜ã®åå‰
 my $changelog_name = "ChangeLog";
-# ¼«Æ°Ê¸»úÎóÃÖ´¹
+# è‡ªå‹•æ–‡å­—åˆ—ç½®æ›
 my $auto_replace = '
 s!(<blockquote>)!</p>$1<p>!g;
 s!(</blockquote>)!</p>$1<p>!g;
 ';
-# CSS ¥Õ¥¡¥¤¥ë
+# CSS ãƒ•ã‚¡ã‚¤ãƒ«
 my $css_file;
-# RSS¥Õ¥¡¥¤¥ëÌ¾
+# RSSãƒ•ã‚¡ã‚¤ãƒ«å
 my $rss_filename = "cl.rdf";
-# RSS¤ËºÇ¶á²¿ÆüÊ¬É½¼¨¤¹¤ë¤«(0¤Î¾ì¹ç¤Ï $opt_topn ¤ÈÆ±¤¸)
+# RSSã«æœ€è¿‘ä½•æ—¥åˆ†è¡¨ç¤ºã™ã‚‹ã‹(0ã®å ´åˆã¯ $opt_topn ã¨åŒã˜)
 my $rss_topn = 0;
-# ¥¤¥ó¥Ç¥Ã¥¯¥¹¥Ú¡¼¥¸(index.html)¤ÇºÇ¶á²¿ÆüÊ¬¤òÉ½¼¨¤¹¤ë¤«
+# ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒšãƒ¼ã‚¸(index.html)ã§æœ€è¿‘ä½•æ—¥åˆ†ã‚’è¡¨ç¤ºã™ã‚‹ã‹
 my $opt_topn = 5;
-# ÆüÉÕ¤Î¸å¤ËÍËÆü(Mon, Tue, ...)¤òÉ½¼¨¤¹¤ë¤« (1:yes or 0:no)
+# æ—¥ä»˜ã®å¾Œã«æ›œæ—¥(Mon, Tue, ...)ã‚’è¡¨ç¤ºã™ã‚‹ã‹ (1:yes or 0:no)
 my $show_day_of_week = 1;
-# ·î¥Ú¡¼¥¸¤Ç¡¢ÆüÉÕ¤ò¹ß½ç (¿·¤·¤¤ÆüÉÕ¤¬¾å) ¤ÇÉ½¼¨¤¹¤ë¤« (1:yes or 0:no)
+# æœˆãƒšãƒ¼ã‚¸ã§ã€æ—¥ä»˜ã‚’é™é † (æ–°ã—ã„æ—¥ä»˜ãŒä¸Š) ã§è¡¨ç¤ºã™ã‚‹ã‹ (1:yes or 0:no)
 my $reverse_order_days = 0;
 
-# ¥¤¥ó¥Ç¥Ã¥¯¥¹¥Ú¡¼¥¸¤Î¥Æ¥ó¥×¥ì¡¼¥È
+# ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒšãƒ¼ã‚¸ã®ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
 my $index_page_template = << "___INDEX_PAGE_TEMPLATE"
 <html lang="ja"><head>
-<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
@@ -74,10 +74,10 @@ my $index_page_template = << "___INDEX_PAGE_TEMPLATE"
 ___INDEX_PAGE_TEMPLATE
     ;
 
-# ·î¥Ú¡¼¥¸¤Î¥Æ¥ó¥×¥ì¡¼¥È
+# æœˆãƒšãƒ¼ã‚¸ã®ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
 my $month_page_template = << "___MONTH_PAGE_TEMPLATE"
 <html lang="ja"><head>
-<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
@@ -97,10 +97,10 @@ my $month_page_template = << "___MONTH_PAGE_TEMPLATE"
 ___MONTH_PAGE_TEMPLATE
     ;
 
-# Æü¥Ú¡¼¥¸¤Î¥Æ¥ó¥×¥ì¡¼¥È
+# æ—¥ãƒšãƒ¼ã‚¸ã®ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
 my $day_page_template = << "___DAY_PAGE_TEMPLATE"
 <html lang="ja"><head>
-<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
@@ -121,10 +121,10 @@ my $day_page_template = << "___DAY_PAGE_TEMPLATE"
 ___DAY_PAGE_TEMPLATE
     ;
 
-# ¥¢¥¤¥Æ¥à¥Ú¡¼¥¸¤Î¥Æ¥ó¥×¥ì¡¼¥È
+# ã‚¢ã‚¤ãƒ†ãƒ ãƒšãƒ¼ã‚¸ã®ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
 my $item_page_template = << "___PAGE_TEMPLATE"
 <html lang="ja"><head>
-<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
@@ -156,10 +156,10 @@ my $item_page_template = << "___PAGE_TEMPLATE"
 ___PAGE_TEMPLATE
     ;
 
-# ¥«¥Æ¥´¥ê¥Ú¡¼¥¸¤Î¥Æ¥ó¥×¥ì¡¼¥È
+# ã‚«ãƒ†ã‚´ãƒªãƒšãƒ¼ã‚¸ã®ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
 my $cat_page_template = << "TMPL"
 <html lang="ja"><head>
-<meta http-equiv="Content-Type" content="text/html;charset=EUC-JP">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <TMPL_IF name=css_file>
  <link rel=stylesheet href="<TMPL_VAR name=css_file>" media=all>
 </TMPL_IF>
@@ -181,7 +181,7 @@ my $cat_page_template = << "TMPL"
 TMPL
     ;
 
-# item ¤Î¥Æ¥ó¥×¥ì¡¼¥È
+# item ã®ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
 my $item_template = << "EACHITEM"
 <!-- start:<TMPL_VAR name=ymdi> -->
 <div class="section">
@@ -195,7 +195,7 @@ my $item_template = << "EACHITEM"
 EACHITEM
     ;
 
-# entry (date) ¤Î¥Æ¥ó¥×¥ì¡¼¥È
+# entry (date) ã®ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
 my $entry_template = << "DAYENTRY"
 <div class="day">
 <h2><span class="date"><TMPL_VAR name=header></span></h2>
@@ -214,7 +214,7 @@ my $entry_template = << "DAYENTRY"
 DAYENTRY
     ;
 
-# RSS¥Õ¥¡¥¤¥ë¤Î¥Æ¥ó¥×¥ì¡¼¥È
+# RSSãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
 my $rss_template = << "RDFSTR"
 <?xml version="1.0" encoding="utf-8"?>
 <rdf:RDF
@@ -255,75 +255,72 @@ my $rss_template = << "RDFSTR"
 RDFSTR
 	;
 
-# É½¼¨¤¹¤ë¤È¤­°úÍÑµ­¹æ ('>' or '|') ¤ò¾Ã¤¹¤« (1:YES, 0:NO)
+# è¡¨ç¤ºã™ã‚‹ã¨ãå¼•ç”¨è¨˜å· ('>' or '|') ã‚’æ¶ˆã™ã‹ (1:YES, 0:NO)
 my $remove_quote_mark = 0;
 
-# ÆüÉÕ°ìÍ÷¤ò¥«¥ì¥ó¥À¡¼É½¼¨¤Ë¤¹¤ë¤« (1:YES, 0:NO)
+# æ—¥ä»˜ä¸€è¦§ã‚’ã‚«ãƒ¬ãƒ³ãƒ€ãƒ¼è¡¨ç¤ºã«ã™ã‚‹ã‹ (1:YES, 0:NO)
 my $calendar_style = 0;
 
-# ¥¢¥¤¥Æ¥à¥Ø¥Ã¥À¡¼¤Î¥Õ¥©¡¼¥Ş¥Ã¥È¤ò¤É¤¦¤¹¤ë¤«
+# ã‚¢ã‚¤ãƒ†ãƒ ãƒ˜ãƒƒãƒ€ãƒ¼ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’ã©ã†ã™ã‚‹ã‹
 # (0:"* HOGE:", 1:"* HOGE", 2:"HOGE:",3:"HOGE")
 my $item_header_style = 0;
-# item header ¤Ç h3 ¥¿¥°¤ò»È¤¦¤« (1:YES, 0:NO) - tDiary ¤È¤Î¸ß´¹À­¤Î¤¿¤á
+# item header ã§ h3 ã‚¿ã‚°ã‚’ä½¿ã†ã‹ (1:YES, 0:NO) - tDiary ã¨ã®äº’æ›æ€§ã®ãŸã‚
 my $use_h3_for_item_header = 0;
-# item header ¤ÎÀèÆ¬¤Îµ­¹æ¤Ë¥¢¥ó¥«¡¼¤ò¤Ä¤±¤ë¤« (1:YES, 0:NO)
+# item header ã®å…ˆé ­ã®è¨˜å·ã«ã‚¢ãƒ³ã‚«ãƒ¼ã‚’ã¤ã‘ã‚‹ã‹ (1:YES, 0:NO)
 my $use_item_anchor = 1;
-# item header ¤ÎÀèÆ¬¤Îµ­¹æ¤Î»ØÄê
-# ¡ØÆüµ­¤Î¥»¥¯¥·¥ç¥ó¤ÎÀèÆ¬(¥µ¥Ö¥¿¥¤¥È¥ë¤Î¹ÔÆ¬)¤ËÁŞÆş¤µ¤ì¤ë¡¢¥ê¥ó¥¯ÍÑ¤Î
-# ¥¢¥ó¥«¡¼Ê¸»úÎó¤ò»ØÄê¤·¤Ş¤¹¡£¤Ê¤ª¡Ö<span class="panchor">_</span>¡×¤ò
-# »ØÄê¤¹¤ë¤È¡¢¥Æ¡¼¥Ş¤Ë¤è¤Ã¤Æ¤Ï¼«Æ°Åª¤Ë²èÁü¥¢¥ó¥«¡¼¤¬¤Ä¤¯¤è¤¦¤Ë¤Ê¤ê¤Ş
-# ¤¹¡£¡Ù(tDiary ¤Î skel/conf.rhtml ¤è¤ê)
+# item header ã®å…ˆé ­ã®è¨˜å·ã®æŒ‡å®š
+# ã€æ—¥è¨˜ã®ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã®å…ˆé ­(ã‚µãƒ–ã‚¿ã‚¤ãƒˆãƒ«ã®è¡Œé ­)ã«æŒ¿å…¥ã•ã‚Œã‚‹ã€ãƒªãƒ³ã‚¯ç”¨ã®
+# ã‚¢ãƒ³ã‚«ãƒ¼æ–‡å­—åˆ—ã‚’æŒ‡å®šã—ã¾ã™ã€‚ãªãŠã€Œ<span class="panchor">_</span>ã€ã‚’
+# æŒ‡å®šã™ã‚‹ã¨ã€ãƒ†ãƒ¼ãƒã«ã‚ˆã£ã¦ã¯è‡ªå‹•çš„ã«ç”»åƒã‚¢ãƒ³ã‚«ãƒ¼ãŒã¤ãã‚ˆã†ã«ãªã‚Šã¾
+# ã™ã€‚ã€(tDiary ã® skel/conf.rhtml ã‚ˆã‚Š)
 my $item_header_mark = '<span class="sanchor">*</span>';
 
-# Â¾¤ÎÇ¯¤ÎÆ±¤¸ÆüÉÕ (·îÆü) ¤Ø¤Î¥ê¥ó¥¯¤òÄ¥¤ë¤« (1:YES, 0:NO)
+# ä»–ã®å¹´ã®åŒã˜æ—¥ä»˜ (æœˆæ—¥) ã¸ã®ãƒªãƒ³ã‚¯ã‚’å¼µã‚‹ã‹ (1:YES, 0:NO)
 my $same_date_jump = 1;
-# # ³Æ¥¢¥¤¥Æ¥à¤Ëµ­½Ò¼ÔÌ¾¤òÉ½¼¨¤¹¤ë¤« (1:YES, 0:NO)
+# # å„ã‚¢ã‚¤ãƒ†ãƒ ã«è¨˜è¿°è€…åã‚’è¡¨ç¤ºã™ã‚‹ã‹ (1:YES, 0:NO)
 # my $show_author_name = 0;
 
-# RSS ¤ò½ĞÎÏ¤¹¤ë¤« (1:YES, 0:NO)
+# RSS ã‚’å‡ºåŠ›ã™ã‚‹ã‹ (1:YES, 0:NO)
 my $output_rss = 1;
-# Æüµ­¤ÎÀâÌÀ for RSS : Îã: "Æü¡¹¤Î¤¢¤ì¤³¤ì¡£"
+# æ—¥è¨˜ã®èª¬æ˜ for RSS : ä¾‹: "æ—¥ã€…ã®ã‚ã‚Œã“ã‚Œã€‚"
 my $changelog_description = "";
-# ChangeLog ¤ò¸ø³«¤¹¤ë URL (ÀäÂÎ URL ¤ò¶¯¤¯¿ä¾©) - RSS ¤ËÉ¬¿Ü
+# ChangeLog ã‚’å…¬é–‹ã™ã‚‹ URL (çµ¶ä½“ URL ã‚’å¼·ãæ¨å¥¨) - RSS ã«å¿…é ˆ
 #my $clog_url = "http://chalow.net/";
 my $clog_url = "./";
 
-# ¸¡º÷ÍÑ¥Õ¥¡¥¤¥ë (cl.itemlist) ¤òºî¤ë¤« (1:YES, 0:NO)
+# æ¤œç´¢ç”¨ãƒ•ã‚¡ã‚¤ãƒ« (cl.itemlist) ã‚’ä½œã‚‹ã‹ (1:YES, 0:NO)
 my $output_itemlist = 1;
-# ¸«½Ğ¤·°ìÍ÷ (JavaScript ¥Õ¥¡¥¤¥ë) ¤Ç½ĞÎÏ¤¹¤ëÆü¿ô
+# è¦‹å‡ºã—ä¸€è¦§ (JavaScript ãƒ•ã‚¡ã‚¤ãƒ«) ã§å‡ºåŠ›ã™ã‚‹æ—¥æ•°
 my $latest_titles_num = 10;
 
-# Æü¤´¤È¤Ë¥Ú¡¼¥¸¤òºî¤ë¤« (0:NO, 1:YES) --- obsolete
+# æ—¥ã”ã¨ã«ãƒšãƒ¼ã‚¸ã‚’ä½œã‚‹ã‹ (0:NO, 1:YES) --- obsolete
 my $day_page_mode = 0;
-# ºîÀ®¤¹¤ë¥Ú¡¼¥¸¤ÎÃ±°Ì¡áºÇ¾®¥Ú¡¼¥¸Ã±°Ì (0:·î, 1:Æü, 2:¥¢¥¤¥Æ¥à)
+# ä½œæˆã™ã‚‹ãƒšãƒ¼ã‚¸ã®å˜ä½ï¼æœ€å°ãƒšãƒ¼ã‚¸å˜ä½ (0:æœˆ, 1:æ—¥, 2:ã‚¢ã‚¤ãƒ†ãƒ )
 my $page_mode = 0;
 
-# ¥«¥Æ¥´¥ê¥Ú¡¼¥¸¤òºî¤ë¤« (0:NO, 1:YES)
+# ã‚«ãƒ†ã‚´ãƒªãƒšãƒ¼ã‚¸ã‚’ä½œã‚‹ã‹ (0:NO, 1:YES)
 my $output_cat_pages = 1;
-# ¥«¥Æ¥´¥ê¥Ú¡¼¥¸Ãæ¤Î¥¨¥ó¥È¥ê¿ô¤Î¾å¸Â
-# ($output_cat_pages = 1 ¤Î¤È¤­¤Î¤ßÍ­¸ú)
+# ã‚«ãƒ†ã‚´ãƒªãƒšãƒ¼ã‚¸ä¸­ã®ã‚¨ãƒ³ãƒˆãƒªæ•°ã®ä¸Šé™
+# ($output_cat_pages = 1 ã®ã¨ãã®ã¿æœ‰åŠ¹)
 my $cat_page_entry_max = 10;
-# ¥«¥Æ¥´¥êÊÌitemÉ½¼¨¤Î¤¿¤á¤ÎCGI¤ò»ØÄê¤¹¤ë¡Ê¥«¥Æ¥´¥êÌ¾¤Ï %%CAT%% ¤ÇÃÖ¤­´¹¤¨¡Ë
-# ($output_cat_pages = 0 ¤Î¤È¤­¤Î¤ßÍ­¸ú)
+# ã‚«ãƒ†ã‚´ãƒªåˆ¥itemè¡¨ç¤ºã®ãŸã‚ã®CGIã‚’æŒ‡å®šã™ã‚‹ï¼ˆã‚«ãƒ†ã‚´ãƒªåã¯ %%CAT%% ã§ç½®ãæ›ãˆï¼‰
+# ($output_cat_pages = 0 ã®ã¨ãã®ã¿æœ‰åŠ¹)
 my $cat_page_cgi = "clsearch.cgi?cat=%%CAT%%";
 #my $cat_page_cgi = "";
 
-# ¥Õ¥¡¥¤¥ë¤ÎºÇ½é¤Ë½Ğ¤Æ¤¯¤ë¡Ö<!-- ReplaceOnce -->¡×¤òÃÖ¤­´¹¤¨¤ëÊ¸»úÎó
+# ãƒ•ã‚¡ã‚¤ãƒ«ã®æœ€åˆã«å‡ºã¦ãã‚‹ã€Œ<!-- ReplaceOnce -->ã€ã‚’ç½®ãæ›ãˆã‚‹æ–‡å­—åˆ—
 my $replace_once = "";
-
-# UTF8 mode (0:OFF, 1:ON)
-my $utf8_mode = 0;
 
 # Read More mode (0:OFF, 1:ON)
 my $readmore_mode = 1;
 # Read More tag
 my $readmore_tag = "====";
 
-### chalow ÉáµÚ¤Î¤¿¤á HTML ¤Î°ìÈÖ²¼¤Ë¥ê¥ó¥¯¤òÉ½¼¨¤¹¤ë¡£¤Ç¤­¤ì¤Ğ¾Ã¤µ¤Ê¤¤¤Ç¡£
+### chalow æ™®åŠã®ãŸã‚ HTML ã®ä¸€ç•ªä¸‹ã«ãƒªãƒ³ã‚¯ã‚’è¡¨ç¤ºã™ã‚‹ã€‚ã§ãã‚Œã°æ¶ˆã•ãªã„ã§ã€‚
 my $signature = qq(<p class="footer">Powered by 
 <a href="http://chalow.org/">chalow</a></p>);
 
-### ¥³¥Ş¥ó¥É¥é¥¤¥ó°ú¿ô
+### ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³å¼•æ•°
 Getopt::Long::Configure('bundling');
 my ($opt_topn_tmp, $outputdir, $quiet_mode, $opt_css_file, $debug_mode,
     $update_by_size, $conf_file, $stop_date);
@@ -334,7 +331,6 @@ my $gor = GetOptions('n|top-n=n'   => \$opt_topn_tmp,
 		     'u|update-by-size' => \$update_by_size,
 		     'C|css=s' => \$opt_css_file,
 		     'q|quiet' => \$quiet_mode,
-		     '8|utf8' => \$utf8_mode,
 		     'd|debug' => \$debug_mode);
 
 if (@ARGV == 0 or $gor == 0) {
@@ -347,31 +343,29 @@ usage: chalow [options] <file> [file]...
     -u, --update-by-size        overwrite only if sizes are different
     -C, --css=FILE              css file
     -q, --quiet                 quiet mode
-    -8, --utf8                  utf8 mode
     -d, --debug                 debug mode
 USAGE
     ;
     exit;
 }
 
-# ¥æ¡¼¥¶ÀßÄê¥Õ¥¡¥¤¥ë¤ÎÆÉ¤ß¹ş¤ß (¥Õ¥¡¥¤¥ëÌ¾¤¬»ØÄê¤µ¤ì¤Æ¤¿¤È¤­¤Î¤ß)
+# ãƒ¦ãƒ¼ã‚¶è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿è¾¼ã¿ (ãƒ•ã‚¡ã‚¤ãƒ«åãŒæŒ‡å®šã•ã‚Œã¦ãŸã¨ãã®ã¿)
 if ($conf_file ne "") {
     open(CONF, $conf_file) or die "Can't open $conf_file : $!\n";
     binmode(CONF);
     my $conf = join('', <CONF>);
-#    $conf = Jcode->new($conf)->euc; # del 050412
     eval $conf;
     die qq(error in "$conf_file" (obsolete variable?): $@\n) if ($@);
 }
 
 $outputdir = "." if (not defined $outputdir);
 
-# ¥æ¡¼¥¶ÀßÄê¥Õ¥¡¥¤¥ë¤è¤ê¥³¥Ş¥ó¥É¥é¥¤¥ó»ØÄê¤òÍ¥Àè¤¹¤ë½èÍı
+# ãƒ¦ãƒ¼ã‚¶è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã‚ˆã‚Šã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³æŒ‡å®šã‚’å„ªå…ˆã™ã‚‹å‡¦ç†
 $opt_topn = $opt_topn_tmp if (defined $opt_topn_tmp);
 $css_file = $opt_css_file if (defined $opt_css_file);
 
-# ½èÍıÄä»ßÆüÉÕ: Ê¸»úÎó¤À¤Ã¤¿¤â¤Î¤ò¿ôÃÍ¤Ë¤¹¤ë¡£¸å¤Ç¿ôÃÍ¤È¤·¤ÆÆüÉÕ¤ÎÈæ³Ó
-# ¤Ë»È¤¦¤«¤é¡£
+# å‡¦ç†åœæ­¢æ—¥ä»˜: æ–‡å­—åˆ—ã ã£ãŸã‚‚ã®ã‚’æ•°å€¤ã«ã™ã‚‹ã€‚å¾Œã§æ•°å€¤ã¨ã—ã¦æ—¥ä»˜ã®æ¯”è¼ƒ
+# ã«ä½¿ã†ã‹ã‚‰ã€‚
 $stop_date =~ s/-//g;
 
 my $latest_item_list;
@@ -385,9 +379,9 @@ $clog_url_pref .= "/" unless ($clog_url_pref =~ m!/$!);
 # http://chalow.net/index.html -> http://chalow.net/
 # http://chalow.net            -> http://chalow.net/
 
-my %month_page;			# ·îÊÌ¤Î¥Ú¡¼¥¸
-my %category_item;		# ¥«¥Æ¥´¥êÊÌ¥Ú¡¼¥¸ÍÑ item
-my %inside_ref;			# ÆüÉÕ¥ê¥ó¥¯¤Ë¤è¤ë¥ê¥Õ¥¡¥é¡¼
+my %month_page;			# æœˆåˆ¥ã®ãƒšãƒ¼ã‚¸
+my %category_item;		# ã‚«ãƒ†ã‚´ãƒªåˆ¥ãƒšãƒ¼ã‚¸ç”¨ item
+my %inside_ref;			# æ—¥ä»˜ãƒªãƒ³ã‚¯ã«ã‚ˆã‚‹ãƒªãƒ•ã‚¡ãƒ©ãƒ¼
 
 #my %all_entries;                # hash for all ChangeLog entries
 # {XXXX-XX-XX}{"eh"} - Entry header
@@ -398,8 +392,8 @@ my %inside_ref;			# ÆüÉÕ¥ê¥ó¥¯¤Ë¤è¤ë¥ê¥Õ¥¡¥é¡¼
 # {XXXX-XX-XX}{"message-top"} - Pragma item
 # {XXXX-XX-XX}{"message-bottom"} - Pragma item
 # {XXXX-XX-XX}{curid} - Item ID manager
-# {XXXX-XX-XX}{1,2,3,...}{"h"} - ¥¢¥¤¥Æ¥à¥Ø¥Ã¥À
-# {XXXX-XX-XX}{1,2,3,...}{"c"} - ÃæÌ£
+# {XXXX-XX-XX}{1,2,3,...}{"h"} - ã‚¢ã‚¤ãƒ†ãƒ ãƒ˜ãƒƒãƒ€
+# {XXXX-XX-XX}{1,2,3,...}{"c"} - ä¸­å‘³
 
 my $cl = ChangeLogReader->new(stop_date => $stop_date);
 
@@ -416,19 +410,19 @@ foreach my $ymd (reverse sort keys %{$cl->{all}}) {
 
 print "done.\n" if (!defined $quiet_mode);
 
-# ·îÊÌ°ìÍ÷¤òºîÀ®¤·¤Æ¤ª¤¯
+# æœˆåˆ¥ä¸€è¦§ã‚’ä½œæˆã—ã¦ãŠã
 my $month_page_list = make_month_page_list($cl->{STAT}->{ym}); 
 
-# º£·î¤ÎÆüÉÕ°ìÍ÷¤òºîÀ®¤·¤Æ¤ª¤¯
+# ä»Šæœˆã®æ—¥ä»˜ä¸€è¦§ã‚’ä½œæˆã—ã¦ãŠã
 my $current_day_list = make_day_list_str($current_ym);
 
-### À¸À®(1)
-write_rss_file() if ($output_rss); # RSS ¥Õ¥¡¥¤¥ë¤òºî¤ë
-write_itemlist_file() if ($output_itemlist); # ¸¡º÷ÍÑ¥Õ¥¡¥¤¥ë(itemlist)¤òºî¤ë 
-write_latest_item_list_file();	# ºÇ¶á¤ÎÏÃÂê°ìÍ÷¤òºî¤ë
-write_category_list_file();	# ¥«¥Æ¥´¥ê°ìÍ÷¤òºî¤ë
+### ç”Ÿæˆ(1)
+write_rss_file() if ($output_rss); # RSS ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œã‚‹
+write_itemlist_file() if ($output_itemlist); # æ¤œç´¢ç”¨ãƒ•ã‚¡ã‚¤ãƒ«(itemlist)ã‚’ä½œã‚‹ 
+write_latest_item_list_file();	# æœ€è¿‘ã®è©±é¡Œä¸€è¦§ã‚’ä½œã‚‹
+write_category_list_file();	# ã‚«ãƒ†ã‚´ãƒªä¸€è¦§ã‚’ä½œã‚‹
 
-### HTML À¸À®¤Î¤¿¤á¤Î¥ë¡¼¥×
+### HTML ç”Ÿæˆã®ãŸã‚ã®ãƒ«ãƒ¼ãƒ—
 foreach my $ymd (sort keys %{$cl->{all}}) {
     my $e = $cl->{all}->{$ymd};
     my @items;
@@ -440,7 +434,7 @@ foreach my $ymd (sort keys %{$cl->{all}}) {
     $month_page{"$y-$m"}{$ymd}{str} = make_entry_html($e, $ymd, \@items);
 }
 
-### À¸À®(2) HTML ¥Õ¥¡¥¤¥ë¤Î½ĞÎÏ
+### ç”Ÿæˆ(2) HTML ãƒ•ã‚¡ã‚¤ãƒ«ã®å‡ºåŠ›
 write_index_page();
 write_month_page();
 write_day_page() if ($day_page_mode or $page_mode >= 1);
@@ -452,7 +446,7 @@ print "done.\n" if (!defined $quiet_mode);
 exit;
 
 
-### ¥¨¥ó¥È¥ê¤ò¥Ñ¡¼¥º¤·¤Æ³ÊÇ¼¤¹¤ë
+### ã‚¨ãƒ³ãƒˆãƒªã‚’ãƒ‘ãƒ¼ã‚ºã—ã¦æ ¼ç´ã™ã‚‹
 sub parse_entry {
     my ($ymd, $ent) = @_;
     for (my $i = $ent->{curid}; $i >= 1; $i--) {
@@ -464,52 +458,52 @@ sub parse_entry {
 }
 
 
-### Ê¸»úÎó¤ÎÃÖ¤­´¹¤¨
+### æ–‡å­—åˆ—ã®ç½®ãæ›ãˆ
 sub okikae {
     local ($_) = shift;	
-    my ($ymd, $i) = @_;		# ²¿¤«¤Ë»È¤¨¤ë¤«¤Ê?
+    my ($ymd, $i) = @_;		# ä½•ã‹ã«ä½¿ãˆã‚‹ã‹ãª?
 
     escape_string(\$_);
 
-    # ÆüÉÕ¥ê¥ó¥¯¾ğÊó¤Î³ÊÇ¼ - parse_entry ¤Ë¤¢¤Ã¤¿¤¬¡¢escape¸å¤Ë¹Ô¤Ê¤Ã
-    # ¤¿Êı¤¬¤è¤¤¤È»×¤Ã¤¿¤Î¤Ç¤³¤Á¤é¤Ë°ÜÆ°(5.1.19)
+    # æ—¥ä»˜ãƒªãƒ³ã‚¯æƒ…å ±ã®æ ¼ç´ - parse_entry ã«ã‚ã£ãŸãŒã€escapeå¾Œã«è¡Œãªã£
+    # ãŸæ–¹ãŒã‚ˆã„ã¨æ€ã£ãŸã®ã§ã“ã¡ã‚‰ã«ç§»å‹•(5.1.19)
     while (/\[((\d\d\d\d-\d\d)-\d\d(-\d+)?)\]/g) {
 	$inside_ref{$1}{"$ymd-$i"}++;
     }
 
     s/&/&amp;/go;
     s/\]>/\]&gt;/go;
-#    s/>/&gt;/go;		# > ¤¬ &.. ¤Ë¤Ê¤ë¤È¡¢URL ¤È¤«°úÍÑ¤Î¥Ş¥Ã¥Á¶¸¤¦
+#    s/>/&gt;/go;		# > ãŒ &.. ã«ãªã‚‹ã¨ã€URL ã¨ã‹å¼•ç”¨ã®ãƒãƒƒãƒç‹‚ã†
 #    s/"/&quot;/go;		# ";
-    ### "<" ¤ÏÃÖ¤­´¹¤¨¤ë¡£
+    ### "<" ã¯ç½®ãæ›ãˆã‚‹ã€‚
     s|<(/?[a-z!]+)|&lt;$1|gio;
-#    s|<(/?[a-z]+)|&lt;$1|gio;	# ¥³¥á¥ó¥È (<!-- -->) ¤ò¤Î¤³¤·¤¿¤¤¾ì¹ç¤Ï¤³¤ì
-    # ¥«¥¹¥¿¥Ş¥¤¥º¤Î¥Ò¥ó¥È: <s></s> ¤ò»Ä¤¹¢ª 
-    # s|<(/?[a-rt-z]+)|&lt;$1|gi; <b> ¤ò»Ä¤¹¢ª 
-    # s|<(/?[ac-z]+)|&lt;$1|gi; (ÉûºîÍÑ = <br> ¤Ê¤É¤â»Ä¤ë)
+#    s|<(/?[a-z]+)|&lt;$1|gio;	# ã‚³ãƒ¡ãƒ³ãƒˆ (<!-- -->) ã‚’ã®ã“ã—ãŸã„å ´åˆã¯ã“ã‚Œ
+    # ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºã®ãƒ’ãƒ³ãƒˆ: <s></s> ã‚’æ®‹ã™â†’ 
+    # s|<(/?[a-rt-z]+)|&lt;$1|gi; <b> ã‚’æ®‹ã™â†’ 
+    # s|<(/?[ac-z]+)|&lt;$1|gi; (å‰¯ä½œç”¨ = <br> ãªã©ã‚‚æ®‹ã‚‹)
 
     ### Read More ###
     s!^$readmore_tag$(.*)$!<div class="readmore">$1</div>!sm;
 
-    ### Ê¸»ú½¤¾ş¤È¿åÊ¿Àş¡£Hiki ¤Îµ­Ë¡¤òºÎÍÑ¡£
+    ### æ–‡å­—ä¿®é£¾ã¨æ°´å¹³ç·šã€‚Hiki ã®è¨˜æ³•ã‚’æ¡ç”¨ã€‚
     s!'''(.+?)'''!<strong>$1</strong>!gms;
     s!''(.+?)''!<em>$1</em>!gms;
     s!==(\S.+?)==!<s>$1</s>!gms;
     s!^\-{4}!<hr>!gms;
 
-    ### URL¡£Hiki ¤Îµ­Ë¡¤òºÎÍÑ¡£
+    ### URLã€‚Hiki ã®è¨˜æ³•ã‚’æ¡ç”¨ã€‚
     s!\[\[(.+?)\s*\|\s*(.+?)\]\]!get_link_str($1, $2)!gmse;
 
-    ### É½¡£Hiki ¤Îµ­Ë¡¤òºÎÍÑ¡£
+    ### è¡¨ã€‚Hiki ã®è¨˜æ³•ã‚’æ¡ç”¨ã€‚
     s!(^(\|\|[^\n]+\n)+)!'<table><tr>'.
 	(join("<tr>", (map {join('<td>', split(/\|\|/ ,$_))} split(/\n/, $1))))
 	    .'</table>'!gsme;
 
-    ### °úÍÑ (quote): ">>" ¤È "<<" ¤Ç°Ï¤à
+    ### å¼•ç”¨ (quote): ">>" ã¨ "<<" ã§å›²ã‚€
     s!^>>\n!<blockquote>!gm;
     s!^<<\n!</blockquote>!gm;
 
-    ### °úÍÑ (quote): "| ..." ¤« "> ..."
+    ### å¼•ç”¨ (quote): "| ..." ã‹ "> ..."
     if ($remove_quote_mark == 1) {
 	my $a;
 	s!((^((\||>)[^\n]*)\n)+)!'<blockquote>'.($a = $1,
@@ -518,14 +512,14 @@ sub okikae {
 	s!((^((\||>)[^\n]*)\n)+)!<blockquote>$1</blockquote>!gmx;
     }
 
-    ### ÆüÉÕ¤Ç»²¾È¥ê¥ó¥¯
+    ### æ—¥ä»˜ã§å‚ç…§ãƒªãƒ³ã‚¯
     # date ref : [YYYY-MM-DD]
     $_ = datestr2anchor($_);
 
-    ### URLÉ½µ­¤ò href ¤Ç
+    ### URLè¡¨è¨˜ã‚’ href ã§
     # URL : http://....
-    # Àµµ¬É½¸½¤Ï http://www.din.or.jp/~ohzaki/perl.htm#httpURL ¤è¤ê¡£
-    # ¥Ğ¥Ã¥¯¥¹¥é¥Ã¥·¥å¤òÍÑ¤¤¤¿URLÃæ¤Ç¤Î²ş¹Ô¤ËÂĞ±ş 021025
+    # æ­£è¦è¡¨ç¾ã¯ http://www.din.or.jp/~ohzaki/perl.htm#httpURL ã‚ˆã‚Šã€‚
+    # ãƒãƒƒã‚¯ã‚¹ãƒ©ãƒƒã‚·ãƒ¥ã‚’ç”¨ã„ãŸURLä¸­ã§ã®æ”¹è¡Œã«å¯¾å¿œ 021025
     #my $URLCHARS = "[-_.!~*'()a-zA-Z0-9;/?:@&=+,%\#\$]";
     my $URLCHARS = "[-_.!~*'a-zA-Z0-9;/?:@&=+,%\#\$]";
     my $URLDELIM = "\\\\\\n *";
@@ -533,21 +527,21 @@ sub okikae {
     {'<a href="'.join('', split(/$URLDELIM/, $1)).'">'.
 	 join('', split(/\\/, $1)).'</a>'}gem; #")};
 
-    ### ¹ÔÆ¬¤Î¥¹¥Ú¡¼¥¹¤Ï &nbsp; ¤ËÃÖ¤­´¹¤¨¤ë¡£
+    ### è¡Œé ­ã®ã‚¹ãƒšãƒ¼ã‚¹ã¯ &nbsp; ã«ç½®ãæ›ãˆã‚‹ã€‚
     s!^( +)!{"&nbsp;" x length($1)}!gme;
     s!^(</?blockquote>)( +)!{"$1" . ("&nbsp;" x length($2))}!gme;
 
-    ### ¼«Æ°Ê¸»úÎóÃÖ´¹Å¬ÍÑ
+    ### è‡ªå‹•æ–‡å­—åˆ—ç½®æ›é©ç”¨
     eval $auto_replace;
 
-    # ³Æ¹Ô¤Î¹ÔËö¤Ë <br> ¤òÉÕ¤±¤ë
-    # memo: ÀÎ¤Ï pre ¤Ç°Ï¤ó¤Ç¤¤¤¿¤¬¡¢v0.23 ¤«¤é¤ä¤á¤¿
+    # å„è¡Œã®è¡Œæœ«ã« <br> ã‚’ä»˜ã‘ã‚‹
+    # memo: æ˜”ã¯ pre ã§å›²ã‚“ã§ã„ãŸãŒã€v0.23 ã‹ã‚‰ã‚„ã‚ãŸ
 #print "1[$_]\n";
     s!$!<br>!gsm;
     s!<br>$!!;
 #print "2[$_]\n";
 
-    unescape_string(\$_);	# ¥×¥é¥°¥¤¥ó¸Æ¤Ó½Ğ¤·¤â¹Ô¤Ê¤¦
+    unescape_string(\$_);	# ãƒ—ãƒ©ã‚°ã‚¤ãƒ³å‘¼ã³å‡ºã—ã‚‚è¡Œãªã†
 
     s!</pre><br>!</pre>!g;	# ad hoc
 
@@ -555,25 +549,25 @@ sub okikae {
 }
 
 
-### ¥¢¥¤¥Æ¥à¤òHTML¤ËÊÑ´¹
+### ã‚¢ã‚¤ãƒ†ãƒ ã‚’HTMLã«å¤‰æ›
 sub make_item_html {
     my ($e, $ymd, $i) = @_;
 
     ### item header
     my $ih = make_item_header_html($e->{$i}{h}, $ymd."-".$i);
 
-    ### ¥«¥Æ¥´¥ê
+    ### ã‚«ãƒ†ã‚´ãƒª
     my $catstr = make_cat_link_html($e->{$i}{cat});
 
-    ### ÆüÉÕ¥ê¥ó¥¯¤Ë¤è¤ë¥ê¥Õ¥¡¥é¡¼
+    ### æ—¥ä»˜ãƒªãƒ³ã‚¯ã«ã‚ˆã‚‹ãƒªãƒ•ã‚¡ãƒ©ãƒ¼
     my @inside_refs = get_inside_ref("$ymd-$i");
     
-    ### item ¤Î´ğÁÃ¾ğÊó
+    ### item ã®åŸºç¤æƒ…å ±
     my $item_url = datestr2url("$ymd-$i");
     my $item_ymdi = $ymd."-".$i; 
     (my $item_id = $ymd.$i) =~ s/-//g; # Ex. "200309241"
     
-    ### item ¤ÎÁÈ¤ß¾å¤²
+    ### item ã®çµ„ã¿ä¸Šã’
     my $t = HTML::Template->new(scalarref => \$item_template,
 				die_on_bad_params => 0);
     my $ccc = $e->{$i}{c};
@@ -594,10 +588,10 @@ sub make_item_html {
     $t->param(rss_file => $rss_filename); # 050821
     my $this_item = $t->output();
 
-    if ($output_cat_pages == 1) { # ¥«¥Æ¥´¥êÊÌ¥Ú¡¼¥¸¤ò½Ğ¤¹¤È¤­¤Î½èÍı
+    if ($output_cat_pages == 1) { # ã‚«ãƒ†ã‚´ãƒªåˆ¥ãƒšãƒ¼ã‚¸ã‚’å‡ºã™ã¨ãã®å‡¦ç†
 	my $ent_h = make_entry_header_html($e->{eh}, $ymd);
 	foreach (@{$e->{$i}{cat}}) {
-	    # ¥«¥Æ¥´¥êÊÌ¥Ú¡¼¥¸¤Ï --stop-date ¤ÈÁêÀ­¤¬°­¤¤¤Î¤ÇÃí°Õ
+	    # ã‚«ãƒ†ã‚´ãƒªåˆ¥ãƒšãƒ¼ã‚¸ã¯ --stop-date ã¨ç›¸æ€§ãŒæ‚ªã„ã®ã§æ³¨æ„
 	    push @{$category_item{$_}}, {eh=>$ent_h, cont=>$this_item};
 	}
     }
@@ -605,7 +599,7 @@ sub make_item_html {
 }
 
 
-### ¥¨¥ó¥È¥ê¤òHTML¤ËÊÑ´¹
+### ã‚¨ãƒ³ãƒˆãƒªã‚’HTMLã«å¤‰æ›
 sub make_entry_html {
     my ($e, $ymd, $itemsp) = @_;
 
@@ -614,7 +608,7 @@ sub make_entry_html {
 
     my ($y, $m, $d) = ($ymd =~ /^(\d{4})-(\d\d)-(\d\d)$/);
 
-    ### Â¾¤ÎÇ¯¤ÎÆ±¤¸ÆüÉÕ (·îÆü) ¤Ø¤Î¥ê¥ó¥¯¤òÄ¥¤ë
+    ### ä»–ã®å¹´ã®åŒã˜æ—¥ä»˜ (æœˆæ—¥) ã¸ã®ãƒªãƒ³ã‚¯ã‚’å¼µã‚‹
     my @same_dates;
     if ($same_date_jump == 1) {
 	if (defined $cl->{STAT}->{md}{"$m-$d"}) {
@@ -624,16 +618,16 @@ sub make_entry_html {
 	}
     }
 
-    ### ÆüÉÕ¥ê¥ó¥¯¤Ë¤è¤ë¥ê¥Õ¥¡¥é¡¼
+    ### æ—¥ä»˜ãƒªãƒ³ã‚¯ã«ã‚ˆã‚‹ãƒªãƒ•ã‚¡ãƒ©ãƒ¼
     my @inside_refs = get_inside_ref("$ymd");
 
-    ### entry ¤Î´ğÁÃ¾ğÊó
+    ### entry ã®åŸºç¤æƒ…å ±
     my $entry_url = datestr2url($ymd);
     my $entry_ymd = $ymd;
 #    my $entry_id = $ymd; $entry_id =~ s/-//g; # Ex. "20030924"
     (my $entry_id = $ymd) =~ s/-//g; # Ex. "20030924"
 
-    ### ¥¨¥ó¥È¥ê¤ÎÁÈ¤ß¾å¤²
+    ### ã‚¨ãƒ³ãƒˆãƒªã®çµ„ã¿ä¸Šã’
     my $t = HTML::Template->new(scalarref => \$entry_template,
 				die_on_bad_params => 0);
     $t->param(header => $ent_h);
@@ -650,7 +644,7 @@ sub make_entry_html {
 }
 
 
-### ¥«¥Æ¥´¥êÊÌ¥Ú¡¼¥¸(ex: cat_life.html)¤òºî¤ë¡£
+### ã‚«ãƒ†ã‚´ãƒªåˆ¥ãƒšãƒ¼ã‚¸(ex: cat_life.html)ã‚’ä½œã‚‹ã€‚
 sub write_category_page {
     my @cat_list = keys %category_item;
 
@@ -670,7 +664,7 @@ sub write_category_page {
 
         for (my $i = 0; $i <= $num_of_old_pages; $i++) {
 
-            ### ¥Ú¡¼¥¸¤ÎÁÈ¤ß¾å¤²
+            ### ãƒšãƒ¼ã‚¸ã®çµ„ã¿ä¸Šã’
             my $t = HTML::Template->new(scalarref => \$cat_page_template,
                                         loop_context_vars => 1,
                                         die_on_bad_params => 0);
@@ -708,14 +702,14 @@ sub write_category_page {
 
             my $ostr = $t->output();
 
-            ### ¥Õ¥¡¥¤¥ë¤Ë½ĞÎÏ
+            ### ãƒ•ã‚¡ã‚¤ãƒ«ã«å‡ºåŠ›
             output_to_file("$outputdir/".$fnames[$i], \$ostr);
         }
     }
 }
 
 
-### ¥¢¥¤¥Æ¥à¥Ú¡¼¥¸(ex: 2001-01-01-1.html)¤òºî¤ë¡£
+### ã‚¢ã‚¤ãƒ†ãƒ ãƒšãƒ¼ã‚¸(ex: 2001-01-01-1.html)ã‚’ä½œã‚‹ã€‚
 sub write_item_page {
     my @day_list = reverse sort keys %{$cl->{all}};
 
@@ -727,18 +721,18 @@ sub write_item_page {
 	    my $item = $ent->{$i};
 	    my $ymdi = "$ymd-$i";
 
-	    ### ¥«¥Æ¥´¥ê
+	    ### ã‚«ãƒ†ã‚´ãƒª
 	    my $catstr = make_cat_link_html($ent->{$i}{cat});
 
-	    ### ÆüÉÕ¥ê¥ó¥¯¤Ë¤è¤ë¥ê¥Õ¥¡¥é¡¼
+	    ### æ—¥ä»˜ãƒªãƒ³ã‚¯ã«ã‚ˆã‚‹ãƒªãƒ•ã‚¡ãƒ©ãƒ¼
 	    my @inside_refs = get_inside_ref("$ymdi");
 
-	    ### item ¤Î´ğÁÃ¾ğÊó
+	    ### item ã®åŸºç¤æƒ…å ±
 	    my $item_url = datestr2url("$ymdi");
 	    my $item_ymdi = $ymdi; 
 	    my $item_id = $ymdi; $item_id =~ s/-//g; # Ex. "200309241"
 
-	    # Á°¸å¤Î¥Ú¡¼¥¸
+	    # å‰å¾Œã®ãƒšãƒ¼ã‚¸
 	    my $ymdi_before;
 	    my $ymdi_after;
 	    if ($i > 1) {
@@ -754,7 +748,7 @@ sub write_item_page {
 		$ymdi_after = $day_a."-1";
 	    }
 
-	    ### ¥Ú¡¼¥¸¤ÎÁÈ¤ß¾å¤²
+	    ### ãƒšãƒ¼ã‚¸ã®çµ„ã¿ä¸Šã’
 	    my $t = HTML::Template->new(scalarref => \$item_page_template,
 					loop_context_vars => 1,
 					die_on_bad_params => 0);
@@ -787,16 +781,16 @@ sub write_item_page {
 	    
 	    my $ostr = $t->output();
 
-	    ### ¥Õ¥¡¥¤¥ë¤Ë½ĞÎÏ
+	    ### ãƒ•ã‚¡ã‚¤ãƒ«ã«å‡ºåŠ›
 	    output_to_file("$outputdir/$ymdi.html", \$ostr);
 	}
     }
 }
 
 
-### Æü¥Ú¡¼¥¸(ex: 2001-01-01.html)¤òºî¤ë¡£
+### æ—¥ãƒšãƒ¼ã‚¸(ex: 2001-01-01.html)ã‚’ä½œã‚‹ã€‚
 sub write_day_page {
-    return if ($day_page_template eq ""); # tmpl¤¬¶õ¤Ê¤éºî¤é¤Ê¤¤»ÅÍÍ(5.1.19)
+    return if ($day_page_template eq ""); # tmplãŒç©ºãªã‚‰ä½œã‚‰ãªã„ä»•æ§˜(5.1.19)
 
     my @day_list = reverse sort keys %{$cl->{all}};
 
@@ -804,14 +798,14 @@ sub write_day_page {
 
 	my ($ymd, $ym) = ($day_list[$idx] =~ /^((\d+-\d+)-\d+)/);
 
-	# Á°¸å¤ÎÆü¥Ú¡¼¥¸
+	# å‰å¾Œã®æ—¥ãƒšãƒ¼ã‚¸
 	my $day_before = $day_list[$idx + 1] if ($idx < @day_list - 1);
 	my $day_after = $day_list[$idx - 1] if ($idx > 0);
 
-	# Æü¤Ø¤Î¥ê¥ó¥¯ (ÆüÉÕ°ìÍ÷)
+	# æ—¥ã¸ã®ãƒªãƒ³ã‚¯ (æ—¥ä»˜ä¸€è¦§)
 	my $day_list = make_day_list_str($ym);
 
-	### ¥Ú¡¼¥¸¤ÎÁÈ¤ß¾å¤²
+	### ãƒšãƒ¼ã‚¸ã®çµ„ã¿ä¸Šã’
 	my $t = HTML::Template->new(scalarref => \$day_page_template,
 				    loop_context_vars => 1,
 				    die_on_bad_params => 0);
@@ -833,37 +827,37 @@ sub write_day_page {
 
 	my $ostr = $t->output();
 
-	### ¥Õ¥¡¥¤¥ë¤Ë½ĞÎÏ
+	### ãƒ•ã‚¡ã‚¤ãƒ«ã«å‡ºåŠ›
 	output_to_file("$outputdir/$ymd.html", \$ostr);
     }
 }
 
 
-### ·î¥Ú¡¼¥¸(ex: 2001-01.html)¤òºî¤ë¡£
+### æœˆãƒšãƒ¼ã‚¸(ex: 2001-01.html)ã‚’ä½œã‚‹ã€‚
 sub write_month_page {
-    return if ($month_page_template eq ""); # tmpl¤¬¶õ¤Ê¤éºî¤é¤Ê¤¤»ÅÍÍ(5.1.19)
+    return if ($month_page_template eq ""); # tmplãŒç©ºãªã‚‰ä½œã‚‰ãªã„ä»•æ§˜(5.1.19)
 
     my @month_list = reverse sort keys %month_page;
     for (my $idx = 0; $idx < @month_list; $idx++) {
 	my $ym = $month_list[$idx];
 
-	# Á°¸å¤Î·î
+	# å‰å¾Œã®æœˆ
 	my $m_before = $month_list[$idx + 1] if ($idx < @month_list - 1);
 	my $m_after = $month_list[$idx - 1] if ($idx > 0);
 
-	# ÆüÉÕ¥ê¥ó¥¯°ìÍ÷
+	# æ—¥ä»˜ãƒªãƒ³ã‚¯ä¸€è¦§
 	my $day_list = make_day_list_str($ym);
 
-	### Æü¡¹¤Î¥¨¥ó¥È¥êºîÀ®
+	### æ—¥ã€…ã®ã‚¨ãƒ³ãƒˆãƒªä½œæˆ
 	my @cont;
-	if ($reverse_order_days) { # ¹ß½ç: ÆüÉÕ¤Î¿·¤·¤¤¤Î¤¬¾å (¡Áv0.11 ¤ÈÆ±¤¸)
+	if ($reverse_order_days) { # é™é †: æ—¥ä»˜ã®æ–°ã—ã„ã®ãŒä¸Š (ã€œv0.11 ã¨åŒã˜)
 	    @cont = reverse sort keys %{$month_page{$ym}};
-	} else {		# ¾º½ç: ÆüÉÕ¤Î¸Å¤¤¤Î¤¬¾å
+	} else {		# æ˜‡é †: æ—¥ä»˜ã®å¤ã„ã®ãŒä¸Š
 	    @cont = sort keys %{$month_page{$ym}};
 	}
 	my @contlist = map {{content => $month_page{$ym}{$_}{str}}} @cont;
 
-	### ¥Ú¡¼¥¸¤ÎÁÈ¤ß¾å¤²
+	### ãƒšãƒ¼ã‚¸ã®çµ„ã¿ä¸Šã’
 	my $t = HTML::Template->new(scalarref => \$month_page_template,
 				    loop_context_vars => 1,
 				    die_on_bad_params => 0);
@@ -889,9 +883,9 @@ sub write_month_page {
 }
 
 
-### ¥¤¥ó¥Ç¥Ã¥¯¥¹¥Ú¡¼¥¸(index.html)¤òºî¤ë
+### ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒšãƒ¼ã‚¸(index.html)ã‚’ä½œã‚‹
 sub write_index_page {
-    ### ºÇ¶á¤Î²¿Æü¤«¤À¤±¥¤¥ó¥Ç¥Ã¥¯¥¹¥Ú¡¼¥¸¤ËºÜ¤»¤ë¤¿¤á¤Î½èÍı
+    ### æœ€è¿‘ã®ä½•æ—¥ã‹ã ã‘ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒšãƒ¼ã‚¸ã«è¼‰ã›ã‚‹ãŸã‚ã®å‡¦ç†
     my @recent = (reverse sort keys %{$cl->{all}})[0..$opt_topn];
 
     my @top_n_entries;
@@ -904,10 +898,10 @@ sub write_index_page {
     }
     my ($ymd, $ym, $d) = ($recent[0] =~ /^((\d{4}-\d\d)-(\d\d))$/);
 
-    # ÆüÉÕ¥ê¥ó¥¯°ìÍ÷
+    # æ—¥ä»˜ãƒªãƒ³ã‚¯ä¸€è¦§
     my $day_list = make_day_list_str($ym);
 
-    ### ¥Ú¡¼¥¸¤ÎÁÈ¤ß¾å¤²
+    ### ãƒšãƒ¼ã‚¸ã®çµ„ã¿ä¸Šã’
     my $t = HTML::Template->new(scalarref => \$index_page_template,
 				loop_context_vars => 1,
 				die_on_bad_params => 0);
@@ -916,8 +910,8 @@ sub write_index_page {
     $t->param(lastupdate => $what_time_is_it_now);
     $t->param(signature => $signature);
 
-    $t->param(ymd => $ymd);	# ºÇ¿·¥¨¥ó¥È¥ê¤ÎÆüÉÕ
-    $t->param(ym => $ym);	# ºÇ¿·¥¨¥ó¥È¥ê¤Î·î
+    $t->param(ymd => $ymd);	# æœ€æ–°ã‚¨ãƒ³ãƒˆãƒªã®æ—¥ä»˜
+    $t->param(ym => $ym);	# æœ€æ–°ã‚¨ãƒ³ãƒˆãƒªã®æœˆ
     $t->param(ndays => $opt_topn);
     $t->param(day_list => $day_list);
     $t->param(month_page_list => $month_page_list);
@@ -932,7 +926,7 @@ sub write_index_page {
 }
 
 
-### ·îÊÌ°ìÍ÷¤òºîÀ®
+### æœˆåˆ¥ä¸€è¦§ã‚’ä½œæˆ
 sub make_month_page_list {
     my ($month_page) = @_;
     my @month_list = sort keys %{$month_page};
@@ -955,7 +949,7 @@ sub make_month_page_list {
 }
 
 
-### ÆüÉÕ¥ê¥ó¥¯°ìÍ÷¤òºîÀ® - Ê¸»úÎó¤òÊÖ¤¹
+### æ—¥ä»˜ãƒªãƒ³ã‚¯ä¸€è¦§ã‚’ä½œæˆ - æ–‡å­—åˆ—ã‚’è¿”ã™
 sub make_day_list_str {	
     my ($ym) = @_;
     if ($calendar_style == 1) {
@@ -965,7 +959,7 @@ sub make_day_list_str {
     }
 }
 
-# ÆüÉÕ¥ê¥ó¥¯°ìÍ÷¤òºîÀ® - ¥ê¥¹¥È¤Ø¤Î¥İ¥¤¥ó¥¿¤òÊÖ¤¹
+# æ—¥ä»˜ãƒªãƒ³ã‚¯ä¸€è¦§ã‚’ä½œæˆ - ãƒªã‚¹ãƒˆã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™
 my %daylist;
 sub make_day_list {	
     my ($ym) = @_;
@@ -983,7 +977,7 @@ sub make_day_list {
     return $daylist{$ym};
 }
 
-# ÆüÉÕ°ìÍ÷¤òºîÀ® - ¥«¥ì¥ó¥À¡¼¥¹¥¿¥¤¥ë
+# æ—¥ä»˜ä¸€è¦§ã‚’ä½œæˆ - ã‚«ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¹ã‚¿ã‚¤ãƒ«
 sub make_calendar_table {
     my ($ym, $dlistp) = @_;
     my ($y, $m) = split("-", $ym);
@@ -1018,20 +1012,20 @@ CAL
 }
 
 
-### anchor, img ¥¿¥°Ê¸»úÎó¤òÀ¸À®¡£
+### anchor, img ã‚¿ã‚°æ–‡å­—åˆ—ã‚’ç”Ÿæˆã€‚
 sub get_link_str {
     my ($a, $b) = @_;
     if ($a =~ /\.(jpg|jpeg|png|gif)$/i) { # [[http://nais.to/|image/nais.jpg]]
-	return qq(<a href="$b"><img src="$a" alt="²èÁü"></a>);
-    } elsif ($b =~ /\.(jpg|jpeg|png|gif)$/i) { # [[¼«²èÁü|image/sp.jpg]]
+	return qq(<a href="$b"><img src="$a" alt="ç”»åƒ"></a>);
+    } elsif ($b =~ /\.(jpg|jpeg|png|gif)$/i) { # [[è‡ªç”»åƒ|image/sp.jpg]]
 	return qq(<img src="$b" alt="$a">);
-    } else {			# [[¥È¥Ã¥×¥Ú¡¼¥¸|http://nais.to/]]
+    } else {			# [[ãƒˆãƒƒãƒ—ãƒšãƒ¼ã‚¸|http://nais.to/]]
 	return qq(<a href="$b">$a</a>);
     }
 }
 
 
-### Ç¯·îÆü¤òÆşÎÏ¤È¤·ÍËÆü¤ò½ĞÎÏ¤¹¤ë´Ø¿ô since 021001
+### å¹´æœˆæ—¥ã‚’å…¥åŠ›ã¨ã—æ›œæ—¥ã‚’å‡ºåŠ›ã™ã‚‹é–¢æ•° since 021001
 # RETURN VALUES
 #     the text name of the day of the week.  Mon, Tue, Wed, ...
 # EXAMPLES
@@ -1044,7 +1038,7 @@ sub get_day_of_week {
 }
 
 
-### Ç¯·î¤òÆşÎÏ¤È¤·¤½¤Î·î¤ÎºÇ½ªÆü¤ò½ĞÎÏ¤¹¤ë´Ø¿ô since 030105
+### å¹´æœˆã‚’å…¥åŠ›ã¨ã—ãã®æœˆã®æœ€çµ‚æ—¥ã‚’å‡ºåŠ›ã™ã‚‹é–¢æ•° since 030105
 # EXAMPLES
 #     get_last_day_of_month(12, 2002), get_last_day_of_month("2002-12")
 sub get_last_day_of_month {
@@ -1055,7 +1049,7 @@ sub get_last_day_of_month {
 }
 
 
-### RSS ¥Õ¥¡¥¤¥ë¤ò½ĞÎÏ¤¹¤ë
+### RSS ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‡ºåŠ›ã™ã‚‹
 sub write_rss_file {
     my $rdfseq;
     my $rdfitem;
@@ -1080,7 +1074,7 @@ sub write_rss_file {
 	    my $cont = $e->{$i}{c};
 	    $cont = html2xmlstr($cont);
 	    if ($cont =~ s/^(([\x00-\x7F]|[\x80-\xFF]{2}){300}).+$/$1/sm) {
-		$cont =~ s/&[^;]*$//g; # &gt...$ ¤ÇXML¥Ñ¡¼¥º¥¨¥é¡¼
+		$cont =~ s/&[^;]*$//g; # &gt...$ ã§XMLãƒ‘ãƒ¼ã‚ºã‚¨ãƒ©ãƒ¼
 		$cont .= "...";
 	    }
 
@@ -1108,7 +1102,6 @@ sub write_rss_file {
     $t->param(rss_file => $rss_filename); # 050821
     $t->param(generatoragent=>"http://chalow.org/?v=$version");
     my $ostr = $t->output();
-    to_utf8_cl(\$ostr) if (not $utf8_mode);
     output_to_file("$outputdir/$rss_filename", \$ostr);
 }
 
@@ -1122,15 +1115,15 @@ sub html2xmlstr {
     s/\s\s+/ /g;
     s|<[^<>]+?>||gosm;
     s/&lt;/</go;
-    s/&/&amp;/go; s/>/&gt;/go; s/</&lt;/go; s/\"/&quot;/go; # "¤¤¤Ä¤â¤Î£´¤Ä
+    s/&/&amp;/go; s/>/&gt;/go; s/</&lt;/go; s/\"/&quot;/go; # "ã„ã¤ã‚‚ã®ï¼”ã¤
     return $_;
 }
 
 
-### JavaScript feed ¥Õ¥¡¥¤¥ë¤ò½ĞÎÏ¤¹¤ë
+### JavaScript feed ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‡ºåŠ›ã™ã‚‹
 sub write_latest_item_list_file {
 
-    ### ºÇ¶á¤Îµ­»ö
+    ### æœ€è¿‘ã®è¨˜äº‹
     my @lines;
     my $date;
     my $ctr = $latest_titles_num;
@@ -1169,7 +1162,7 @@ sub write_latest_item_list_file {
 
 
 sub write_category_list_file {
-    ### ¥«¥Æ¥´¥ê°ìÍ÷
+    ### ã‚«ãƒ†ã‚´ãƒªä¸€è¦§
 #    return if ($output_cat_pages == 0 or $cat_page_cgi eq "");
 #    return if ($output_cat_pages == 0);
 
@@ -1198,8 +1191,8 @@ sub write_category_list_file {
 }
 
 
-### ¸¡º÷ÍÑ¥Õ¥¡¥¤¥ë¤ò½ĞÎÏ¤¹¤ë
-# clsearch.cgi ÍÑ¤Î¥Õ¥¡¥¤¥ë¤òÀ¸À®
+### æ¤œç´¢ç”¨ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‡ºåŠ›ã™ã‚‹
+# clsearch.cgi ç”¨ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ç”Ÿæˆ
 sub write_itemlist_file {
     my $ostr;
     foreach my $ymd (sort {$b cmp $a} keys %{$cl->{all}}) {
@@ -1216,12 +1209,12 @@ sub write_itemlist_file {
 	    $c =~ s/&nbsp;/ /g;
 	    $c =~ s/\s\s+/ /g;
             $c =~ s/<.+?>//g;
-	    $c =~ s/\x01/\t/;	# Ä¶ ad hoc¡£¤ä¤Ğ
+	    $c =~ s/\x01/\t/;	# è¶… ad hocã€‚ã‚„ã°
 	    $ostr .= datestr2anchor("[$ymd-$i]")."\t$c\n";
 	}
     }
 
-    if (-e "$outputdir/cl.itemlist" and $stop_date != 0) { # º¹Ê¬¹¹¿·
+    if (-e "$outputdir/cl.itemlist" and $stop_date != 0) { # å·®åˆ†æ›´æ–°
 	open(F, "$outputdir/cl.itemlist") or die;
 	my $flag = 0;
 	while (<F>) {
@@ -1240,14 +1233,14 @@ sub write_itemlist_file {
 }
 
 
-### ÆüÉÕ¤Ç»²¾È¥ê¥ó¥¯
+### æ—¥ä»˜ã§å‚ç…§ãƒªãƒ³ã‚¯
 sub datestr2anchor {
     my ($d) = @_;
-    if ($page_mode == 2) {	# ¥¢¥¤¥Æ¥à¥â¡¼¥É
+    if ($page_mode == 2) {	# ã‚¢ã‚¤ãƒ†ãƒ ãƒ¢ãƒ¼ãƒ‰
 	$d =~ s!\[(\d{4}-\d\d-\d\d(-\d+)?)\]!<a href="$1.html">[$1]</a>!g;
-    } elsif ($day_page_mode or $page_mode == 1) { # Æü¥â¡¼¥É
+    } elsif ($day_page_mode or $page_mode == 1) { # æ—¥ãƒ¢ãƒ¼ãƒ‰
 	$d =~ s!\[((\d{4}-\d\d-\d\d)(-\d+)?)\]!<a href="$2.html#$1">[$1]</a>!g;
-    } else {			# ·î¥â¡¼¥É
+    } else {			# æœˆãƒ¢ãƒ¼ãƒ‰
 	$d =~ s!\[((\d{4}-\d\d)-\d\d(-\d+)?)\]!<a href="$2.html#$1">[$1]</a>!g;
     }
     return $d;
@@ -1255,20 +1248,20 @@ sub datestr2anchor {
 
 sub datestr2url {
     my ($d) = @_;
-    if ($page_mode == 2) {	# ¥¢¥¤¥Æ¥à¥â¡¼¥É
+    if ($page_mode == 2) {	# ã‚¢ã‚¤ãƒ†ãƒ ãƒ¢ãƒ¼ãƒ‰
 	$d =~ s!(\d{4}-\d\d-\d\d(-\d+)?)!$1.html!;
-    } elsif ($day_page_mode or $page_mode ==1) { # Æü¥â¡¼¥É
+    } elsif ($day_page_mode or $page_mode ==1) { # æ—¥ãƒ¢ãƒ¼ãƒ‰
 	unless ($d =~ s!((\d{4}-\d\d-\d\d)-\d+)!$2.html\#$1!) {
 	    $d =~ s!(\d{4}-\d\d-\d\d)!$1.html!;
 	}
-    } else {			# ·î¥â¡¼¥É
+    } else {			# æœˆãƒ¢ãƒ¼ãƒ‰
 	$d =~ s!((\d{4}-\d\d)-\d\d(-\d+)?)!$2.html#$1!;
     }
     return $d;
 }
 
 
-### Ê¸»úÎóÃÖ¤­´¹¤¨¤«¤é°ì»şÅª¤ËÂàÈò¤·¡¢¸å¤ËÉüµ¢¤µ¤»¤ë
+### æ–‡å­—åˆ—ç½®ãæ›ãˆã‹ã‚‰ä¸€æ™‚çš„ã«é€€é¿ã—ã€å¾Œã«å¾©å¸°ã•ã›ã‚‹
 my $num_of_escaped_string;
 my %escaped_string;
 my $num_of_escaped_src;
@@ -1279,9 +1272,9 @@ my %escaped_plugin;
 sub escape_string {
     my ($strp) = @_;
 
-    ### HTML ¥¨¥¹¥±¡¼¥× - Ê¸»úÎó¤½¤Î¤Ş¤Ş
-    my $btag = '_HTML_START_\n'; # ³«»Ï¥Ş¡¼¥¯
-    my $atag = '_HTML_END_\n'; # ½ªÎ»¥Ş¡¼¥¯
+    ### HTML ã‚¨ã‚¹ã‚±ãƒ¼ãƒ— - æ–‡å­—åˆ—ãã®ã¾ã¾
+    my $btag = '_HTML_START_\n'; # é–‹å§‹ãƒãƒ¼ã‚¯
+    my $atag = '_HTML_END_\n'; # çµ‚äº†ãƒãƒ¼ã‚¯
     $num_of_escaped_string = 0;
     $$strp =~ s!$btag(.*?)$atag!
 	$escaped_string{++$num_of_escaped_string} = $1,
@@ -1290,7 +1283,7 @@ sub escape_string {
 	$escaped_string{++$num_of_escaped_string} = $2,
 	sprintf("\x5\x13%d\x3", $num_of_escaped_string)!gsmxe;
 
-    ### ¥½¡¼¥¹¥¨¥¹¥±¡¼¥× - "&" ¤ä "<" ¤Ê¤É¤òÃÖ´¹¤· pre ¤òÉÕ¤±¤ë
+    ### ã‚½ãƒ¼ã‚¹ã‚¨ã‚¹ã‚±ãƒ¼ãƒ— - "&" ã‚„ "<" ãªã©ã‚’ç½®æ›ã— pre ã‚’ä»˜ã‘ã‚‹
     $num_of_escaped_src = 0;
     $$strp =~ s!\[src\](.*?)\[/src\]!
 	$escaped_src{++$num_of_escaped_src} = $1,
@@ -1299,7 +1292,7 @@ sub escape_string {
 	$escaped_src{$num_of_escaped_src} =~ s/>/&gt;/g,
 	sprintf("\x6\x13%d\x3", $num_of_escaped_src)!gsmxe;
 
-    ### ¥×¥é¥°¥¤¥ó¥¨¥¹¥±¡¼¥×
+    ### ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—
     $num_of_escaped_plugin = 0;
     $$strp =~ s!{{(.*?)}}!
 	$escaped_plugin{++$num_of_escaped_plugin} = $1,
@@ -1309,17 +1302,17 @@ sub escape_string {
 sub unescape_string {
     my ($strp) = @_;
 
-    ### ¥×¥é¥°¥¤¥ó¥¢¥ó¥¨¥¹¥±¡¼¥× - ¼Â¹Ô¡ª
+    ### ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‚¢ãƒ³ã‚¨ã‚¹ã‚±ãƒ¼ãƒ— - å®Ÿè¡Œï¼
     $$strp =~ s|\x7\x13(\d+)\x3|eval($escaped_plugin{$1})|ge;
-    ### ¥½¡¼¥¹¥¢¥ó¥¨¥¹¥±¡¼¥× - pre ÄÉ²Ã
+    ### ã‚½ãƒ¼ã‚¹ã‚¢ãƒ³ã‚¨ã‚¹ã‚±ãƒ¼ãƒ— - pre è¿½åŠ 
     #$$strp =~ s|\x6\x13(\d+)\x3|<pre>$escaped_src{$1}</pre>|g;
     $$strp =~ s|\x6\x13(\d+)\x3|</p><pre>$escaped_src{$1}</pre><p>|g;
-    ### HTML ¥¢¥ó¥¨¥¹¥±¡¼¥×
+    ### HTML ã‚¢ãƒ³ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—
     $$strp =~ s|\x5\x13(\d+)\x3|$escaped_string{$1}|g;
 }
 
 
-### inside referrer ¤Î¥ê¥ó¥¯ºîÀ®
+### inside referrer ã®ãƒªãƒ³ã‚¯ä½œæˆ
 sub get_inside_ref {
     my ($id) = @_;
     if (defined $inside_ref{"$id"}) {
@@ -1330,31 +1323,30 @@ sub get_inside_ref {
 }
 
 
-### ¥«¥Æ¥´¥ê¥Ú¡¼¥¸¤Î¥Õ¥¡¥¤¥ëÌ¾¤òÀ¸À®
+### ã‚«ãƒ†ã‚´ãƒªãƒšãƒ¼ã‚¸ã®ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ç”Ÿæˆ
 sub get_category_filename {
     my ($cn) = @_;
-    to_utf8_cl(\$cn) if (not $utf8_mode and $cn =~ /[\x80-\xff]/);
     $cn =~ s/([^0-9a-z_-])/unpack('H2', $1)/gei;
     $cn =~ tr/A-Z/a-z/;
     return "cat_$cn.html";
 }
 
 
-### ¥¨¥ó¥È¥ê¥Ø¥Ã¥À¡¼¤ÎÀ¸À®
+### ã‚¨ãƒ³ãƒˆãƒªãƒ˜ãƒƒãƒ€ãƒ¼ã®ç”Ÿæˆ
 sub make_entry_header_html {
     my ($eh, $ymd) = @_;
-    if ($show_day_of_week == 1) { ### ÆüÉÕ¤Î¸å¤í¤ò¤É¤¦¤¹¤ë¤«?
-	# ÍËÆü(Mon, Tue, ...)¤òÄÉ²Ã: "2000-10-19" --> "2000-10-19 Thu"
+    if ($show_day_of_week == 1) { ### æ—¥ä»˜ã®å¾Œã‚ã‚’ã©ã†ã™ã‚‹ã‹?
+	# æ›œæ—¥(Mon, Tue, ...)ã‚’è¿½åŠ : "2000-10-19" --> "2000-10-19 Thu"
 	$eh .= " ".get_day_of_week($ymd);
     }
     return qq(<a name="$ymd" href="@{[datestr2url($ymd)]}">$eh</a>);
 }
 
 
-### ¥¢¥¤¥Æ¥à¥Ø¥Ã¥À¡¼¤ÎÀ¸À®
+### ã‚¢ã‚¤ãƒ†ãƒ ãƒ˜ãƒƒãƒ€ãƒ¼ã®ç”Ÿæˆ
 sub make_item_header_html {
     my ($ih, $ymdi) = @_;
-    # Á°¤ËÂ­¤¹¤â¤Î
+    # å‰ã«è¶³ã™ã‚‚ã®
     my $ihb = "";
     if ($item_header_style == 0 or $item_header_style == 1) {
 	$ihb = $item_header_mark;
@@ -1365,9 +1357,9 @@ sub make_item_header_html {
 	$ihb .= " ";
     }
 
-    # ¥¿¥°¤Ç°Ï¤à
+    # ã‚¿ã‚°ã§å›²ã‚€
     $ih = qq($ihb<span class="clitemheader">$ih</span>);
-    # ¸å¤í¤ËÂ­¤¹¤â¤Î
+    # å¾Œã‚ã«è¶³ã™ã‚‚ã®
     if ($item_header_style == 0 or $item_header_style == 2) {
 	$ih .= ":";
     }
@@ -1401,17 +1393,13 @@ sub make_cat_link_html {
 }    
 
 
-### »ØÄê¤µ¤ì¤¿¥Õ¥¡¥¤¥ë¤ØÊ¸»úÎó¤ò½ĞÎÏ
+### æŒ‡å®šã•ã‚ŒãŸãƒ•ã‚¡ã‚¤ãƒ«ã¸æ–‡å­—åˆ—ã‚’å‡ºåŠ›
 sub output_to_file {
     my ($fname, $contp) = @_;
     $$contp =~ s/<!-- ReplaceOnce -->/$replace_once/;
 
     if ($update_by_size == 1 and -s $fname == length($$contp)) {
 	return;
-    }
-
-    if ($utf8_mode) {		# ad hoc 050821
-	$$contp =~ s/;charset=EUC-JP">/;charset=UTF-8">/;
     }
 
     print "output to \"$fname\"\n" if (!defined $quiet_mode);
@@ -1428,13 +1416,3 @@ sub urlencode {
     s/ /+/g;
     return $_;
 }
-
-### modularized for i18n
-# delete content of this func, 
-# if you use utf8 file and don't use Jcode.
-sub to_utf8_cl {
-    my ($sp) = @_;
-    use Jcode;
-    $$sp = Jcode->new($$sp)->utf8;
-}
-

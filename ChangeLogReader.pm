@@ -109,8 +109,8 @@ sub store_entry {
 
     $self->{STAT}->{ym}{$y."-".$m}++; # for month_page_list
     $self->{STAT}->{md}{$m."-".$d}{$y} = 1; # for SameDateJump
-    # {"ym"} : ³ÆÇ¯·î¤Ë´Ş¤Ş¤ì¤Æ¤¤¤ëÆüÉÕ¥¨¥ó¥È¥ê¿ô
-    # {"md"} : Æ±¤¸·îÆü¤ò»ı¤ÄÇ¯ for same date jump
+    # {"ym"} : å„å¹´æœˆã«å«ã¾ã‚Œã¦ã„ã‚‹æ—¥ä»˜ã‚¨ãƒ³ãƒˆãƒªæ•°
+    # {"md"} : åŒã˜æœˆæ—¥ã‚’æŒã¤å¹´ for same date jump
 
     if ($self->{stop_date} != 0) {
 	my $cdate = $y * 10000 + $m * 100 + $d;
@@ -121,7 +121,6 @@ sub store_entry {
 }
 
 
-# Ê¸»ú¥³¡¼¥É¤ò euc ¤Ë¤·¤Æ¤ª¤¯???????
 sub store_item {
     my ($self, $entp, $linesp, $ymd, $user) = @_;
 #    $entp = $self->{all}->{$ymd};

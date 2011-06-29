@@ -3,14 +3,14 @@ Title: chalow default
  */
 
 /*
-¥Ú¡¼¥¸Á´ÂÎ¤Î´ğËÜÅª¤ÊÀßÄê¡£ÇØ·Ê¿§¤äÊ¸»ú¿§¤Ê¤É
+ãƒšãƒ¼ã‚¸å…¨ä½“ã®åŸºæœ¬çš„ãªè¨­å®šã€‚èƒŒæ™¯è‰²ã‚„æ–‡å­—è‰²ãªã©
 */
 body {
 	background-color: White;
 }
 
 /*
-¥ê¥ó¥¯Ê¸»úÎó¤Ë´Ø¤¹¤ëÀßÄê
+ãƒªãƒ³ã‚¯æ–‡å­—åˆ—ã«é–¢ã™ã‚‹è¨­å®š
 */
 a:link {
         text-decoration: none;
@@ -22,7 +22,7 @@ a:visited {
 
 
 /*
-¥Ú¡¼¥¸¥È¥Ã¥× (¤È¤«¡¢²¼) ¤Ë¤¢¤ëÁàºî¥Ü¥¿¥ó¤ÎÊÂ¤Ö¹Ô¤ÎÀßÄê
+ãƒšãƒ¼ã‚¸ãƒˆãƒƒãƒ— (ã¨ã‹ã€ä¸‹) ã«ã‚ã‚‹æ“ä½œãƒœã‚¿ãƒ³ã®ä¸¦ã¶è¡Œã®è¨­å®š
 */
 .adminmenu {
         text-align: left;
@@ -31,7 +31,7 @@ a:visited {
 }
 
 /*
-Æüµ­¥¿¥¤¥È¥ë¤ÎÀßÄê
+æ—¥è¨˜ã‚¿ã‚¤ãƒˆãƒ«ã®è¨­å®š
 */
 h1 {
 	text-align: left;
@@ -42,7 +42,7 @@ h1 {
 }
 
 /*
-1Æü¤ÎÆüµ­Á´ÂÎ¤ò°Ï¤àÏÈ¤ÎÀßÄê (entry)
+1æ—¥ã®æ—¥è¨˜å…¨ä½“ã‚’å›²ã‚€æ ã®è¨­å®š (entry)
 */
 div.day { 
         padding: 5px 0px 5px 0px;
@@ -50,7 +50,7 @@ div.day {
 }
 
 /*
-¥¿¥¤¥È¥ë¹ÔÁ´ÂÎ¤ÎÀßÄê (enrty header)
+ã‚¿ã‚¤ãƒˆãƒ«è¡Œå…¨ä½“ã®è¨­å®š (enrty header)
 */
 h2 {
         margin: 0.0em 0.0em 0.5em 0.0em;
@@ -62,14 +62,14 @@ h2 {
 }
 
 /*
-ÆüÉÕ¤ÎÀßÄê (in enrty header)
+æ—¥ä»˜ã®è¨­å®š (in enrty header)
 */
 span.date {
         padding: 0em 0.5em 0em 0.5em;
 }
 
 /*
-¥¿¥¤¥È¥ë¤ò½ü¤¤¤¿1Æü¤ÎÆüµ­ËÜÊ¸Á´ÂÎ¤ÎÀßÄê (items)
+ã‚¿ã‚¤ãƒˆãƒ«ã‚’é™¤ã„ãŸ1æ—¥ã®æ—¥è¨˜æœ¬æ–‡å…¨ä½“ã®è¨­å®š (items)
 */
 div.body { 
         padding: 0em;
@@ -77,9 +77,9 @@ div.body {
 }
 
 /*
-item header ¤ÎÀßÄê
+item header ã®è¨­å®š
 */
-/* memo: tDiary ¤À¤È h3¡£chalow ¤Ç¤âÀßÄê¤Ë¤è¤Ã¤Æ h3 ¤ò½Ğ¤¹¤³¤È¤¬²ÄÇ½ */
+/* memo: tDiary ã ã¨ h3ã€‚chalow ã§ã‚‚è¨­å®šã«ã‚ˆã£ã¦ h3 ã‚’å‡ºã™ã“ã¨ãŒå¯èƒ½ */
 .clitemheader { 
         color: #606060;
 	font-weight: bold;
@@ -93,7 +93,7 @@ h3 {
 }
 
 /*
-¥¤¥á¡¼¥¸¥¢¥ó¥«¡¼¤ÎÀßÄê
+ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚¢ãƒ³ã‚«ãƒ¼ã®è¨­å®š
 */
 /*div.day span.sanchor {*/
 span.sanchor {
@@ -109,7 +109,7 @@ span.sanchor {
 }
 
 /*
-¥µ¥Ö¥¿¥¤¥È¥ë¤ò´Ş¤à¥»¥¯¥·¥ç¥ó (item) ¤ÎÀßÄê
+ã‚µãƒ–ã‚¿ã‚¤ãƒˆãƒ«ã‚’å«ã‚€ã‚»ã‚¯ã‚·ãƒ§ãƒ³ (item) ã®è¨­å®š
 */
 div.section { 
         border-color: #ffffff;
@@ -121,7 +121,7 @@ div.section {
 }
 
 /*
-item Ãæ¤Î°úÍÑ¤ÎÀßÄê
+item ä¸­ã®å¼•ç”¨ã®è¨­å®š
 */
 div.body blockquote { 
         border-color: #808080;
@@ -135,7 +135,7 @@ div.body blockquote {
 }
 
 /*
-³Æ item ¤Î pre ¤ÎÀßÄê (³Æ item ¤Ï pre ¤Ç°Ï¤Ş¤ì¤Æ¤¤¤ë)
+å„ item ã® pre ã®è¨­å®š (å„ item ã¯ pre ã§å›²ã¾ã‚Œã¦ã„ã‚‹)
 */
 div.body pre {
 	font-family: monospace;
@@ -152,7 +152,7 @@ div.body p {
 }
 
 /*
-¥«¥ì¥ó¥À¡¼¤ÎÀßÄê
+ã‚«ãƒ¬ãƒ³ãƒ€ãƒ¼ã®è¨­å®š
 */
 .calendar {
 	background-color: #fff8ff;
@@ -166,7 +166,7 @@ div.body p {
 
 
 /*
-¥Õ¥Ã¥¿¤ÎÀßÄê (°ìÈÖ²¼¤Î chalow ¤Î¥í¥´)
+ãƒ•ãƒƒã‚¿ã®è¨­å®š (ä¸€ç•ªä¸‹ã® chalow ã®ãƒ­ã‚´)
 */
 .footer {
 	text-align: right;
@@ -178,7 +178,7 @@ p.footer a {
 	font-weight: bold;
 }
 
-/* ¥Ä¥Ã¥³¥ß´ØÏ¢ */
+/* ãƒ„ãƒƒã‚³ãƒŸé–¢é€£ */
 
 div.comment {
         border-style: solid;
@@ -226,7 +226,7 @@ div.commentbody {
 
 
 /*
-¤¤¤í¤¤¤í
+ã„ã‚ã„ã‚
 */
 img {
 	margin: 2px;
@@ -240,7 +240,7 @@ img {
 */
 
 /*
-for chalow: Referrer by ÆüÉÕ¥ê¥ó¥¯
+for chalow: Referrer by æ—¥ä»˜ãƒªãƒ³ã‚¯
 */
 div .referer { 
   font-size: x-small;

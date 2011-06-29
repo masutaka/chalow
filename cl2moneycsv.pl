@@ -1,76 +1,76 @@
 #!/usr/bin/env perl
 # $Id: cl2moneycsv.pl,v 1.1 2003/07/31 14:36:20 yto Exp $
-# ChangeLog ���ǲȷ���!
+# ChangeLog メモで家計簿!
 #  ref. <http://nais.to/~yto/doc/zb/0016.html#kakeibo>
 #
-# ���ե����ޥå�
-# * .+?��ʪ����:
-# ^\t[����][���ڡ���][������][���]$
-# - ���ڡ�����Ⱦ�ѤǤ����ѤǤ��ɤ���
-# - ��ۤ�Ⱦ�ѿ������奫��ޤ�����ƤϤ����ʤ���
+# ■フォーマット
+# * .+?買物ログ:
+# ^\t[費目][スペース][コメント][金額]$
+# - スペースは半角でも全角でも良い。
+# - 金額は半角数字。桁カンマは入れてはいけない。
 #
-# ������
-# - ���ܸ쥳���ɤ� EUC ����
-# - Excel ���ɤ߹��ޤ�������ʸ�������ɤ� Shift-JIS ���Ѵ�����ɬ�פ���
+# ■注意
+# - 日本語コードは UTF-8 を仮定
+# - Excel に読み込ませる前に文字コードを Shift-JIS に変換する必要あり
 #
-# ����������¹���
+# ■記述例＆実行例
 # 
 # $ cat ChangeLog
 # 2003-08-02  YAMASHITA Tatsuo  <yto@example.com>
 # 
-# 	* �Ǥ�����: ������餷�Ƥ���
+# 	* できごと: だらだらしてた。
 # 
-# 	* p:��ʪ����: 
-# 	�� �����ѡ� 1050
-# 	�� ����ӥˤǻ��� 380
+# 	* p:買物ログ: 
+# 	食 スーパー 1050
+# 	本 コンビニで雑誌 380
 # 
 # 2003-08-01  YAMASHITA Tatsuo  <yto@example.com>
 # 
-# 	* �Ǥ�����: ���Ǳǲ衣
+# 	* できごと: 川崎で映画。
 # 
-# 	* p:��ʪ����: 
-# 	�� �ե������ȥա��� 525
-# 	ͷ �ǲ� 2000
-# 	�� ������ 420
-# 	�� �����ѡ� 780
+# 	* p:買物ログ: 
+# 	外 ファーストフード 525
+# 	遊 映画 2000
+# 	交 川崎往復 420
+# 	食 スーパー 780
 # 
 # 2003-07-31  YAMASHITA Tatsuo  <yto@example.com>
 # 
-# 	* �Ǥ�����: ��ë�˽гݤ�����
+# 	* できごと: 渋谷に出掛けた。
 # 
-# 	* p:��ʪ����: 
-# 	�� �쥹�ȥ�� 3000
-# 	�� ��ë���� 640
-# 	�� �ڥ�ȥ��Ģ 550
+# 	* p:買物ログ: 
+# 	外 レストラン 3000
+# 	交 渋谷往復 640
+# 	雑 ペンとメモ帳 550
 # 
 # $ cl2moneycsv.pl ChangeLog
-#           ,  ��,  ��,  ��,  ͷ,  ��,  ��,  ��,  ��,  ¾
+#           ,  外,  食,  交,  遊,  本,  音,  雑,  衣,  他
 # 2003.07.31,3000,   0, 640,   0,   0,   0, 550,   0,   0
 # 2003.08.01, 525, 780, 420,2000,   0,   0,   0,   0,   0
 # 2003.08.02,   0,1050,   0,   0, 380,   0,   0,   0,   0
-# $ cl2moneycsv.pl -m ChangeLog  (������˽���)
-#           ,  ��,  ��,  ��,  ͷ,  ��,  ��,  ��,  ��,  ¾
+# $ cl2moneycsv.pl -m ChangeLog  (←月毎に集計)
+#           ,  外,  食,  交,  遊,  本,  音,  雑,  衣,  他
 # 2003-07,3000,   0, 640,   0,   0,   0, 550,   0,   0
 # 2003-08, 525,1830, 420,2000, 380,   0,   0,   0,   0
 # $ cl2moneycsv.pl -m ChangeLog | nkf -s > kaimono.csv
 
 use strict;
 
-### ���ޥ�ɥ饤�����
+### コマンドライン引数
 use Getopt::Long;
 Getopt::Long::Configure('bundling');
 my ($mon_mode);
 GetOptions('m|monthly' => \$mon_mode);
 
-# ���� an item of expendidure
-my @lioe = ('��', '��', '��', 'ͷ', '��', '��', '��', '��', '¾');
+# 費目 an item of expendidure
+my @lioe = ('外', '食', '交', '遊', '本', '音', '雑', '衣', '他');
 
 my $date;	
 my $inside_flag = 0;
 
 my %entry = ();
 while (<>) {
-    if (/^((\d{4}-\d\d)-\d\d)/) { # ���դ򥭡���
+    if (/^((\d{4}-\d\d)-\d\d)/) { # 日付をキープ
 	if (defined $mon_mode) {
 	    $date = $2;		# = year-month
 	} else {
@@ -78,10 +78,10 @@ while (<>) {
 	    $date =~ s|-|.|g;	# for Excel
 	}
 	next;
-    } elsif (/��ʪ����:/) {	# �ȷ����ǡ������ҥ֥��å��λϤޤ�
+    } elsif (/買物ログ:/) {	# 家計簿データ記述ブロックの始まり
 	$inside_flag = 1;
-    } elsif ($inside_flag == 1) { # �֥��å���
-	if (/^\s*$/ and $inside_flag == 1) { # �֥��å��ν����
+    } elsif ($inside_flag == 1) { # ブロック内
+	if (/^\s*$/ and $inside_flag == 1) { # ブロックの終わり
 	    $inside_flag = 0;
 	} elsif (/^\t(.+?)(\s|\xa1\xa1).*(\s|\xa1\xa1)(\d+)$/) {
 	    $entry{$date}->{$1} += $4;

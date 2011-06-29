@@ -13,7 +13,6 @@ $Id: README,v 1.1 2007-10-19 22:07:48+09 tatsuoyamashita Exp tatsuoyamashita $
 chalow自体のインストールは不要ですが、以下のPerlモジュールが必要です。
 CPANから入手してインストールしておいてください。
 
-- Jcode
 - HTML::Template
 
 ----------------------------------------------------------------------
@@ -56,6 +55,8 @@ ChangeLog の記述内容から、「インデックスページ」「月ペー�
 出力先ディレクトリとは、ChangeLog から変換された HTML ファイルが出力さ
 れる先。デフォルトでは現在のディレクトリ。
 
+ChangeLog は UTF-8 を想定。
+
 
 ----------------------------------------------------------------------
 使い方
@@ -68,7 +69,6 @@ usage: chalow [options] <file> [file]...
     -s, --stop-date             date to stop processing
     -u, --update-by-size        overwrite only if sizes are different
     -C, --css=FILE              css file
-    -8, --utf8                  utf8 mode
     -q, --quiet                 quiet mode
 
 -n で、「インデックスページ」に最近の何日分を載せるか指定できる。
@@ -79,7 +79,6 @@ usage: chalow [options] <file> [file]...
    未指定なら最後まで処理する。 (例: --stop-date "2002-01-01")
 -C で、chalow: CSS ファイルをコマンドラインから指定できる。
 -u を指定すると、出力先ファイルとサイズが異なる場合のみ上書き出力する。
--8 を指定すると、UTF8での出力になる。ChangeLog, cl.conf はUTF8を仮定。
 -q を指定すると、変換作業進捗情報を標準出力に出力しなくなる。
 
 

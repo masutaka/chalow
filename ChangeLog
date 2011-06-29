@@ -1,52 +1,61 @@
+2011-06-30  Takashi Masuda  <masutaka@nifty.com>
+
+	* UTF-8 完全対応
+
+	全ファイルの文字コードを EUC から UTF-8 に変更。
+	それに伴い Jcode.pm が不要になった。使用箇所を削除。
+	chalow の -8 オプション削除。
+	conf/utf8/cl.conf 削除。
+
 2007-10-19  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 1.0[��꡼��]: 
-	chalow 1.0 ��������ޤ���
-	Ĺ�����Ȥۤä��餫���ʤΤ�����������ä��Τǡ�
-	����¤ν����ǤȤꤢ����1.0��Ф��Ƥ������Ȥˤ��ޤ���
-	�������� oldtype �ǿ��ͤ˸�������ΤǤϤʤ��Ǥ�����
-	�Ȥ���Ф褤�䡢�Ȥ������Ȥǡ�
-	���ߤϡ�1.0�Ȥ��ʤ꤫��Υ�줿���С��������äƤ��ޤ���
-	�Ȥ������������äƤ���ȷ빽����Υ��Ƥ��ޤä����Ȥ����Τ�����Ǥ���
+	* version 1.0[リリース]: 
+	chalow 1.0 を公開します。
+	長いことほったらかしなのが気がかりだったので、
+	最低限の修正でとりあえず1.0を出しておくことにします。
+	ソースも oldtype で人様に見せれるものではないですが、
+	使えればよいや、ということで。
+	現在は、1.0とかなりかけ離れた新バージョンを作っています。
+	というか、いじっていると結構かけ離れてしまった、というのが真相です。
 
 	* clsearch.cgi: 
-	URL�ʤɤ�����
+	URLなどを修正。
 
 	* conf/utf8/cl.conf: 
-	URL�ʤɤ�����
+	URLなどを修正。
 
 	* cl.conf: 
-	URL�ʤɤ�����
+	URLなどを修正。
 
 	* README: 
-	������äȽ�����
+	ちょろっと修正。
 
 	* chalow (unescape_string): 
-	Tatsuya Kinoshita �ѥå���Ŭ�ѡ�
+	Tatsuya Kinoshita パッチを適用。
 
 2005-08-21  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 1.0rc6[��꡼��]:
-	������
+	* version 1.0rc6[リリース]:
+	公開。
 
 	* chalow: 
-	RSS�˺ǶᲿ��ʬɽ�����뤫�����Ǥ���褦�ˤ�����
-	0�ξ��� $opt_topn ��Ʊ���ˤʤ롣
+	RSSに最近何日分表示するかを指定できるようにした。
+	0の場合は $opt_topn と同じになる。
 	[src]
-	# RSS�˺ǶᲿ��ʬɽ�����뤫(0�ξ��� $opt_topn ��Ʊ��)
+	# RSSに最近何日分表示するか(0の場合は $opt_topn と同じ)
 	$rss_topn = 0;
 	[/src]
-	(write_rss_file): ���嵭�Τ���ˤ��δؿ������ä���
+	(write_rss_file): ←上記のためにこの関数いじった。
 
 	* conf/utf8/cl.conf: 
-	���Ŧĺ������Τ������ޤ��������꤬�Ȥ��������ޤ�����
-	��ʸ������������
+	御指摘頂いたものを修正しました。ありがとうございました。
+	●文字化け修正。
 
 	* chalow (output_to_file): 
-	���Ŧĺ������Τ������ޤ��������꤬�Ȥ��������ޤ�����
+	御指摘頂いたものを修正しました。ありがとうございました。
 
-	��utf8 mode�ΤȤ���chalow������ץ���Υƥ�ץ졼�ȤΡ�charset ����� 
-	�ǥե���Ȥ� EUC-JP �ǤϤʤ� UTF-8 �ˤ���褦�ˤ�����ad hoc��
+	●utf8 modeのとき、chalowスクリプト内のテンプレートの、charset 指定を 
+	デフォルトの EUC-JP ではなく UTF-8 にするようにした。ad hoc。
 	[src]
 	if ($utf8_mode) {
 	  $$contp =~ s/;charset=EUC-JP">/;charset=UTF-8">/;
@@ -54,13 +63,13 @@
 	[/src]
 
 	* chalow: 
-	���Ŧĺ������Τ������ޤ��������꤬�Ȥ��������ޤ�����
+	御指摘頂いたものを修正しました。ありがとうございました。
 	
-	��usage��å������ǡ�-c���ץ����ΤȤ����Ρ�(default "cl.conf")��
-	���Τλ��ͤʤΤǺ����
+	●usageメッセージで、-cオプションのところの「(default "cl.conf")」
+	は昔の仕様なので削除。
 
-	��blockquote�������p���������ꡣ����ΤȤ����ǥǥե���Ȥǰʲ���
-	����Ƥ������Ȥˤ�����
+	●blockquoteの前後のpタグの問題。定義のところでデフォルトで以下を
+	入れておくことにした。
 	[src]
 	my $auto_replace = '
 	s!(<blockquote>)!</p>$1<p>!g;
@@ -68,154 +77,154 @@
 	';
 	[/src]
 
-	��RSS�Υե�����̾�Ȥ��ơ�cl.rdf�ʳ���Ȥ���褦�ˤ��ޤ�����
-	cl.conf ������Ǥ��ޤ����ǥե���Ȥ� "cl.rdf" �Ǥ���
+	●RSSのファイル名として、cl.rdf以外も使えるようにしました。
+	cl.conf で設定できます。デフォルトは "cl.rdf" です。
 	[src]
-	# RSS�ե�����̾
+	# RSSファイル名
 	$rss_filename = "cl.rdf";
 	[/src]
-	- cl.rdf �ʳ��Υե�����̾�ˤ������ͤ����� cl.conf ���Խ����ƻȤ�
-	���μ�硧
-	cl.conf �� $rss_filename ���ɲáʾ嵭�ˤ��ѹ���
-	�����ơ�cl.conf ��γƼ�ƥ�ץ졼�ȥե������
+	- cl.rdf 以外のファイル名にしたい人が過去の cl.conf を編集して使う
+	場合の手順：
+	cl.conf に $rss_filename を追加（上記）し変更。
+	そして、cl.conf 中の各種テンプレートファイル（
 	$index_template, $month_page_template, $day_page_template,
-	$item_page_template, $cat_page_template, $rss_template����� 
-	"cl.rdf" �� <TMPL_VAR name=rss_file> ���֤������Ʋ�������
+	$item_page_template, $cat_page_template, $rss_template）中の 
+	"cl.rdf" を <TMPL_VAR name=rss_file> に置き換えて下さい。
 
 2005-08-10  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 1.0rc5[��꡼��]:
-	������
+	* version 1.0rc5[リリース]:
+	公開。
 
-	����μ���ѹ����ϰʲ���
+	今回の主な変更点は以下：
 
-	'''��³�����ɤ�׵�ǽ''': 
-	'[esc]====[/esc]' �ȵ�������Ȥ���ʲ��ε��Ҥ���ά���� item page ��
-	�����פ����󥯤�ɽ������ޤ���
-	item page ��Ф��褦�ˤ����Ȥ�($page_mode=2)�Τߵ�ǽ���ޤ���
-	�ʤ���cl.conf �� $item_template �˰ʲ��Τ褦�ʵ��Ҥ��ɲä���ɬ�פ�
-	����ޤ���
+	'''「続きを読む」機能''': 
+	'[esc]====[/esc]' と記入するとそれ以下の記述が省略され item page へ
+	ジャンプするリンクが表示されます。
+	item page を出すようにしたとき($page_mode=2)のみ機能します。
+	なお、cl.conf の $item_template に以下のような記述を追加する必要が
+	あります。
 	[src]
 	<TMPL_IF name=readmore>
-	��<a href="<TMPL_VAR name=url>">³�����ɤ�</a>��
+	《<a href="<TMPL_VAR name=url>">続きを読む</a>》
 	</TMPL_IF>
 	[/src]
 
 	'''utf8 mode''': 
-	chalow �򥳥ޥ�ɥ饤�󥪥ץ���� --utf8 �Ǽ¹ԡ�ChangeLog ���Τ� 
-	cl.conf ��ʸ�������ɤ� utf8 �ˤʤäƤ���ɬ�פ��ꡣ 
-	cl.conf �� conf/utf8/cl.conf �򻲹ͤˤɤ�����
+	chalow をコマンドラインオプション --utf8 で実行。ChangeLog 本体も 
+	cl.conf も文字コードが utf8 になっている必要あり。 
+	cl.conf は conf/utf8/cl.conf を参考にどうぞ。
 
 	* README: 
 	mod.
 
 	* ChangeLogReader.pm: 
-	�������Τ��֤����������ʤ���ޤǤ��̥ե�����̾�ǥƥ��Ȥ��Ƥ���
+	新しいのに置き換えた。（これまでは別ファイル名でテストしてた）
 
-	* ��˾:
-	- ���ƥ��������ͥ���
+	* 要望:
+	- カテゴリ一覧をネスト
 
 2005-06-23  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 
 	> my $readmore_tag = "[esc]====[/esc]";
-	�ǥե���Ȥ� :::: ���� [esc]====[/esc] ���ѹ����ϤƤʵ�ˡ�˽��
+	デフォルトを :::: から [esc]====[/esc] に変更。はてな記法に準拠。
 
 2005-04-12 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (okikae,make_item_html): 
-	readmore�ν������ɲá�
+	readmoreの処理を追加。
 
-	* ��³�����ɤ�׵�ǽ[ReadMore]: 
-	���͡�item page ��Ф��褦�ˤ����Ȥ�($page_mode=2)�Τߵ�ǽ���롣
-	item page�Ǥ������ɤ�롣
-	¾�Υڡ����Ǥϻ��ꤷ���Ȥ����ޤ�ɽ��������read more�����Υ��
-	��item page�����֡�
+	* 「続きを読む」機能[ReadMore]: 
+	仕様：item page を出すようにしたとき($page_mode=2)のみ機能する。
+	item pageでは全部読める。
+	他のページでは指定したところまで表示し、「read more」等のリンク
+	でitem pageへ飛ぶ。
 	====
-	okikae��readmore��ˡ�βս��item�κǸ�� class �դ�����������롣
+	okikaeでreadmore記法の箇所とitemの最後に class 付きタグを入れる。
 
-	> ����
+	> んんん
 	> ::::
-	> ������
-	��
-	> ����
-	> <div class="readmore">������</div>
+	> あああ
+	↓
+	> んんん
+	> <div class="readmore">あああ</div>
 
 	make_item_html() - for other pages
-	(1) name=content �ˤϡ�readmore��div��ä�����Τ�����롣
-	(2) $item_template �ǿ��ѿ� name=readmore ���Ȥ���褦�ˤʤ롣
+	(1) name=content には、readmoreのdivを消したものを入れる。
+	(2) $item_template で新変数 name=readmore が使えるようになる。
 	
 	make_item_page() - for item pages
-	���Τޤޡ�
+	そのまま。
 
 
 	> # Read More mode (0:OFF, 1:ON)
 	> $readmore_mode = 1;
 
-	readmore��ˡ('::::')���ѹ��Ǥ��롣
+	readmore記法('::::')は変更できる。
 	> # Read More tag
 	> $readmore_tag = "::::";
 
 	* conf/utf8/cl.conf: 
-	New.  ����ե����� for utf8
+	New.  設定ファイル for utf8
 
 	* chalow (to_utf8_cl): 
 	New.  modularized for i18n
 
 	* utf8 mode[i18n]: 
-	��Ū����ݲ�(UTF8)�Τ����ʸ���������Ѵ��ޤ���ɽ경���롣
-	���͡�ʸ���������Ѵ��򤻤��ˤ��Τޤ��̤���
+	目的：国際化(UTF8)のために文字コード変換まわりを局所化する。
+	仕様：文字コード変換をせずにそのまま通す。
 
 	> # UTF8 mode (0:OFF, 1:ON)
 	> my $utf8_mode = 0;
 
-	���ޥ�ɥ饤�󥪥ץ���� --utf8
+	コマンドラインオプション --utf8
 
 	ToDo(chalow)
-	����������Υǥե���ȥƥ�ץ졼�Ȥ����ܸ�ʤ�(ascii)��
-	���桼�������ɤ߹��߸��EUC-JP�ؤ��Ѵ������
-	��write_rss_file: rss���ϻ���UTF8�ؤ��Ѵ�����->func
-	��get_category_filename: ���ƥ���ե�����̾��������UTF8�Ѵ�����->func
+	●ソース中のデフォルトテンプレートを日本語なし(ascii)に
+	●ユーザ設定読み込み後のEUC-JPへの変換をやめる
+	●write_rss_file: rss出力時のUTF8への変換切替->func
+	●get_category_filename: カテゴリファイル名作成時のUTF8変換切替->func
 
 	!!!
-	��clsearch.cgi
+	〇clsearch.cgi
 
-	* ��ȺƳ�: 
-	��Ȥ�Ƴ����ޤ�����
+	* 作業再開: 
+	作業を再開しました。
 
 2005-01-25 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
-	�졧$ymd."T23:59:59+9:00";
-	����$ymd."T23:59:59+09:00";
+	旧：$ymd."T23:59:59+9:00";
+	新：$ymd."T23:59:59+09:00";
 
 2005-01-19 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 
-	tmpl�����ʤ��ڡ��������ڡ�������ʤ����ͤˤ�����
+	tmplが空なら月ページ、日ページを作らない仕様にした。
 
 	* chalow: 
-	pm�˼�򤤤���ݤ���ʲ�¤��
+	pmに手をいれ大掛かりな改造。
 
 2004-12-24  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 1.0rc4[��꡼��]:
-	������
+	* version 1.0rc4[リリース]:
+	公開。
 
 	* sample/diary.css: 
-	����ץ벽�����������ߤ᤿��
+	シンプル化。画像指定を止めた。
 
 	* chalow: 
-	> # RSS �� description �� CDATA �ǰϤफ (1:YES, 0:NO)
+	> # RSS の description を CDATA で囲むか (1:YES, 0:NO)
 	> my $rss_cdata = 0;
-	���ѻߡ�ref. [2004-11-28-2]
-	��꡼������Ƴ�����Ƥ������ѻߤ����椨�ƶ��ʤ���
+	を廃止。ref. [2004-11-28-2]
+	リリース前に導入してすぐに廃止したゆえ影響なし。
 
 	* chalow (write_rss_file): 
-	dc:creator ��Ф���褦�ˤ�����
+	dc:creator も出せるようにした。
 
 	* cl.conf: 
-	Ĵ����
+	調整。
 
 	* chalow (okikae): 
 	> s/\]>/\]&gt;/go;
@@ -227,87 +236,87 @@
 	Add.
 	> $escaped_src{$num_of_escaped_src} =~ s/>/&gt;/g,
 
-	�ƥ�������ˡ�]]>�פ�����ȡ�<![CDATA[�פν�����ǧ������RSS����
-	�顼�ˤʤ�Τǡ�
+	テキスト中に「]]>」があると「<![CDATA[」の終わりと認識されRSSがエ
+	ラーになるので。
 
 2004-12-22 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
-	RSS�ե�����Υƥ�ץ졼�Ȳ���
+	RSSファイルのテンプレート化！
 
-	HTML::Template��Ȥ��褦�ˤ�����
-	��������ܡ�
+	HTML::Templateを使うようにした。
+	新設定項目。
 	>>
-	# RSS�ե�����Υƥ�ץ졼��
+	# RSSファイルのテンプレート
 	my $rss_template = << "RDFSTR"
 	...
 	RDFSTR
 	<<
 
-	���ȡ�RSS�����äȽ�����
+	あと、RSSをちょっと修整。
 	xmlns:lang=>xml:lang, resource=>rdf:resource, content:encoded
 
 	* ChangeLogReader.pm (store_changelog): 
-	�����ѹ���
-	�졧 } elsif (/^\t?__DATA__.*$/) {
-	���� } elsif (/^__DATA__\s*$/) {
+	仕様変更。
+	旧： } elsif (/^\t?__DATA__.*$/) {
+	新： } elsif (/^__DATA__\s*$/) {
 
 	* README: 
-	- typo �����񤭢�ľ�� 
+	- typo 時下書き→直書き 
 	- typo [src]...[/esc] -> [src]...[/src]
-	- ����ץ��󼨤ΤȤ��Ρ�>�פϤ��ƹ�Ƭ���֤����줷����
+	- サンプル提示のときの「>」はやめて行頭タブに統一した。
 
-	�ʤɡ�
+	など。
 
 2004-12-11  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* conf/yto/diary.css: 
-	New. sample/ �ˤ���ΤȤ��̡�
+	New. sample/ にあるのとは別。
 
 2004-11-30  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
-	RSS �� Bloglines �Ǹ��Ƥߤ�ȡ�����URL�����������ʤäƤ��롣
-	2004-11-27-3.html �� http://nais.to/2004-11-27-3.html �ˤ�����äƤ롣
-	�����ǡ�RSS ������Хѥ������Хѥ��ˤ���褦�ˤ����� ad hoc
+	RSS を Bloglines で見てみると、相対URLがおかしくなっている。
+	2004-11-27-3.html を http://nais.to/2004-11-27-3.html にしちゃってる。
+	そこで、RSS 中で相対パスを絶対パスにするようにした。 ad hoc
 	ref. http://chalow.net/2004-11-28-1.html
 
 2004-11-29  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* ChangeLogReader.pm (store_changelog): 
-	����("close F;"���ĤäƤ�)��ä�����
+	ゴミ("close F;"が残ってた)を消した。
 
 2004-11-28  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
-	RSS �� description �� CDATA ��Ф��⡼�ɺ�����
-	> # RSS �� description �� CDATA �ǰϤफ (1:YES, 0:NO)
+	RSS の description で CDATA を出すモード作成。
+	> # RSS の description を CDATA で囲むか (1:YES, 0:NO)
 	> my $rss_cdata = 0;
 
 	* chalow: 
-	ǧ�����Ƥ������ꡧ
-	�����item�����ζ�����ȥ꤬ %entry_statistics �˻Ĥä��㤦���ꡣ
+	認識している問題：
+	非公開itemだけの空エントリが %entry_statistics に残っちゃう問題。
 
 2004-11-27  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 
-	item�ڡ��������Τ���Τ���������ȡ�
-	> # ��������ڡ�����ñ�� (0:��, 1:��, 2:�����ƥ�)
+	itemページ作成のためのいろいろ作業。
+	> # 作成するページの単位 (0:月, 1:日, 2:アイテム)
 	> my $page_mode = 0;
-	(datestr2anchor): ���碌�롣
-	(datestr2url): ���碌�롣
+	(datestr2anchor): あわせる。
+	(datestr2url): あわせる。
 	(write_item_page): New. 
 
-	$item_page_template ���Ѱդ�����
-	item�Υƥ�ץ졼�����Ǥ�cat���ɲá�
-	���ޤ�
+	$item_page_template も用意した。
+	itemのテンプレート要素にcatを追加。
+	今まで
 	> <TMPL_VAR name=header>
-	���줫��
+	これから
 	> <TMPL_VAR name=header><TMPL_VAR name=cat>
-	¾�ˤϡ�header_text �Ȥ�����Τ⡣head/title �����ʤɤ˻Ȥ���
+	他には、header_text というものも。head/title タグなどに使う。
 
 	* chalow: 
-	ChangeLogReader.pm ��Ȥ��褦�˲�¤��
+	ChangeLogReader.pm を使うように改造。
 
 	* ChangeLogReader.pm (store_entry): 
 	Add.
@@ -315,147 +324,147 @@
 2004-11-12  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
-	[2004-10-25-2]�Τ����äȲ�¤�������Τ�ΰʳ���
-	T23:59:59+9:00 ��­�����Ȥˤ�����
+	[2004-10-25-2]のをちょっと改造。今日のもの以外は
+	T23:59:59+9:00 を足すことにした。
 	> <dc:date>2004-10-25T23:59:59+9:00</dc:date>
 
 2004-11-07  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 1.0rc3[��꡼��]:
-	������
+	* version 1.0rc3[リリース]:
+	公開。
 
 2004-10-25  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
-	RSS �γ� item �� dc:date �ˤĤ��ơ�
-	���ޤǤϤ��٤����դΤߤǤ��ä���
+	RSS の各 item の dc:date について。
+	今まではすべて日付のみであった。
 	> <dc:date>2004-10-25</dc:date>
-	���ˤ��ѹ��������Τ�Τ������֤ޤ�����뤳�Ȥˤ�����
+	方針を変更。今日のものだけ時間まで入れることにした。
 	> <dc:date>2004-10-25T23:00:00+9:00</dc/date>
-	�ɲä��������å���
+	追加したロジック：
 	> my $item_dcdate = ($dcdate =~ /^$ymd/) ? $dcdate : $ymd;
 
 2004-10-07 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow �Ǻ�ʬ������Ԥʤ���ˡ: 
-	chalow �Ǥ� --stop-date ���ץ����ˤ�뺹ʬ�������Ǥ���Τ�����
-	���ƥ���ե�����Ϻ�ʬ��������ʤ��������ǥ��ƥ�����ɽ���� 
-	clsearch.cgi �ǹԤʤ��褦�ˤ�����ɤ������ϰʲ����̤ꡧcl.conf 
-	�� $output_cat_pages �� 0 �ˤ��롣ɬ�פʤ�� $cat_page_cgi �� 
-	clsearch.cgi �ؤΥѥ���Ķ��ˤ��碌���ѹ����롣
+	* chalow で差分更新を行なう方法: 
+	chalow では --stop-date オプションによる差分更新ができるのだが、
+	カテゴリファイルは差分更新されない。そこでカテゴリ別表示を 
+	clsearch.cgi で行なうようにすると良い。手順は以下の通り：cl.conf 
+	の $output_cat_pages を 0 にする。必要ならば $cat_page_cgi の 
+	clsearch.cgi へのパスを環境にあわせて変更する。
 
 	* chalow (parse_entry): 
-	�����ʤ���!
-	ʣ�������ѤΤȤ��� item ID ��Ϳ���ˤ��ѹ����ޤ�����
-	1,2,3,4 �����̤ˤĤ��ޤ���
-	���ޤǤϡ�author������뤴�Ȥ� +100 ����Ƥޤ�����
-	1,2,3,101,102,...�Ȥ������ˡ�
+	ごめんなさい!
+	複数人利用のときの item ID 付与方針を変更しました。
+	1,2,3,4 と普通につきます。
+	今までは、authorがかわるごとに +100 されてました。
+	1,2,3,101,102,...という風に。
 
-	�������������������å����礭���ѹ����Ƥ���
-	���줬ư���Ƥ��ʤ��褦�Ǥ���Ʊ�����ե���ȥ꤬����ȡ�
-	�ޡ�������ʤ��Ǿ�񤭤���Ƥ��ߤ����Ǥ���
-	�������뤿��˾嵭�Τ褦�˻��ͤ�ּ����ʤ�Ρפ��ѹ����ޤ�����
+	しかし、この前ロジックを大きく変更してから
+	これが動いていないようです。同じ日付エントリがあると、
+	マージされないで上書きされてたみたいです。
+	修整するために上記のように仕様を「自然なもの」に変更しました。
 
-	�Ѥʻ��ͤˤ����Τ��ְ㤤�Τ�ȤǤ�����
-	�����ʤ����������ʤ����������ʤ�����
+	変な仕様にしたのが間違いのもとでした。
+	ごめんなさい、ごめんなさい、ごめんなさい。
 
-	$enthashp->{curid} �Ȥ����Τ�Ƴ�����ơ�item ID �� entry ���Ȥ�
-	��������褦�ˤ��ޤ������ǽ餫�餳��ǹԤ��Ф褫�ä������ʤ���
-	�Ծʡ�
+	$enthashp->{curid} というのを導入して、item ID を entry ごとに
+	管理するようにしました。最初からこれで行けばよかったんだよなあ。
+	猛省。
 
 2004-08-18 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_itemlist_file): 
-	--stop-date 2004-08-01 ����ȡ� cl.itemlist �� 2004-07-31-* ��ؤ�
-	�����������ʤ롣clsearch.cgi�Ǥθ�����ȯ�������Х���
-	�����å������������ä��Τǽ���������
+	--stop-date 2004-08-01 すると、 cl.itemlist の 2004-07-31-* らへん
+	がおかしくなる。clsearch.cgiでの検索で発見したバグ。
+	ロジックがおかしかったので修整した。
 
 2004-07-31 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_itemlist_file): 
-	--stop-date �ΤȤ��� cl.itemlist ��ʬ��������褦�ˤ�����
+	--stop-date のとき、 cl.itemlist を差分更新するようにした。
 
 	* chalow: 
-	���꡼�˥�ľ��Τ������ʥ����å���ľ������
-	category_count �򥯥꡼�˥󥰤�ľ������줿��
-	������������ϸ�ΨŪ�ǤϤʤ����ƹͤ�ɬ�ס�
+	クリーニング直後のおかしなロジックを直した。
+	category_count をクリーニングの直後に入れた。
+	しかし、これは効率的ではない。再考が必要。
 
 	* chalow (write_js_file): 
-	ʬ�䤷����
-	(write_category_list_file): ���ƥ������
-	(write_latest_item_list_file): �Ƕ�ε���
+	分割した。
+	(write_category_list_file): カテゴリ一覧
+	(write_latest_item_list_file): 最近の記事
 
 	* chalow (write_*_page): 
 	latest_item_list, category_list
 	> $t->param(latest_item_list => $latest_item_list);
 	> $t->param(category_list => $category_list);
 
-	�Ȥ��� (cl.conf)��
+	使い方 (cl.conf)：
 	<td><script language="JavaScript" src="cl.js"></script></td>
-	����������
+	↓↓↓↓↓
 	<td><TMPL_VAR name=latest_item_list></td>
-	��������update����뤿�Ӥ����ե�����ι�����ɬ�פˤʤ롣
+	ただし、updateされるたびに全ファイルの更新が必要になる。
 
 	* chalow (write_js_file): 
-	JS�����Ǥʤ�HTML��ʸ����򥰥롼�Х��ѿ� $latest_item_list,
-	�˥����פ��� HTML::Template �ǻȤ����Ȥˤ�����
+	JSだけでなくHTMLの文字列をグルーバル変数 $latest_item_list,
+	にキープして HTML::Template で使うことにした。
 
 	* chalow (urlencode):
-	New. ���ޤ��顣
+	New. いまさら。
 
 	* chalow: 
-	��HTML �����Τ���Υ롼�ספΤȤ����ǡ�
-	���ƥ�����itemɽ����CGI�ˤ���Ȥ��ν�����񤯡�
-	(write_js_file): �����Ǥ�Ʊ�ͤν�����
+	「HTML 生成のためのループ」のところで、
+	カテゴリ別item表示をCGIにするときの処理を書く。
+	(write_js_file): ここでも同様の処理を。
 
 	* cl.conf: 
-	��������� see ��
+	新設定項目 see ↓
 
 	* chalow: 
-	��������ܡ�����ӡ�������
+	新設定項目。および、整理。
 	>>
-	# ���ƥ���ڡ������뤫 (0:NO, 1:YES)
+	# カテゴリページを作るか (0:NO, 1:YES)
 	my $output_cat_pages = 1;
-	# ���ƥ���ڡ�����Υ���ȥ���ξ��
-	# ($output_cat_pages = 1 �ΤȤ��Τ�ͭ��)
+	# カテゴリページ中のエントリ数の上限
+	# ($output_cat_pages = 1 のときのみ有効)
 	my $cat_page_entry_max = 10;
-	# ���ƥ�����itemɽ���Τ����CGI����ꤹ��ʥ��ƥ���̾�� %%CAT%% ��
-	�֤�������
-	# ($output_cat_pages = 0 �ΤȤ��Τ�ͭ��)
+	# カテゴリ別item表示のためのCGIを指定する（カテゴリ名は %%CAT%% で
+	置き換え）
+	# ($output_cat_pages = 0 のときのみ有効)
 	my $cat_page_cgi = "clsearch.cgi?cat=%%CAT%%";
 	<<
 
 	* clsearch.cgi: 
-	clsearch.cgi�ǡ����ƥ������ (cat:Music, cat:��������)�����ջ��� 
-	(date:2004, date:2004-07, date:2004-07-01)�����Ȥ���褦�ˤ�����
+	clsearch.cgiで、カテゴリ指定 (cat:Music, cat:日常生活)、日付指定 
+	(date:2004, date:2004-07, date:2004-07-01)、が使えるようにした。
 
-	list mode�Ȥ����Τ��ä����ѥ�᡼���� mode=2���ޥå�����item��
-	item��󥯤�item header�ΰ�����ɽ�����롣����ɽ�����롣from�����
-	�ɤ�̵����date:2004-07 ���Ȥ߹�碌�ƻȤ��Ȥ��η�Υ����ȥ������
-	�Ф��롣
+	list modeというのを作った。パラメータで mode=2。マッチしたitemの
+	itemリンクとitem headerの一覧を表示する。全部表示する。from指定な
+	どは無効。date:2004-07 と組み合わせて使うとその月のタイトル一覧が
+	出せる。
 
-	�ޤ���date�ѥ�᡼������ꤹ��������� mode=2 �ˤʤ롣
-	�㡧 clsearch.cgi?date=2004
+	また、dateパラメータを指定すると内部で mode=2 になる。
+	例： clsearch.cgi?date=2004
 
-	�ޤ���cat�ѥ�᡼������ꤹ��������� mode=1 �ˤʤ롣
-	�㡧 clsearch.cgi?cat=Life
+	また、catパラメータを指定すると内部で mode=1 になる。
+	例： clsearch.cgi?cat=Life
 
 	* chalow (write_itemlist_file): 
-	cl.itemlist�Υե����ޥåȤ��ѹ�����������
-	cl.itemlist�˥��ƥ��������ɲá����ƥ�����ɽ����CGI�Ǥ�Ǥ���褦
-	�ˤ��뤿�ᡣ
-	item header��item content�δ֤򥹥ڡ������饿�֤ˤ�����CGI�Ǥ��Ĥ�
-	���䤹���褦�ˡ�
+	cl.itemlistのフォーマットを変更！！！！！
+	cl.itemlistにカテゴリ情報も追加。カテゴリ別表示をCGIでもできるよう
+	にするため。
+	item headerとitem contentの間をスペースからタブにした。CGIであつか
+	いやすいように。
 
 	* chalow (okikae): 
-	�Τβ���Ž���դ���ˡ�ؤ��б���ߤ��ʥ������������ˡ�
-	[IMG:image/hogehoge.jpg]�ʤɡ�
+	昔の画像貼り付け記法への対応を止める（ソースから削除）。
+	[IMG:image/hogehoge.jpg]など。
 	>>
-	### ����ĥ���դ�
+	### 画像張り付け
 	# image : [IMG:image/2000-06-20-08-32-57.m.jpg]
-	s!\[IMG:([^\]\s]+)\]!get_link_str("����", $1);die!ge;
-	### ����դ�����ĥ���դ�
-	# ����ͥ���ȳ�������ʤɤ�
+	s!\[IMG:([^\]\s]+)\]!get_link_str("画像", $1);die!ge;
+	### リンク付き画像張り付け
+	# サムネイルと拡大画像などに
 	# image : [IMG:image/hello-s.jpg image/hello.jpg]
 	# image : [IMG:image/hello-s.jpg http://example.com/hoge.html]
 	s!\[IMG:([^\]\s]+)\s+([^\]\s]+)\]!get_link_str($1, $2);die!gesm;
@@ -463,40 +472,40 @@
 
 2004-07-26 (Mon)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 1.0rc2[��꡼��]:
-	������
+	* version 1.0rc2[リリース]:
+	公開。
 
 	* cl-yto.conf:
-	Add. "conf/yto/cl-yto.conf". yto������ե�����򥵥�ץ�Ȥ��ƤĤ�
-	�Ȥ����Ȥˤ�������������­���ƹԤ������ȡ�
+	Add. "conf/yto/cl-yto.conf". ytoの設定ファイルをサンプルとしてつけ
+	とくことにした。いろいろ足して行こうかと。
 
 	* cl.conf (clsearch): 
-	[2004-05-12-1]�ˤȤ�ʤ� update.
+	[2004-05-12-1]にともない update.
 
 2004-07-22 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf: 
-	�٤����ѹ���
+	細かく変更。
 
 	* chalow (write_rss_file): 
-	RSS�γƥ����ƥ�Υ����ȥ�Υե����ޥåȤ��ѹ���
+	RSSの各アイテムのタイトルのフォーマットを変更。
 	OLD: <title>$ymd-$i  $ih</title>
 	NEW: <title>$ih</title>
 
 2004-06-27  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf: 
-	�����ݡ� blukfeeds --> bulkfeeds
+	タイポ： blukfeeds --> bulkfeeds
 
 2004-06-13  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (output_to_file): 
-	Replace Once ��ǽ��1���ɲä���������
+	Replace Once 機能。1行追加しただけ。
 	> $$contp =~ s/<!-- ReplaceOnce -->/$replace_once/;
 
 	* cl.conf: 
-	��������ܡ�
-	> # �ե�����κǽ�˽ФƤ����<!-- ReplaceOnce -->�פ��֤�������ʸ����
+	新設定項目。
+	> # ファイルの最初に出てくる「<!-- ReplaceOnce -->」を置き換える文字列
 	> $replace_once = "";
 
 2004-06-04  YAMASHITA Tatsuo  <yto at nais.to>
@@ -505,63 +514,63 @@
 	typo. alisgn --> align
 
 	* README: 
-	��<!-- -->�פˤĤ��Ƥε��Ҥ�����
-	����¾�����������פ䥽�����ε���ˡ���ɵ���
+	「<!-- -->」についての記述を削除。
+	その他、エスケープやソースの記述法を追記。
 
 	* clkeitai.cgi (output_an_item): 
-	[2004-05-12-1]����ˡ�˽��
-	�ʲ�����Ȥ���ǧ�����롣
+	[2004-05-12-1]の方法に準拠。
+	以下を塊として認識する。
 	<!-- start:<TMPL_VAR name=ymdi> -->
 	<!-- end:<TMPL_VAR name=ymdi> -->
 
 2004-05-18  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 
-	$version �ǥС�������ֹ�����Ǥ���
+	$version でバージョン番号管理です。
 
 2004-05-12 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi: 
-	$home_page_url, $home_page_name���ѻߡ�
+	$home_page_url, $home_page_nameを廃止。
 
-	���ޤǤ�ɽ��������ץ�⡼�ɡ������˥����ƥ�⡼�ɤ��ưס������
-	v0.19�ޤǤ�clsearch.cgi��ɽ��������
+	今までの表示がシンプルモード。新たにアイテムモードも容易。これは
+	v0.19までのclsearch.cgiの表示方式。
 
-	�����ƥ�⡼�ɤϡ��ʲ�����Ȥ���ǧ�����롣
+	アイテムモードは、以下を塊として認識する。
 	<!-- start:<TMPL_VAR name=ymdi> -->
 	<!-- end:<TMPL_VAR name=ymdi> -->
 
-	clseach.cgi?mode=1 ��item mode��0����simple mode��
+	clseach.cgi?mode=1 でitem mode。0だとsimple mode。
 
 	(get_item): New.
-	�ե����뤫�顢ID�ˤ����ꤵ�줿item��������ؿ���
+	ファイルから、IDにより指定されたitemを取りだす関数。
 
 2004-05-09  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 1.0rc1[��꡼��]:
-	������
+	* version 1.0rc1[リリース]:
+	公開。
 
 	* README: 
 	mod.
 
 	* sample/diary.css: 
-	table ��Ϣ�ɲ� (.day)��
-	h3 ���ɲá�
+	table 関連追加 (.day)。
+	h3 を追加。
 
 	* chalow (okikae):
-	ɽ��Hiki �ε�ˡ����ѡ�
+	表。Hiki の記法を採用。
 
-	�ʲ��Τ褦�˵��Ҥ���ȡ�
-	> ||����1-1||����1-2||����1-3
-	> ||����2-1||����2-2||����2-3
-	�ʲ��Τ褦��ɽ�ˤʤ�ޤ���
-	||����1-1||����1-2||����1-3
-	||����2-1||����2-2||����2-3
+	以下のように記述すると、
+	> ||項目1-1||項目1-2||項目1-3
+	> ||項目2-1||項目2-2||項目2-3
+	以下のような表になります。
+	||項目1-1||項目1-2||項目1-3
+	||項目2-1||項目2-2||項目2-3
 
 2004-04-24 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf: 
-	Ĵ����
+	調整。
 
 2004-04-14 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
@@ -569,25 +578,25 @@
 	New!
 
 	* chalow: 
-	�ѻߡ�$no_indent 
-	> # ���֤ˤ�륤��ǥ�Ȥ�ʤ����� (1:�ʤ��� or 0:���Τޤ�)
+	廃止：$no_indent 
+	> # タブによるインデントをなくすか (1:なくす or 0:そのまま)
 	> my $no_indent = 0;
 
-	���֥���ǥ�Ȥ��ߤ����Ȥ��ϰʲ��Τ褦�ˤ��褦��
+	タブインデントが欲しいときは以下のようにしよう！
 	> <div class="body" style="margin-left:4em;">
 
 	* chalow: 
-	����� kuttukibbs.cgi 1.0rc1 �ʹߤΤߥ��ݡ��ȡ�
+	今後は kuttukibbs.cgi 1.0rc1 以降のみサポート。
 	<http://nais.to/~yto/tools/kuttukibbs/>
-	kuttukibbs.cgi v0.4 ������˴�������
-	����� $entry_url =~ s/\#/%23/;
-	����� $item_url =~ s/\#/%23/;
+	kuttukibbs.cgi v0.4 以前の亡霊を削除。
+	削除： $entry_url =~ s/\#/%23/;
+	削除： $item_url =~ s/\#/%23/;
 
 	New: $item_ymd, $entry_ymd
 
 	* cl.conf: mod.
-	����ǥå����ڡ����˥����ɥС���
-	�����ȼ��ա�
+	インデックスページにサイドバー。
+	コメント周辺。
 
 	* sample/diary.css: mod.
 
@@ -598,131 +607,131 @@
 2004-02-27 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_category_page): 
-	���ƥ���ڡ�����Υ���ȥ꤬¿���Ȥ���ʣ���ڡ����ˤ���褦�ˤ�����
-	����ˤȤ�ʤ���������ܡ�
-	> # ���ƥ���ڡ�����Υ���ȥ���ξ��
+	カテゴリページ中のエントリが多いときは複数ページにするようにした。
+	これにともない新設定項目。
+	> # カテゴリページ中のエントリ数の上限
 	> my $cat_page_entry_max = 30;
 
 	* chalow (make_day_list): 
 	> if (defined $all_entries{$ym."-".$day}) {
-	��������������������
+	↓↓↓↓↓↓↓↓↓↓
 	> if (defined $entry_statistics{ymd}{$ym."-".$day}) {
 
 2004-02-26 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf (amazon_search): 
-	New. �ץ饰����amazon ��������̥�󥯤κ�����
+	New. プラグイン。amazon サーチ結果リンクの作成。
 	>>
-	[src]{{amazon_search('�ȥȥ�')}}[/src]
-	�� {{amazon_search('�ȥȥ�')}}
+	[src]{{amazon_search('トトロ')}}[/src]
+	→ {{amazon_search('トトロ')}}
 
-	[src]{{amazon_search('�ȥȥ�','books-jp')}}[/src]
-	�� {{amazon_search('�ȥȥ�','books-jp')}}
+	[src]{{amazon_search('トトロ','books-jp')}}[/src]
+	→ {{amazon_search('トトロ','books-jp')}}
 
-	[src]{{amazon_search('�ȥȥ�','dvd-jp')}}[/src]
-	�� {{amazon_search('�ȥȥ�','dvd-jp')}}
+	[src]{{amazon_search('トトロ','dvd-jp')}}[/src]
+	→ {{amazon_search('トトロ','dvd-jp')}}
 	<<
 
 2004-02-17 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow:
-	HTML::Template ��
+	HTML::Template 化
 	- item, entry
 	- write_*_page()
 
-	- �ʲ����ѻߡ� cl.conf �����ä���
+	- 以下、廃止。 cl.conf からも消す。
 	>>
-	# ����ǥå����ڡ����� HTML �إå����ɲä�������� (favicon.ico �ʤ�)
+	# インデックスページの HTML ヘッダに追加したいもの (favicon.ico など)
 	my $index_page_head_plus = "";
-	# ��ڡ����� HTML �إå����ɲä��������
+	# 月ページの HTML ヘッダに追加したいもの
 	my $month_page_head_plus = "";
-	# ���ڡ����� HTML �إå����ɲä��������
+	# 日ページの HTML ヘッダに追加したいもの
 	my $day_page_head_plus = "";
-	# �ĥå��ߵ�ǽ����Ѥ��뤫 (1:YES, 0:NO)
+	# ツッコミ機能を使用するか (1:YES, 0:NO)
 	my $use_tukkomi = 0;
-	# �ĥå��ߤΥƥ�ץ졼�� = <div class="comment">...</div> ����̣��
-	# TUKKOMI_DATE �Ϥ��Υ���ȥ������ (��: 2003-06-25) ���Ѵ������
+	# ツッコミのテンプレート = <div class="comment">...</div> の中味。
+	# TUKKOMI_DATE はそのエントリの日付 (例: 2003-06-25) に変換される
 	my $tukkomi_template = "";
 	<<
 
 	* cl.conf (amazon): 
-	New �ץ饰����amazon ��󥯤κ����������������㤤�������Ū��
+	New プラグイン。amazon リンクの作成。これだけありゃいいじゃん的。
 	[2004-02-16-1]
 
 2004-02-16  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.24[��꡼��]:
-	������
+	* version 0.24[リリース]:
+	公開。
 
-	* �����ͽ��[���]: 
-	- HTML::Template ����ѡ�
-	  - $*_page_head_plus ���ѻ�
-	  - $use_tukkomi, $tukkomi_template ���ѻ�
-	    - �����Ȥ� TB ��Ϣ�� entry �� template ��ľ�ܽ�����
-	  - $css_file ���ѻ�
+	* 今後の予定[メモ]: 
+	- HTML::Template を採用。
+	  - $*_page_head_plus の廃止
+	  - $use_tukkomi, $tukkomi_template の廃止
+	    - コメントや TB 関連は entry の template に直接書く方針
+	  - $css_file の廃止
 
 	* p:TODO:
-	- ���ܸ쥳���ɤ�����
+	- 日本語コードの選択
         - chalowlib?
-        - ���äĤ� BBS �Ȥ�Ϣ�Ȥޤ��򤹤ä��ꤵ����
-	- �ڡ���ñ�̤����ɡ���󥯸�ɽ��
-          ����: <http://www.ijn-jp.net/user8/report/svchat13.html>
-          ��Ĵ��: JavaScript �� #2003... ����뤫?
+        - くっつき BBS との連携まわりをすっきりさせる
+	- ページ単位だけど、リンク元表示
+          参考: <http://www.ijn-jp.net/user8/report/svchat13.html>
+          要調査: JavaScript で #2003... も取れるか?
 
 2004-02-15  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 
-	�٤���������Ȥ���������
-	- usage ɽ���ξ�ꤤ����
-	- $top_n_ctr �ѻ�(����󤫤ä�)
-	- New ��
+	細かい修整作業いろいろ。
+	- usage 表示の場所いじる
+	- $top_n_ctr 廃止(いらんかった)
+	- New ↓
 	> my %entry_statistics;
-	> # {ymd} : ���� (ǯ-��-��) �ν�ʣ (for ʣ��������)
-	> # {ym} : ��ǯ��˴ޤޤ�Ƥ������ե���ȥ��
-	> # {md} : Ʊ�����������ǯ for same date jump
+	> # {ymd} : 日付 (年-月-日) の重複 (for 複数人利用)
+	> # {ym} : 各年月に含まれている日付エントリ数
+	> # {md} : 同じ月日を持つ年 for same date jump
 
 2004-02-14  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf: 
-	��������ܡ�
-	> # ���հ����򥫥�����ɽ���ˤ��뤫 (1:YES, 0:NO)
+	新設定項目。
+	> # 日付一覧をカレンダー表示にするか (1:YES, 0:NO)
 	> $calendar_style = 0;
 
 	* chalow (write_rss_file): 
-	description ��Ĺ���Ȥ���ά����Ȥ�����ǽ�����ä�ľ����
-	�ޤ� ad hoc �����ɡ��ޤ������䡣������ utf8 �Ǥ�ꤿ����
+	description が長いとき省略するという機能をちょっと直す。
+	まだ ad hoc だけど、まあいいや。本当は utf8 でやりたい。
 	(html2xmlstr): New.  for RSS output.
-	(write_js_file): ���դˤ��󥯤��դ�����
-	(make_day_list_str): New.  for ���հ���
-	(make_day_list): ������
-	(make_calendar_table): New.  ���հ����Υ���������������������
+	(write_js_file): 日付にもリンクを付けた。
+	(make_day_list_str): New.  for 日付一覧
+	(make_day_list): 整理。
+	(make_calendar_table): New.  日付一覧のカレンダースタイルを作成。
 
 	* README: 
 	mod.
 
 2004-02-13  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow (parse_entry)[���]: 
-	item header �θ��³���Ʋ���񤫤��˲��Ԥ��륹������ΤȤ���
-	item header �� h3 �ǰϤ�����ˤ���ȡ�
-	���Ԥ� item �� header �� content �δ֤����äƤ��ޤ�����ˤĤ��ơ�
+	* chalow (parse_entry)[メモ]: 
+	item header の後に続けて何も書かずに改行するスタイルのとき、
+	item header を h3 で囲む設定にすると、
+	空行が item の header と content の間に入ってしまう問題について。
 	> * itemheader:
 	> content content content
-	$use_h3_for_item_header = 1 �ΤȤ��ϡ�item content �κǽ�ζ��Ԥ�
-	���褦�ˤ��Ƥ��롣
+	$use_h3_for_item_header = 1 のときは、item content の最初の空行を
+	削るようにしている。
 
 	* chalow (output_to_file): 
-	New. ���ꤵ�줿�ե������ʸ��������
+	New. 指定されたファイルへ文字列を出力
 
 	* chalow: 
-	�ƥ�ץ졼�Ȳ��ؤ����Ф���������
+	テンプレート化への布石いろいろ。
 
 	* chalow (write_rss_file): 
-	$permlink ��ȤäƤ���äȤ������ä��ꡣ
+	$permlink を使ってちょっとだけすっきり。
 
-	* chalow (parse_entry)[���]: 
-	�֤����������ˡ��ϥå���˳�Ǽ����Ȥ��� okikae()��
-	�֤�������ʸ�����RSS�ʤɤ�ή�Ѥ���Τǡ�
+	* chalow (parse_entry)[メモ]: 
+	置き換えの方針：ハッシュに格納するときに okikae()。
+	置き換えた文字列をRSSなどに流用するので。
 
 2004-02-12  YAMASHITA Tatsuo  <yto at nais.to>
 
@@ -732,89 +741,89 @@
 2004-02-11  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (parse_entry): 
-	�ץ饰�� pragma �ν�����
-	���ե���ȥ�ξ�Ȳ��˥�å��������������褦�ˤ��Ƥߤ���
+	プラグマ pragma の処理。
+	日付エントリの上と下にメッセージを埋め込めるようにしてみた。
 
-	* ��å����������ߡ���2:
+	* メッセージ埋め込み、案2:
 	> * message-top:
 	> <span style="font-size:x-small;padding:3pt;margin:3pt">
-	> �����Ȥ����ϸ� --- �٥󥸥�ߥ󡦥ե�󥯥��
+	> 美食家の末は乞食 --- ベンジャミン・フランクリン
 	> </span>
 	> 
 	> * message-bottom:
 	> <span style="font-size:x-small;padding:3pt;margin:3pt">
-	> �� Jeith Jarrett / La Scala
+	> ♪ Jeith Jarrett / La Scala
 	> </span>
 
 	* message-top:
 	<span style="font-size:x-small;padding:3pt;margin:3pt">
-	�����Ȥ����ϸ� --- �٥󥸥�ߥ󡦥ե�󥯥��
+	美食家の末は乞食 --- ベンジャミン・フランクリン
 	</span>
 
 	* message-bottom:
 	<span style="font-size:x-small;padding:3pt;margin:3pt">
-	�� Jeith Jarrett / La Scala
+	♪ Jeith Jarrett / La Scala
 	</span>
 
-	* ��å����������ߡ���1: �Ѱơ�
+	* メッセージ埋め込み、案1: 廃案。
 	> * chalow::pragma: 
-	> <msg_top>�����Ȥ����ϸ� --- �٥󥸥�ߥ󡦥ե�󥯥��</msg_top>
-	> <msg_btm>�� Jeith Jarrett / La Scala</msg_btm>
+	> <msg_top>美食家の末は乞食 --- ベンジャミン・フランクリン</msg_top>
+	> <msg_btm>♪ Jeith Jarrett / La Scala</msg_btm>
 
 2004-02-08  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf (cat): 
-	New. ���ƥ���ڡ����ؤΥ�󥯤���������ץ饰����
+	New. カテゴリページへのリンクを生成するプラグイン。
 
 	* chalow:
-	���ƥ����̥ڡ���������Ϣ��ȡ�cat_life.html �Τ褦�ʤν��ϡ�
+	カテゴリ別ページ作成関連作業。cat_life.html のようなの出力。
 	(get_category_filename): New.
 	(write_category_page): New. 
-	(write_js_file): ���ƥ������JavaScript�ե��������Ϥ���褦�ˤ�
-	����cl-cat.js
+	(write_js_file): カテゴリ一覧JavaScriptファイルも出力するようにし
+	た。cl-cat.js
 
-	* ChangeLog�ι�¤[���]: 
+	* ChangeLogの構造[メモ]: 
 	>>
 	ChangeLog
-	��entry*
-	������entry header (= XXXX-XX-XX)
-	������item*
-	����������id (= XXXX-XX-XX-X)
-	����������item header
-	��������������title
-	��������������category?
-	����������item content
-	����������item author?
+	└entry*
+	　　├entry header (= XXXX-XX-XX)
+	　　└item*
+	　　　　├id (= XXXX-XX-XX-X)
+	　　　　├item header
+	　　　　│　├title
+	　　　　│　└category?
+	　　　　├item content
+	　　　　└item author?
 	<<
 
 	* chalow: 
-	HTML::Template Ŭ�Ѥ˸����Ƥ������������롣
-	(parse_entry): �ǡ�����Ǽ��HTML������ԤʤäƤ�������HTML������ʬ
-	��ʬΥ���롣
+	HTML::Template 適用に向けていろいろいじる。
+	(parse_entry): データ格納とHTML作成を行なっていたが、HTML作成部分
+	を分離する。
 
 	* chalow (clean_changelog): 
-	���꡼�˥󥰻����������뤳�Ȥˤ��������­����
+	クリーニング時に曜日を削ることにした。後で足す。
 
 	* cl.conf: 
-	�桼��������ܤ�������
+	ユーザ設定項目の整理。
 	remove $opt_odir
 
 	* chalow (make_item_header_html): 
 	New.
-	item header �Ǥ� okikae ��Ŭ�Ѥ��ʤ��褦�����ˤ��ѹ���
-	���ƥ�������򤢤Ȥǻܤ�����ˡ�
+	item header では okikae を適用しないように方針を変更。
+	カテゴリ処理をあとで施すために。
 
 	* chalow (make_entry_header_html): 
 	New.
 
 	* chalow (get_inside_ref): 
-	New.  HTML::Template ����Ѥ�����ʤ��ʤ뤫�⡣
-	inside referrer �ν�ʣ��̵��������
+	New.  HTML::Template を採用したらなくなるかも。
+	inside referrer の重複を無くした。
 
 2004-01-25  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 
-	�ǥХ��⡼�� ($debug_mode) ��ä���ref. [2004-01-09-1]
+	デバグモード ($debug_mode) 作った。ref. [2004-01-09-1]
 
 2004-01-23  YAMASHITA Tatsuo  <yto at nais.to>
 
@@ -824,28 +833,28 @@
 2004-01-16  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_js_file): 
-	js �ե������ url �� $clog_url_pref ��­���褦�ˤ�����
+	js ファイルの url に $clog_url_pref を足すようにした。
 
 2004-01-14 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
         * cl.conf,sample/diary.css:
-        �����ɥ�˥塼�� id="links" (CSS ���� #links) �ǡ�
-        ���Τ� id="content" (CSS ���� #content) �ǰϤ����ˤˤ�����
-        ����� MovableType ��������ޤͤ���
+        サイドメニューは id="links" (CSS だと #links) で、
+        本体は id="content" (CSS だと #content) で囲む方針にした。
+        これは MovableType の方式をまねた。
 
 2004-01-13 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
-        * cl.conf (shorten_url): New.  URL ��û��ɽ������ץ饰����
-        �Ȥ������ʲ����ͤ˽񤯤ȡ�
+        * cl.conf (shorten_url): New.  URL を短く表示するプラグイン。
+        使い方：以下の様に書くと、
         [src]
-        ���͡�{{shorten_url('http://example.com/0123456789/0123456789/
+        参考：{{shorten_url('http://example.com/0123456789/0123456789/
         0123456789/0123456789/0123456789/0123456789-a.html',54)}}
         {{shorten_url('http://example.com/0123456789/0123456789/
         0123456789/0123456789/0123456789/0123456789-b.html')}}
         [/src]
-        �����ʤ�ޤ���
+        こうなります：
         >>
-        ���͡�{{shorten_url('http://example.com/0123456789/0123456789/
+        参考：{{shorten_url('http://example.com/0123456789/0123456789/
         0123456789/0123456789/0123456789/0123456789-a.html',54)}}
         {{shorten_url('http://example.com/0123456789/0123456789/
         0123456789/0123456789/0123456789/0123456789-b.html')}}
@@ -853,65 +862,65 @@
 
 2004-01-11  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.23[��꡼��]: 
-	�����������ɤȤꤢ����������
-	�ѥ�桼���ʳ��ˤϤ������ᤷ�ޤ���
+	* version 0.23[リリース]: 
+	作業途中だけどとりあえず公開。
+	パワーユーザ以外にはおすすめしません。
 
 2004-01-09 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (clean_changelog): 
-	����ñ�̤�ʬ�䤷�ƥꥹ�Ȥ������Τ򤳤��ʳ��ǹԤʤ��褦�ˤ�����
+	日付単位に分割してリストに入れるのをこの段階で行なうようにした。
 
-	���������̩�ι��ܤ� stdout �˽��Ϥ�������������
-	���ν��Ϥ�Ԥʤ�����Υ⡼�ɤϸ�Ǻ�롣���̤ϥǥե���ȡ�
+	削除した秘密の項目を stdout に出力する処理を実装。
+	この出力を行なうためのモードは後で作る。当面はデフォルト。
 
 2003-12-29 (Mon)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (okikae): 
-	��Ƭ�Υ��ڡ����� &nbsp; ���֤�������褦�ˤ�����
+	行頭のスペースは &nbsp; に置き換えるようにした。
 
 	* chalow (escape_string): 
-	ʸ����Υ��������ס����֡�
-	1. HTML ���������� - ʸ���󤽤Τޤ�
-	2. ���������������� - "&" �� "<" �ʤɤ��ִ��� pre ���դ��� (�����
-	  ��Ȥ����פʤȤ���) --- ���ޤ�Ȥ�ʤ�����
-	3. �ץ饰���󥨥�������
-	�᤹�Ȥ��ϵա�
+	文字列のエスケープ。順番。
+	1. HTML エスケープ - 文字列そのまま
+	2. ソースエスケープ - "&" や "<" などを置換し pre を付ける (インデ
+	  ントが重要なときに) --- あまり使わないかも
+	3. プラグインエスケープ
+	戻すときは逆。
 
 	* chalow (okikae): 
-	���֤�ǽ�˾ä����ˤˤ����ΤǥХ����Ф���������
+	タブを最初に消す方針にしたのでバグが出た。修正。
 	OLD: my $URLDELIM = "\\\\\\n[\\t ]+";
 	NEW: my $URLDELIM = "\\\\\\n *";
 
 	* cl.conf (amazon_link): 
-	�ץ饰����� <br> �δط��Ǥ����㤴����ȡ�
-	������ "..\n..\n.." �Ȥ���ʸ����ˤ� <br> �����­����
+	プラグインと <br> の関係でごちゃごちゃと。
+	引数の "..\n..\n.." という文字列には <br> を再度足す。
 
 	* chalow (write_js_file): 
 	New write_js_file().
-	JavaScript feed �ե��������Ϥ���ؿ�
+	JavaScript feed ファイルを出力する関数
 
-	* pre�ѻ�[���]:
-	pre �Ϥߤ���롣�ƹԤι����� <br> ���դ���褦�ˤ�����
-	pre ������̤˹Ԥʤ���
-	��������ɽ���� [esc][src][/src][/esc] ��Ȥ�������ƥ��ƥ��ִ���pre��
+	* pre廃止[メモ]:
+	pre 囲みをやめる。各行の行末に <br> を付けるようにした。
+	pre 指定は別に行なう。
+	ソースの表示は [esc][src][/src][/esc] を使う→エンティティ置換＆pre。
 
-	�㡧 [literal][esc][/literal]<pre>...</pre>[literal][/esc][/literal]
+	例： [literal][esc][/literal]<pre>...</pre>[literal][/esc][/literal]
 
 	[sic][esc][/sic]<pre>
-	������������
-	����������������������
-	����������������������
-	����������������������
-	����������������������
+	┏━━━┓　
+	┃　　　┣━━━━━┓
+	┗┳━━┛　　　　　┃
+	　┃　　　　　　　　┃
+	　┗━━━━━━━━┛
 	</pre>[sic][/esc][/sic]
-	  ��
+	  ↓
 	[esc]<pre>
-	������������
-	����������������������
-	����������������������
-	����������������������
-	����������������������
+	┏━━━┓　
+	┃　　　┣━━━━━┓
+	┗┳━━┛　　　　　┃
+	　┃　　　　　　　　┃
+	　┗━━━━━━━━┛
 	</pre>[/esc]
 
 	[sic][src][/sic]
@@ -920,7 +929,7 @@
 	    return qq(<a href="http://example.com/search?q=$k">$o</a>);
 	}
 	[sic][/src][/sic]
-	  ��
+	  ↓
 	[src]
 	sub test {
 	    my ($k) = @_;
@@ -931,28 +940,28 @@
 2003-12-28 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 
-	�ǽ�Υ��꡼��� (clean_changelog) �˹�Ƭ�Υ��֤������ʤ����褦��
-	����������ˤȤ�ʤä����Τ�����
-	¾�ե����ޥåȤΥץ쥤��ƥ������б��ؤ����С�
-	(�㤨�С�Windows �Υ��Ģ�� .LOG �Υե����ޥå�)
+	最初のクリーン時 (clean_changelog) に行頭のタブを全部なくすように
+	した。これにともなって全体を修正。
+	他フォーマットのプレインテキスト対応への布石。
+	(例えば、Windows のメモ帳の .LOG のフォーマット)
 
 	* chalow: 
-	$clog_url �Ρ�# ������ "/" �����ספäƾ���̵������
-	(write_rss_file): RSS �ν��ϥ���ȥ���ξ�¤��᤿��7 ��ʬ�ʾ��
-	�Ф��ʤ���
-	(escape_string): ��������֥��å�[2003-09-05-1]�ε�ˡ���ɲá�
-	��Wiki Way�פ򻲹ͤˡ�
+	$clog_url の「# 末尾の "/" は不要」って条件を無くす。
+	(write_rss_file): RSS の出力エントリ数の上限を決めた。7 日分以上は
+	出さない。
+	(escape_string): 処理回避ブロック[2003-09-05-1]の記法の追加。
+	「Wiki Way」を参考に。
 	> [sic][literal]{{g}}[/literal][/sic], [literal][sic]{{g}}[/sic], [esc]{{g}}[/esc][/literal]
-	  ��	
+	  ↓	
 	> [literal]{{g}}[/literal], [sic]{{g}}[/sic], [esc]{{g}}[/esc]
 
 	* cl.conf (blukfeeds): 
-	Bulkfeeds ������ɸ����ץ饰����
+	Bulkfeeds キーワード検索プラグイン
 
 2003-12-25  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
-	RSS �˰ʲ��ε��Ҥ��ɲá�
+	RSS に以下の記述を追加。
 	>>
 	xmlns:admin="http://webns.net/mvcb/"
 	<admin:generatorAgent rdf:resource="http://nais.to/~yto/tools/chalow/" />
@@ -961,205 +970,205 @@
 2003-11-07  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf (amazon_link): 
-	�ץ饰�������̤Υ��ޥ��󥢥��������ȥ�󥯤κ�����
+	プラグイン。普通のアマゾンアソシエイトリンクの作成。
 
 2003-11-06 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf (wiki_link): 
-	�ץ饰����Wiki �ؤΥ�󥯤κ�����
+	プラグイン。Wiki へのリンクの作成。
 	usage: [esc]{{wiki_link('WIKINAME')}}[/esc]
-	{{wiki_link('���ȥޥ����⥢���ޥ���')}}
+	{{wiki_link('ゲトマネ戦隊アサマシ８')}}
 	
 	* cl.conf (qualmish_amazon_link): 
-	�ץ饰���󡣸���᤿�� amazon �����������ȥ�󥯤κ���
+	プラグイン。後ろめたい amazon アソシエイトリンクの作成
 	usage [esc]{{qualmish_amazon_link('ASIN', 'ID', 'STR')}}[/esc]
 	{{qualmish_amazon_link('4756102816','ytoshomepage-22',
-	"TEST:Perl��ˡ
+	"TEST:Perl書法
 	image/gazou.png")}}
 
-	{{qualmish_amazon_link('4756102816','',"TEST:Perl��ˡ")}}
+	{{qualmish_amazon_link('4756102816','',"TEST:Perl書法")}}
 
 	ref. <http://chalow.net/2003-11-06.html>
 
 2003-11-04  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.22[��꡼��]: 
-	������
-	�Х������Ⱦ������ѹ��Τߡ�
+	* version 0.22[リリース]: 
+	公開。
+	バグ修正と小さな変更のみ。
 
 2003-11-03  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file), cl.conf: 
-	channel/description ����Ȥ�����Ǥ���褦�ˤ�����
+	channel/description の中身を設定できるようにした。
 	>>
-	# ���������� for RSS : ��: "�����Τ��줳�졣"
+	# 日記の説明 for RSS : 例: "日々のあれこれ。"
 	my $changelog_description = "";
 	<<
 
 	* chalow (parse_entry): 
-	RSS �� itemheader ���Фʤ��Ȥ������礦��ʤ��Х���ʤ����ޤ�����
+	RSS の itemheader が出ないというしょうもないバグをなおしました。
 	http://apollo.u-gakugei.ac.jp/~sunaoka/clog/2003-11.html#2003-11-02-9
 
 2003-11-02  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.21[��꡼��]: 
-	������
-	�Х������侮�����ѹ��Τߡ���ǽ���ɲäʤɤϤʤ���
+	* version 0.21[リリース]: 
+	公開。
+	バグ修正や小さな変更のみ。機能の追加などはなし。
 
 	* chalow: 
-	- h4rss ��ʤ��� (all_entries �Υ���)��
+	- h4rss をなくす (all_entries のキー)。
 
 2003-11-01  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
-	���Τ� dc:date �����դ�������ʤ����֤������褦�ˤ�����
+	全体の dc:date に日付だけじゃなく時間も入れるようにした。
 
 2003-10-30  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* cl.conf: 
-	clsearch �ץ饰������ɲá�
+	clsearch プラグインを追加。
 
 	* chalow (write_index_page): 
-	����ǥå����ڡ����Υƥ�ץ졼�Ȥ� YEARMONTH ���Ȥ���褦�ˤʤ��
-	������
+	インデックスページのテンプレートで YEARMONTH が使えるようになりま
+	した！
 
 	* chalow: 
-	- $all_month ���ѻߡ�
-	- make_month_page_list �ϰ������Ƥ֤��Ȥˤ�����
-	- write_index_page �� write_month_page �ΰ����ο��ؤ餹��
-	- �Ƕ�β�������������ǥå����ڡ����˺ܤ��뤿��ν�����
-	  write_index_page �ء�
+	- $all_month を廃止。
+	- make_month_page_list は一回だけ呼ぶことにした。
+	- write_index_page と write_month_page の引数の数へらす。
+	- 最近の何日かだけインデックスページに載せるための処理を
+	  write_index_page へ。
 
 	* chalow (clean_changelog): 
-	������Ǥ�������ڤ�ɽ�����Ԥ򥿥ֹԤˤ���Ȥ�������ɽ�����ѹ���
-	�Ĥ��Ǥ�Ϣ³���Ԥ�ͤ�롣
+	項目内での段落区切り表す空行をタブ行にするとこの正規表現を変更。
+	ついでに連続空行を詰める。
 	OLD  $$strp =~ s/\n(\n\t[^\*])/\n\t$1/gm;
 	NEW  $$strp =~ s/\n+(\n\t[^\*])/\n\t$1/gm;
 
 2003-10-28  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi: 
-	������̤˥�󥯽����褦�˥ǥե���ȤȤ��� GET ����ꡣ
+	検索結果にリンク出来るようにデフォルトとして GET を指定。
 
 2003-10-27  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
-	> <dc:data>$today</dc:data>������<dc:date>$today</dc:date>
+	> <dc:data>$today</dc:data>　→　<dc:date>$today</dc:date>
 	http://mailarc.namazu.org/htmlmail/chalow/62
 
 	(parse_entry): 
-	> push @{$same_date{"$m-$d"}}, $y; # Ʊ������ (����) �����ǯ�Υꥹ��
-	��
-	> push @{$same_date{"$m-$d"}}, $y  # Ʊ������ (����) �����ǯ�Υꥹ��
+	> push @{$same_date{"$m-$d"}}, $y; # 同じ日付 (月日) を持つ年のリスト
+	→
+	> push @{$same_date{"$m-$d"}}, $y  # 同じ日付 (月日) を持つ年のリスト
 	>     if (!grep(/$y/, @{$same_date{"$m-$d"}}));
 	http://mailarc.namazu.org/htmlmail/chalow/63
 
-	�Х��ե��å������ġ�
+	バグフィックス２つ。
 
 2003-10-23  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (okikae): 
-	�����Ȥ�Ĥ����Ȥ����ǥե����������᤿��
+	コメントを残す、というデフォルト設定をやめた。
 
 	* chalow (clean_changelog): 
-	Saito HiroAki ��Υѥå���Ŭ�Ѥ����Τ����㴳��ľ����
+	Saito HiroAki 氏のパッチを適用したのち、若干手直し。
 
-	[chalow:60] �ץ饤�١��ȥ����ƥ�����Υ���ȥ��parse error 
+	[chalow:60] プライベートアイテムだけのエントリでparse error 
 	http://mailarc.namazu.org/htmlmail/chalow/60
 
 2003-10-22 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* p:��̩�Ǥ�: [2003-10-23-1]�Υƥ��ȡ�
-	�ۤۤ���
+	* p:秘密です: [2003-10-23-1]のテスト。
+	ほほう。
 
-	�ؤؤ�
+	へへへ
 
 2003-10-21 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.20[��꡼��]: 
-	����
+	* version 0.20[リリース]: 
+	公開
 
-	* ������ѹ���: 
-	- ���ڡ���������ǽ
-	- �ѹ��Τ��ä��ե�����������Ϥ���⡼��
-	- ʣ���ե�����Υޡ���
-	- HTML �����򤽤Τޤ޽񤯵�ˡ
-	- ���� CGI �ޤ����ѹ�
-	- ���������� CGI
-	- TrackBack ��Ȥ�����β�¤
+	* 今回の変更点: 
+	- 日ページ作成機能
+	- 変更のあったファイルだけ出力するモード
+	- 複数ファイルのマージ
+	- HTML タグをそのまま書く記法
+	- 検索 CGI まわりの変更
+	- 携帯電話用 CGI
+	- TrackBack を使うための改造
 
 	* clkeitai.cgi (output_simple_list): 
-	�����ƥ�Υ��������礭������ȥХ���Τǽ�����
+	アイテムのサイズが大きすぎるとバグるので修正。
 
 	* chalow (write_day_page, write_month_page, write_index_page): 
-	������ե�����ȥ��������ۤʤ���Τ߽��Ϥ���⡼�ɤ��ߤ�����
-	> # ������ե�����ȥ��������ۤʤ���Τ߽��Ϥ��� (0:NO, 1:YES)
+	出力先ファイルとサイズが異なる場合のみ出力するモードを設けた。
+	> # 出力先ファイルとサイズが異なる場合のみ出力する (0:NO, 1:YES)
 	> $update_by_size = 1;
 	
-	����ˡ������ޥ�ɥ饤�󥪥ץ����
-	> -u  ������ե�����ȥ��������ۤʤ���Τ߽��Ϥ���
+	さらに、新コマンドラインオプション
+	> -u  出力先ファイルとサイズが異なる場合のみ出力する
 
 	* chalow (write_rss_file): 
-	rss �� description ����̣��ʸ����Ĺ�ξ�¤���ơ��ڤ�褦�ˤ�����
+	rss の description の中味の文字列長の上限を決めて、切るようにした。
 
 	* README: 
 	mod.
 
 	* chalow (okikae): 
-	���Ѥο���ˡ��">>" �� "<<" �ǰϤࡣref �ϤƤʥ������꡼��
+	引用の新記法：">>" と "<<" で囲む。ref はてなダイアリー。
 	> >>
-	> ���ѤǤ���
+	> 引用です。
 	> <<
-	�Ȥ���ȡ�
+	とすると、
 	>>
-	���ѤǤ���
+	引用です。
 	<<
-	�Ȥʤ�ޤ���
+	となります。
 
 2003-09-29 (Mon)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file): 
-	RSS �� description �ǲ��Ԥ����ڡ����ˤʤäƤ��ޤäƤ����Τ�����
+	RSS の description で改行がスペースになってしまっていたのを修正。
 
 2003-09-25 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow: 
-	TrackBack ��Ȥ�����β�¤��
+	TrackBack を使うための改造。
 
-	$tukkomi_template �� New �֤��������� DATE_ID = "20030924"
+	$tukkomi_template の New 置き換え項目 DATE_ID = "20030924"
 
-	<div class="comment">$template</div> �� div �� cl.conf �������
-	�Ƥ�����ˤ��ѹ���
+	<div class="comment">$template</div> の div は cl.conf で設定書い
+	てもら方針に変更。
 	> $items_new .= qq(<div class="comment">$template</div>);
-	��
+	↓
 	> $items_new .= $template;
 
 2003-09-17 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clkeitai.cgi: 
 	New!!!
-	chalow �ˤ�� HTML �����줿�ڡ����򥱡������Ǹ��뤿��� CGI��
+	chalow により HTML 化されたページをケータイで見るための CGI。
 
-	�����ѥե����� cl.itemlist ��ɬ�פǤ���cl.conf �� $output_itemlist
-	(�����ѥե�������뤫�ݤ�) �� 1 �ˤ��뤬ɬ�פ���ޤ���
+	検索用ファイル cl.itemlist が必要です。cl.conf の $output_itemlist
+	(検索用ファイルを作るか否か) を 1 にするが必要あります。
 
-	�����ƥ����ɽ�����ǥե���ȤǤ���HTML �����ϤۤȤ�ɤʤ����ץ쥤
-	��ƥ����Ȥ˶ᤤɽ���Ǥ��������ƥ���ɽ���ؤΥ�󥯤�����ޤ���
+	アイテム一覧表示。デフォルトです。HTML タグはほとんどなく、プレイ
+	ンテキストに近い表示です。アイテム別表示へのリンクがあります。
 
-	�����ƥ���ɽ�������󥫡����ꡣ���Ԥ��ꡣ�����ƥ������������ǥ���
-	��פ�����ޤ���
+	アイテム別表示。アンカーあり。改行あり。アイテム一覧から選んでジャ
+	ンプして来ます。
 
 	* clsearch.cgi: 
 	use binmode().
 
 	* chalow (write_rss_file): 
-	<description></description> �˥����ƥ����̣�����줿��
+	<description></description> にアイテムの中味を入れた。
 
 	* cl.conf:
-	���礤������
+	ちょい修正。
 
 	* chalow: 
-	use binmode(). ���ƤΥե����� IO �ˡ�
+	use binmode(). 全てのファイル IO に。
 
 2003-09-10  YAMASHITA Tatsuo  <yto at nais.to>
 
@@ -1169,106 +1178,106 @@
 2003-09-05 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi: 
-	ʣ�������Ǥ⸡���Ǥ���褦�ˤ�����
-	���ڡ����Ƕ��ڤ롣���ڡ�������Υ����� "" �ǰϤࡣ
+	複数キーでも検索できるようにした。
+	スペースで区切る。スペース入りのキーは "" で囲む。
 
 	* chalow: 
-	ʣ���Υե������ޡ����Ǥ���褦�ˤ��������ޤǤ⤽���Ǥ���Ϥ�����
-	���Τ������Ǥ��Ƥʤ��ä� (Ʊ�����դ��񤭤��Ƥ��ޤ�)��
+	複数のファイルをマージできるようにした。今までもそうできるはずだっ
+	たのだが、できてなかった (同じ日付を上書きしてしまう)。
 	
 	* chalow (clean_changelog): 
-	New. ChangeLog �Υ��꡼�˥󥰡�����Ω�ؿ�����
+	New. ChangeLog のクリーニング、を独立関数化。
 
 	* chalow (escape_string, unescape_string): 
-	New.  ʸ�����֤�����������Ū�����򤷡�����������뤿��δؿ�������
-	���ϥޡ��� '\t_HTML_START_\n' �Ƚ�λ�ޡ��� '\t_HTML_END_\n' �˰Ϥ�
-	�줿�ΰ�Ϥ��Τޤ� HTML �ե�����ؽ��Ϥ��롣
-	(����ˤ�ꡢ��Ƭ�Υ��֤Ϻ���뤳�Ȥ⤢��)
+	New.  文字列置き換えから一時的に退避し、後に復帰するための関数たち。
+	開始マーク '\t_HTML_START_\n' と終了マーク '\t_HTML_END_\n' に囲ま
+	れた領域はそのまま HTML ファイルへ出力する。
+	(設定により、行頭のタブは削られることもある)
 
 	_HTML_START_
-	��: <a href="javascript:(function(){for(i=0;i<document.all.length;i++)
+	例: <a href="javascript:(function(){for(i=0;i<document.all.length;i++)
 	{e=document.all(i);if(e.style){e.style.fontSize=&quot;medium&quot;
-	}}})();">�ե���ȥ���������β��</a>
+	}}})();">フォントサイズ指定の解除</a>
 	_HTML_END_
 
 2003-09-04 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_day_page):
-	New. ���ڡ���������
+	New. 日ページ作成。
 
-	> # �����Ȥ˥ڡ������뤫 (1:YES, 0:NO)
+	> # 日ごとにページを作るか (1:YES, 0:NO)
 	> my $day_page_mode = 1;
 	
 	* chalow (make_day_list):
-	New. ���հ��������������Ω�ؿ��ˤ�����
+	New. 日付一覧を作成、を独立関数にした。
 
 	* chalow (datestr2anchor):
-	New. ���դǻ��ȥ�󥯺���������Ω�ؿ��ˤ�����
+	New. 日付で参照リンク作成、を独立関数にした。
 
 	* clsearch.cgi: 
-	�����ѥե��������Ѥ���褦�������˽񤭴�����
-	Jcode.pm �����פ� (��Ȥ�Ȥ���ʤ��ä�����...)��
+	検索用ファイルを使用するように大幅に書き換え。
+	Jcode.pm は不要に (もともといらなかった疑惑...)。
 
 	* chalow (write_itemlist_file): 
-	New. �����ѥե��������Ϥ��롣�����Ѥ� itemlist �� 1 �ե�����ˤ�
-	�Ȥ᤿�ե�������뤳�Ȥˤ�����
+	New. 検索用ファイルを出力する。検索用に itemlist を 1 ファイルにま
+	とめたファイルを作ることにした。
 
-	> # �����ѥե����� (itemlist) ���뤫 (1:YES, 0:NO)
+	> # 検索用ファイル (itemlist) を作るか (1:YES, 0:NO)
 	> my $output_itemlist = 1;
 
 2003-08-30 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.19[��꡼��]: 
-	����
+	* version 0.19[リリース]: 
+	公開
 
-	* �ѹ����ΤޤȤ�: 
+	* 変更点のまとめ: 
 
-	- �ץ饰����ǽ
-	  �㡧
-	  [esc]{{google_search('��Ϸ̾ �ǲ��')}}[/esc] �� {{google_search('��Ϸ̾ �ǲ��')}}
+	- プラグイン機能
+	  例：
+	  [esc]{{google_search('海老名 映画館')}}[/esc] → {{google_search('海老名 映画館')}}
 
-	- ��ʬ������������ǤΥ�ե��顼��ǽ
+	- 自分の日記内だけでのリファラー機能
 	  ref. <http://chalow.net/2002-06-28-2.html>
 
-	- Hiki �ε�ˡ��==�ѥ���==����
-	  Ǥ�դ� URL �ؤΥ�󥯡�ʸ����������ʿ��
-	  �㡧(��������Ѥ�ɽ�����Ƥ��ޤ������ºݤ�Ⱦ��)
-	  �Ρ�Yahoo!|http://www.yahoo.co.jp/�ϡ� �� [[Yahoo!|http://www.yahoo.co.jp/]]
-	  ���ABC���     �� ==ABC==
-	  �ǡ�ABC�ǡ�     �� ''ABC''
-	  �ǡǡ�ABC�ǡǡ� �� '''ABC'''
+	- Hiki の記法を==パクる==採用
+	  任意の URL へのリンク、文字修飾、水平線
+	  例：(記号は全角で表記していますが、実際は半角)
+	  ［［Yahoo!|http://www.yahoo.co.jp/］］ → [[Yahoo!|http://www.yahoo.co.jp/]]
+	  ＝＝ABC＝＝     → ==ABC==
+	  ’’ABC’’     → ''ABC''
+	  ’’’ABC’’’ → '''ABC'''
 
-	- �ƥ����ƥ�˵��Ҽ�̾��ɽ�����뵡ǽ (for ʣ���ͤ� ChangeLog)
+	- 各アイテムに記述者名を表示する機能 (for 複数人で ChangeLog)
 
-	- nkf �Ϥ��ơ�Jcode.pm ��Ȥ��褦�ˤ���
+	- nkf はやめて、Jcode.pm を使うようにした
 
-	- RSS �� <dc:date> ��­���褦�ˤ���
+	- RSS に <dc:date> も足すようにした
 
 	* README:
 	mod.
 
 	* chalow (parse_entry): 
-	$descending_order_item_num �ѻߡ������ƥ�� ID �Ϲ߽�Ǹ��ꡣ
+	$descending_order_item_num 廃止。アイテムの ID は降順で固定。
 
 	* {clsearch.cgi,chalow}: 
-	���������䤹���褦�ˡ��� item (section) �ν����򤢤�魯�ޡ��� 
-	<!--eos--> ����������ˤˤ������ǽ餫�餳��������ɤ��ä�...��
+	検索がしやすいように、各 item (section) の終わりをあらわすマーク 
+	<!--eos--> を入れる方針にした。最初からこうすれば良かった...。
 
 2003-08-29 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* �ץ饰����ǽ[���]:
-	�ץ饰����ǽ���о�!
-	��{�ף��Ĥȡ�}�ף��ĤǰϤ�ȥץ饰���� (�ؿ�) ��ƤӽФ����Ȥ��Ǥ�
-	�ޤ�������ޤ�¿���Τ��ȤϤǤ��ޤ���...��
+	* プラグイン機能[メモ]:
+	プラグイン機能が登場!
+	「{」２つと「}」２つで囲むとプラグイン (関数) を呼び出すことができ
+	ます。あんまり多くのことはできませんが...。
 
-	�㡧(��������Ѥ�ɽ�����Ƥ��ޤ������ºݤ�Ⱦ��)
-	> [esc]{{google_search('��Ϸ̾ �ǲ��')}}[/esc] �� {{google_search('��Ϸ̾ �ǲ��')}}
+	例：(記号は全角で表記していますが、実際は半角)
+	> [esc]{{google_search('海老名 映画館')}}[/esc] → {{google_search('海老名 映画館')}}
 
-	�ץ饰����� cl.conf ��­�����֤��лȤ��ޤ���
+	プラグインは cl.conf に足して置けば使えます。
 
 	in cl.conf
 	> # -------------------------------------------------------------
-	> # �ʲ����ץ饰����
+	> # 以下、プラグイン
 	> sub google_search {
 	>     my ($k) = @_;
 	>     my $o = $k;
@@ -1279,255 +1288,255 @@
 	> }
 
 	* chalow: 
-	���ե�󥯤ˤ���ե��顼���Ĥޤꡢ��ʬ������������ǤΥ�ե��顼
-	��ǽ�������
+	日付リンクによるリファラー、つまり、自分の日記内だけでのリファラー
+	機能を実装。
 	ref. <http://chalow.net/2002-06-28-2.html>
 
-	<div class="referer"><span> </span></div> �ǰϤࡣ
-	sample/diary.css �ˤ��Υ��饹���ɲä�����
+	<div class="referer"><span> </span></div> で囲む。
+	sample/diary.css にそのクラスを追加した。
 
-	�ƥ���: [2003-06-26-2] [2003-06-26-1] [2003-06-26]
+	テスト: [2003-06-26-2] [2003-06-26-1] [2003-06-26]
 	
 	* gazou.png: 
-	New! ���좭 cvs add -kb ������
-	[[����|image/gazou.png]]
+	New! これ↓ cvs add -kb した。
+	[[画像|image/gazou.png]]
 
 	* chalow: (get_link_str):
-	New for Hiki ��ˡ�������ơ� get_img_str() ���ѻߡ�
+	New for Hiki 記法。そして、 get_img_str() を廃止。
 
 	* p:[IMG:image/gazou.png] [IMG:image/gazou.png http://nais.to/~yto/]
 
 	* chalow (okikae): 
-	Hiki �ε�ˡ��==�ѥ���==���ѡ�
+	Hiki の記法を==パクる==採用。
 
-	��Ǥ�դ� URL �ؤΥ��
+	■任意の URL へのリンク
 
-	��ñ��|URL�פ� 2 �Ĥ�Ⱦ�ѥ������å��ǰϤ�Ȥ�Ǥ�դ� URL �ؤΥ��
-	�ˤʤ�ޤ���
+	「単語|URL」を 2 つの半角カギカッコで囲むとを任意の URL へのリンク
+	になります。
 
-	�㡧(��������Ѥ�ɽ�����Ƥ��ޤ������ºݤ�Ⱦ��)
-	> �Ρ�Yahoo!|http://www.yahoo.co.jp/�ϡ� �� [[Yahoo!|http://www.yahoo.co.jp/]]
+	例：(記号は全角で表記していますが、実際は半角)
+	> ［［Yahoo!|http://www.yahoo.co.jp/］］ → [[Yahoo!|http://www.yahoo.co.jp/]]
 	
-	���ΤȤ� URL �������� jpg,jpeg,png,gif ���� IMG ������Ÿ������ޤ���
-	�ʻ��ꤷ��ñ�줬ALT�����ꤵ����
+	このとき URL の末尾が jpg,jpeg,png,gif だと IMG タグに展開されます。
+	（指定した単語がALTに設定される）
 
-	�㡧(��������Ѥ�ɽ�����Ƥ��ޤ������ºݤ�Ⱦ��)
-	> �� �Ρο�|image/gazou.png�ϡ�
-	[[��|image/gazou.png]]
+	例：(記号は全角で表記していますが、実際は半角)
+	> ↓ ［［図|image/gazou.png］］
+	[[図|image/gazou.png]]
 	
-	��ñ��פ������� jpg,jpeg,png,gif ���ȥ���å���ǽ�� IMG ������Ÿ
-	������ޤ���IMG �� URL �ؤΥ�󥯤ˤʤ�ޤ���
+	「単語」の末尾が jpg,jpeg,png,gif だとクリック可能な IMG タグに展
+	開されます。IMG が URL へのリンクになります。
 	
-	�㡧(��������Ѥ�ɽ�����Ƥ��ޤ������ºݤ�Ⱦ��)
-	> �� �Ρ�image/gazou.png|http://nais.to/~yto/�ϡ�
+	例：(記号は全角で表記していますが、実際は半角)
+	> ↓ ［［image/gazou.png|http://nais.to/~yto/］］
 	[[image/gazou.png|http://nais.to/~yto/]]
 
-	�ޤ���URL �äݤ���Τ�����Ⱦ���˥�󥯤��Ϥ��ޤ���
+	また、URL っぽいものがあると勝手にリンクがはられます。
 
-	�㡧
+	例：
 	> http://www.yahoo.co.jp/
 
-	��ʸ�������ε�ˡ
+	■文字修飾の記法
 
-	��'��2�ĤǤϤ������ʬ�϶�Ĵ����ޤ�����'��3�ĤǤϤ������ʬ�Ϥ���
-	�˶�Ĵ����ޤ�����=��2�ĤǤϤ������ʬ�ϼ�����ˤʤ�ޤ���
+	「'」2個ではさんだ部分は強調されます。「'」3個ではさんだ部分はさら
+	に強調されます。「=」2個ではさんだ部分は取消線になります。
 
-	�㡧(��������Ѥ�ɽ�����Ƥ��ޤ������ºݤ�Ⱦ��)
-	> ���ABC��� �� ==ABC== (<s>ABC</s>)
-	> �ǡ�ABC�ǡ� �� ''ABC'' (<em>ABC</em>)
-	> �ǡǡ�ABC�ǡǡ� �� '''ABC''' (<strong>ABC</strong>)
+	例：(記号は全角で表記していますが、実際は半角)
+	> ＝＝ABC＝＝ → ==ABC== (<s>ABC</s>)
+	> ’’ABC’’ → ''ABC'' (<em>ABC</em>)
+	> ’’’ABC’’’ → '''ABC''' (<strong>ABC</strong>)
 
-	����ʿ���ε�ˡ
+	■水平線の記法
 
-	�ޥ��ʥ������-�פ�Ԥ���Ƭ�Υ��֤θ夫�� 4 �Ľ񤯤ȿ�ʿ���ˤʤ��
-	����
+	マイナス記号「-」を行の先頭のタブの後から 4 つ書くと水平線になりま
+	す。
 
-	�㡧(��������Ѥ�ɽ�����Ƥ��ޤ������ºݤ�Ⱦ��)
-	>         ���Ϥ�
-	>         �ݡݡݡ�
-	>         ���Ҥ�
-	���Ϥ�
+	例：(記号は全角で表記していますが、実際は半角)
+	>         あはは
+	>         −−−−
+	>         いひひ
+	あはは
 	----
-	���Ҥ�
+	いひひ
 
 2003-08-25  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow:
-        ���դ����Ǥʤ����ҼԤ��θ����褦�ˤ��ʤ���������� ChangeLog (ʣ
-	���ο͡�����ȯ���Ѥ���Ȥ�������) �ǻȤ��ʤ�����ڤ���??? �����ǡ�
-	���ҼԤ�ʣ������ ChangeLog �ե������Ѥˡ��ƥ����ƥ�˵��Ҽ�̾��ɽ
-	������⡼�ɤ��ä���
+        日付だけでなく記述者も考慮するようにしなくちゃ本来の ChangeLog (複
+	数の人々が開発に用いるという状況) で使えない。普及の壁??? そこで、
+	記述者が複数いる ChangeLog ファイル用に、各アイテムに記述者名を表
+	示するモードを作った。
 	
         in cl.conf:
-        > # �ƥ����ƥ�˵��Ҽ�̾��ɽ�����뤫 (1:YES, 0:NO)
+        > # 各アイテムに記述者名を表示するか (1:YES, 0:NO)
         > $show_author_name = 0;
 
-	<div class="itemauthor"><span>̾��</span></div>
+	<div class="itemauthor"><span>名前</span></div>
 	
-        ��author name��
+        「author name」
         ref. <http://www.jurta.org/emacs/ee/text/changelog.en.html>
 
 2003-08-16  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* README: 
-	mod.  nkf ��ɬ�ס��Ȥε��Ҥ�����
+	mod.  nkf が必要、との記述を削除。
 
 	* clsearch.cgi: 
-	���������դ��Ф���ʤ��ʤäƤ����Τ�����
+	検索で日付が出て来なくなっていたのを修正。
 
 2003-08-11 (Mon)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi:
-	nkf �Ϥ��ơ�Jcode.pm ��Ȥ��褦�ˤ�����
+	nkf はやめて、Jcode.pm を使うようにした。
 
 	* chalow: 
-	nkf ��Ƥ֤ΤϤ��ơ�Jcode.pm ��Ȥ��褦�ˤ�����
-	(write_rss_file): utf-8 �ؤ�ʸ���������Ѵ��� Jcode ��Ȥ��褦�ˤ�
-	�����椨�ˡ�chalow 0.18 ����ɬ�פȤʤä���nkf 2.0 �ʹߡפ����ס�
+	nkf を呼ぶのはやめて、Jcode.pm を使うようにした。
+	(write_rss_file): utf-8 への文字コード変換に Jcode を使うようにし
+	た。ゆえに、chalow 0.18 から必要となった「nkf 2.0 以降」は不要。
 
-	- ¾�ξ��Ǥ� nkf �Ȥ��Τ�᤿��
-	- FileHandle ��Ȥ��Τ�᤿��
+	- 他の場所でも nkf 使うのやめた。
+	- FileHandle も使うのやめた。
 
-	- memo: Cygwin �� Jcode.pm 
+	- memo: Cygwin へ Jcode.pm 
 	<http://chalow.net/2003-08-12-1.html>
 
 2003-08-09  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi:
-	CSS ����ߤǤ���äȽ�����
+	CSS がらみでちょっと修正。
 
 2003-08-08 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (write_rss_file):
-	RSS �� <dc:date> ��­���褦�ˤ��������դ����ǡ����֤Ϥʤ���
-	��: <dc:date>2003-08-03</dc:date>
+	RSS に <dc:date> も足すようにした。日付だけで、時間はなし。
+	例: <dc:date>2003-08-03</dc:date>
 
 2003-08-03  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.18[��꡼��]: 
-	����
+	* version 0.18[リリース]: 
+	公開
 
 	* add-extent.pl: 
-	��� extent �����Ĵ�٤�Τϻ��֤�������Τ� cache �ե��������ѡ�
+	毎回 extent 情報を調べるのは時間がかかるので cache ファイルを採用。
 
 2003-07-31  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* RSS (RDF):
 	<script type="text/javascript" src="http://rss-jp.net/x/read_rss.cgi?url=http://nais.to/~yto/clog/cl.rdf&style=js&encode=euc&num=10"></script>
 
-	RSS ����Ϥ���褦�ˤ�����
+	RSS を出力するようにした。
 
-	���ΤȤ�����RDF ��ʸ�������ɤ� euc-jp��utf-8 �Ǥʤ���������ư����
-	�� RSS �������եȤ�����餷�����ɤ�������Τ���
-	(ref. RSS -- �����Ⱦ��������ȸ��� 
+	今のところ、RDF の文字コードは euc-jp。utf-8 でないと正しく動かな
+	い RSS 処理ソフトがあるらしい。どうしたものか。
+	(ref. RSS -- サイト情報の要約と公開 
 	<http://www.kanzaki.com/docs/sw/rss.html>)
 
-	�� nkf -w �Ǥʤ�Ȥ����롣��������nkf �Ͽ������Τ���ʤ���ʤ�̡�
+	→ nkf -w でなんとかする。しかし、nkf は新しいのじゃなきゃならぬ。
 
 	* chalow:
 	(parse_entry): mod for RSS
-	%all_items �Ȥ����ϥå�����������ƥ�����ͤ���ࡣ
+	%all_items というハッシュに全アイテム情報を詰め込む。
 	(write_rdf_file): New.  for RSS output.
-	(parse_entry): �ѡ������Ʒ�̤�ϥå���˵ͤ����褦�ˤ�����
-	�ѡ������������̥ѥ��ˤ�����
+	(parse_entry): パーズして結果をハッシュに詰め込むようにした。
+	パーズと生成を別パスにした。
 
 	* {chalow,cl.conf}:
-	������������ܤ��ɲ�
-	> # RSS ����Ϥ��뤫 (1:YES, 0:NO)
+	新たな設定項目を追加
+	> # RSS を出力するか (1:YES, 0:NO)
 	> my $output_rss = 1;
-	> # ChangeLog ��������� URL (���� URL �Բ�)
+	> # ChangeLog を公開する URL (相対 URL 不可)
 	> my $clog_url = "http://nais.to/~yto/clog";
-	> # ¾��ǯ��Ʊ������ (����) �ؤΥ�󥯤�ĥ�뤫 (1:YES, 0:NO)
+	> # 他の年の同じ日付 (月日) へのリンクを張るか (1:YES, 0:NO)
 	> my $same_date_jump = 1;
 
 	* cl2moneycsv.pl:
 	New.  
-	ChangeLog ���ǲȷ����äݤ����Ȥ򤹤뤿��Τ�Ρ�
-	ChangeLog ��⤫����ʪ������ȴ�������� CSV �ˤ��롣
+	ChangeLog メモで家計簿っぽいことをするためのもの。
+	ChangeLog メモから買物ログを抜きだして CSV にする。
 	(ref. <http://nais.to/~yto/doc/zb/0016.html#kakeibo>)
 
 2003-07-30 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow:
-	¾��ǯ��Ʊ������ (����) �ؤΥ�󥯤��դ��뵡ǽ (same date jump) ��
-	�ƥ���Ū�˼������㤨�С����� (����ȥ�إå���) �β��˲���ǯ�� 
-	7/30 �ε��ҤؤΥ�󥯤�ɽ������롣
+	他の年の同じ日付 (月日) へのリンクを付ける機能 (same date jump) を
+	テスト的に実装。例えば、日付 (エントリヘッダー) の下に過去数年の 
+	7/30 の記述へのリンクが表示される。
 
-	�Ѥ��긵: <http://kitaj.no-ip.com/tdiary/20021112.html#p07>
-	> �� nǯ����
-	> ¾��ǯ��Ʊ�����������Ĥ��Ƥ�����Τ�[nǯ����]�Ȥ�����󥯤�
-	> �����褦�ˤʤ�ޤ�����[nǯ����]�������ޤǴ�ĥ�ä�������Ĥ�
-	> ³���Ƥ������������줫��nǯ�����⡼�ɤǤ�[nǯ����]�Υ�󥯤�ɽ��
-	> ���ʤ��褦�ˤ��ޤ�����
+	ぱくり元: <http://kitaj.no-ip.com/tdiary/20021112.html#p07>
+	> 凹 n年日記
+	> 他の年の同じ月に日記をつけている場合のみ[n年日記]というリンクが
+	> 現れるようになりました．[n年日記]が現れるまで頑張って日記をつけ
+	> 続けてください．それからn年日記モードでは[n年日記]のリンクを表示
+	> しないようにしました．
 
 	* chalow: 
-	�ֺǶ�β�������������ǥå����ڡ����˺ܤ��뤿��ν����פ����Υ롼
-	�פγ��ؽФ����� $top_n_ctr ���ط����롣
+	「最近の何日かだけインデックスページに載せるための処理」を全体ルー
+	プの外へ出した。 $top_n_ctr が関係する。
 
 2003-07-23 (Wed)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* {chalow,cl.conf}: 
-	Add ��type="text/javascript"��
+	Add 「type="text/javascript"」
 	ref. <http://oikaze.com/~tamada/Diary/2003-07.html#2003-07-12-4>
 
 2003-07-15 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (parse_entry): 
-	item header �ʳ��ιԤ���\t*�פǻϤޤ�ȡ�����ʹߤ��ä��Ƥ��ޤ���
-	�����Х� [chalow:23] ���н衣
+	item header 以外の行が「\t*」で始まると、それ以降が消えてしまうと
+	いうバグ [chalow:23] に対処。
 
-	��: 
+	例: 
 	a
 	b
 	*
 	c
 
-	������ item ��ǧ����������ɽ����
+	原因は item を認識する正規表現。
 
-	> # (3) �ġ��� item ��ʬ�򤷡��� item ���Ȥ˽���
+	> # (3) 個々の item に分解し、各 item ごとに処理
 	> my @itemlist;
 	> while ($items =~ /^(\t\* .+?\n(?=\s*(\t\*|\Z)))/gsm) {
 	>     push @itemlist, $1;
 	> }
-	��
+	↓
 	> while ($items =~ /^(\t\* .+?\n(?=\s*(\t\* |\Z)))/gsm) {	
 	
 2003-07-12  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.17[��꡼��]: 
-	����
+	* version 0.17[リリース]: 
+	公開
 
 	* memo:
-	���äĤ� BBS = <http://nais.to/~yto/tools/kuttukibbs/>
+	くっつき BBS = <http://nais.to/~yto/tools/kuttukibbs/>
 
 2003-07-08 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow (parse_entry): 
-	���äĤ� BBS �ˤ��碌�ơ�TUKKOMI_DATE �λ��ͤ��ѹ���
+	くっつき BBS にあわせて、TUKKOMI_DATE の仕様を変更。
 	old: $template =~ s/TUKKOMI_DATE/$day/g;
 	new: $template =~ s/TUKKOMI_DATE/$mon.html%23$day/g;
 
 	old:
-	> �����Υĥå��� [<a href='./kuttukibbs.cgi?date=TUKKOMI_DATE'>����
-	> ���� / �ĥå��ߤ������</a>]
+	> 本日のツッコミ [<a href='./kuttukibbs.cgi?date=TUKKOMI_DATE'>全部
+	> 見る / ツッコミを入れる</a>]
 
 	new:
-	> �����Υĥå��� [<a href='./kuttukibbs.cgi?url=TUKKOMI_DATE'>����
-	> ���� / �ĥå��ߤ������</a>]
+	> 本日のツッコミ [<a href='./kuttukibbs.cgi?url=TUKKOMI_DATE'>全部
+	> 見る / ツッコミを入れる</a>]
 	
 2003-07-01 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* {chalow,cl.conf}:
 	mod $item_header_mark (ref. [2003-06-26-1])
-	> # item header ����Ƭ�ε���λ���
-	> # �������Υ�����������Ƭ(���֥����ȥ�ι�Ƭ)����������롢����Ѥ�
-	> # ���󥫡�ʸ�������ꤷ�ޤ����ʤ���<span class="panchor">_</span>�פ�
-	> # ���ꤹ��ȡ��ơ��ޤˤ�äƤϼ�ưŪ�˲������󥫡����Ĥ��褦�ˤʤ��
-	> # ������(tDiary �� skel/conf.rhtml ���)
+	> # item header の先頭の記号の指定
+	> # 『日記のセクションの先頭(サブタイトルの行頭)に挿入される、リンク用の
+	> # アンカー文字列を指定します。なお「<span class="panchor">_</span>」を
+	> # 指定すると、テーマによっては自動的に画像アンカーがつくようになりま
+	> # す。』(tDiary の skel/conf.rhtml より)
 	> $item_header_mark = "<span class="sanchor">*</span>";
 
-	version 0.15 �ʹߡ�panchor �˷���Ǥ��ˤ��Ƥ��ޤäƤ�������sanchor 
-	�⤢��櫓�ʤΤǡ�����Ǥ���褦�ˤ�����
+	version 0.15 以降、panchor に決め打ちにしてしまっていたが、sanchor 
+	もあるわけなので、設定できるようにした。
 
 2003-06-29 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
@@ -1538,22 +1547,22 @@
 	New for sample CSS
 
 	* {chalow,cl.conf}:
-	������������ܤ��ɲ�
-	> # �ĥå��ߵ�ǽ����Ѥ��뤫 (1:YES, 0:NO)
+	新たな設定項目を追加
+	> # ツッコミ機能を使用するか (1:YES, 0:NO)
 	> my $use_tukkomi = 1;
-	> # �ĥå��ߤΥƥ�ץ졼�� = <div class="comment">...</div> ����̣��
-	> # TUKKOMI_DATE �Ϥ��Υ���ȥ������ (��: 2003-06-25) ���Ѵ������
+	> # ツッコミのテンプレート = <div class="comment">...</div> の中味。
+	> # TUKKOMI_DATE はそのエントリの日付 (例: 2003-06-25) に変換される
 	> my $tukkomi_template = qq(
 	> <div class="caption">
-	> �����Υĥå��� [<a href='./kuttukibbs.cgi?date=TUKKOMI_DATE'>����
-	> ���� / �ĥå��ߤ������</a>]
+	> 本日のツッコミ [<a href='./kuttukibbs.cgi?date=TUKKOMI_DATE'>全部
+	> 見る / ツッコミを入れる</a>]
 	> </div>
 	> <script language="JavaScript" src="kblog/TUKKOMI_DATE.js"></script>
 	> );
 
 	* chalow: 
-	�Ū�˥ĥå��ߵ�ǽ��Ȥ���褦�ˤ������ĥå��ߵ�ǽ���Τϳ����Υ�
-	���ƥ�����ѡ�������ʬ�ˤĤ��ƤϺ����������ѹ��β�ǽ���硣
+	試験的にツッコミ機能を使えるようにした。ツッコミ機能自体は外部のシ
+	ステムを利用。この部分については今後大幅な変更の可能性大。
 
 2003-06-26  YAMASHITA Tatsuo  <yto at nais.to>
 
@@ -1561,19 +1570,19 @@
 	add
 
 	* chalow (okikae): 
-	- ����դ�����ĥ���դ���Ǥ���褦�ˤ���������ͥ���ȳ��������
-	  �ɤˡ���������� URL �ؤΥ�󥯤��ǽ��
-	  > [IMG��image/hello-s.jpg image/hello.jpg]
-	  > [IMG��image/hello-s.jpg http��//example.com/hoge.html]
-	  (������ɽ���ϡ�Ⱦ�ѥ�����Ǥ�)
+	- リンク付き画像張り付けをできるようにした。サムネイルと拡大画像な
+	  どに。画像からの URL へのリンクも可能。
+	  > [IMG：image/hello-s.jpg image/hello.jpg]
+	  > [IMG：image/hello-s.jpg http：//example.com/hoge.html]
+	  (正しい表記は、半角コロンです)
 	
-	- URL ʸ����Υޥå��ѥ�����򤤤��롣
+	- URL 文字列のマッチパターンをいじる。
 	
-	* chalow (parse_entry): item header �ν����ΤȤ����Υ����å��ѹ���
+	* chalow (parse_entry): item header の処理のところのロジック変更。
 
 	* {chalow,cl.conf}:
-	������������ܤ��ɲ�
-	> # item header ����Ƭ�ε���λ���
+	新たな設定項目を追加
+	> # item header の先頭の記号の指定
 	> my $item_header_mark = "*";
 
 2003-06-24  YAMASHITA Tatsuo  <yto at nais.to>
@@ -1584,32 +1593,32 @@
 
 2003-06-23 (Mon)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.16[��꡼��]:
-	����
+	* version 0.16[リリース]:
+	公開
 
-	* chalow (parse_entry)[���]: 
+	* chalow (parse_entry)[メモ]: 
 	<http://oikaze.com/~tamada/Diary/2003-06.html#2003-06-23>
 
-	> tDiary �Υơ��ޤ�Ȥ���褦�ˤʤ�ȸ��ɤ��������㤤�ޤ��ʡ�
-	> �������ˤ���餯�ϡ�* ��ĥ���륢�󥫡���
-	> ChangeLog �����ʤΤǡ���ˤɤ�ɤ�񤫤�Ƥ�����
-	> �����˲���⹹������ȥ��󥫡��Υ�٥뤬�Ѥ�äƤ��ޤ���
-	> �������˽񤤤�����ȥ꤫����֤� 1, 2 ���դ����ߤ�����
+	> tDiary のテーマも使えるようになると見栄えが全然違いますな。
+	> ただ、惜しむらくは、* に張られるアンカー。
+	> ChangeLog 形式なので、上にどんどん書かれていく。
+	> 一日に何回も更新するとアンカーのラベルが変わってしまう。
+	> その日に書いたエントリから順番に 1, 2 と付けて欲しい。
 
-	�Τ��ˡ������ʤ�Ǥ���͡��Ȥ������Ȥǡ��ǥե���Ȥ�߽�ˤ��ޤ�����
-	��Υ����ƥफ�顢5, 4, 3, 2, 1 �Ȥʤ�ޤ���version 0.15 �Τ褦��
-	����ˤ���ˤϡ�cl.conf �� $descending_order_item_num = 0 �Ȥ����
-	OK��
+	確かに。そうなんですよね。ということで、デフォルトを降順にしました。
+	上のアイテムから、5, 4, 3, 2, 1 となります。version 0.15 のように
+	昇順にするには、cl.conf で $descending_order_item_num = 0 とすれば
+	OK。
 
 	* {chalow,cl.conf}:
-	������������ܤ��ɲ�
-	> # item header ����Ƭ�� "*" �Υ��󥫡��ֹ��߽�ˤ��뤫 (1:YES, 0:NO)
+	新たな設定項目を追加
+	> # item header の先頭の "*" のアンカー番号を降順にするか (1:YES, 0:NO)
 	> my $descending_order_item_num = 1;
 
 2003-06-22  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.15[��꡼��]:
-	����
+	* version 0.15[リリース]:
+	公開
 
 	* README: 
 	mod
@@ -1618,64 +1627,64 @@
 	remove
 
 	* chalow:
-	tDiary �ơ���Ŭ�Ѥ�Ĵ������ item �� p �ǰϤ�褦�ˤ�����
+	tDiary テーマ適用の調整。各 item を p で囲むようにした。
 
-	* ChangeLog �γ�����̾��[���]:
-	chalow �Ǥϳ�����ʲ��Τ褦�˸Ƥ֤��Ȥˤ��ޤ���
-	����ե����롢CSS���ץ�����ॽ�����򸫤�Ȥ��ˤ����Ȳ�������
+	* ChangeLog の各部の名称[メモ]:
+	chalow では各部を以下のように呼ぶことにします。
+	設定ファイル、CSS、プログラムソースを見るときにご参照下さい。
 	[[IMG|image/chalow-cl-name-s.gif]]
 
-	* Ⱦ�ѥ��ڡ���Ϣ³���ä��Ƥ��ޤ�����[���]: 
-	pre ������� p �Ȥ� div �Ȥ��� "white-space: pre; font-family:
-	monospace;" �Ȼ��ꤹ����ˡ�ϡ��ʲ��Τ褦�ʡ�Ⱦ�ѥ��ڡ���Ϣ³��ɽ��
-	�������Ȥ������꤬���롣item �� pre �ǰϤ�ΤϤ��ޤ����ʴ����Ǥ�
-	���뤬�������Ф餯�Ϥ������ʤ���
+	* 半角スペース連続が消えてしまう問題[メモ]: 
+	pre の代わりに p とか div とかで "white-space: pre; font-family:
+	monospace;" と指定する方法は、以下のような「半角スペース連続」表記
+	で崩れるという問題がある。item を pre で囲むのはいまいちな感じでは
+	あるが、今しばらくはやむを得ない。
 
-	���줬...
+	これが...
 	> 4       5       6       7       8       9       10
-	> ��������������������������������������������������
-	> - ���أ�
-	>   - ���أ�
-	>     - ���أ�
+	> ┴───┴───┴───┴───┴───┴───┴
+	> - 階層１
+	>   - 階層２
+	>     - 階層３
 
-	�����ʤ�
+	こうなる
 	> 4 5 6 7 8 9 10
-	> ��������������������������������������������������
-	> - ���أ�
-	> - ���أ�
-	> - ���أ�
+	> ┴───┴───┴───┴───┴───┴───┴
+	> - 階層１
+	> - 階層２
+	> - 階層３
 
 2003-06-21  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* README:
-	tDiary �Υơ��ޤ�Ȥ����������ˤĤ��ơ�
+	tDiary のテーマを使うための設定について。
 
 	* {chalow,cl.conf}: 
-	tDiary �Υ�������󥢥󥫡��ߤ����ʤΤ�������Ȥ��ˤϡ���������� 
-	$use_item_anchor �� 1 �ˤ��롣
+	tDiary のセクションアンカーみたいなのを実装。使うには、新設定項目 
+	$use_item_anchor を 1 にする。
 
-	> # item header ����Ƭ�� "*" �˥��󥫡���Ĥ��뤫 (1:YES, 0:NO)
+	> # item header の先頭の "*" にアンカーをつけるか (1:YES, 0:NO)
 	> $use_item_anchor = 1;
 
-	$item_header_style ������ǡ�"* HOGE:" �� "* HOGE" �ˤ��Ƥ���ɬ��
-	���ꡣ
+	$item_header_style の設定で、"* HOGE:" か "* HOGE" にしておく必要
+	あり。
 
-	����ˤȤ�ʤ���okikae() ��Ρ����դǻ��ȥ�󥯡פ�����
-	- item anchor �ؤλ��ȥ�󥯤ε�����ˡ����: [2003-06-21-1]��
-	- ������󺣤ޤǤ� [2003-06-21] �Ȥ����Τ�Ȥ��롣
-	- �ƥ���: [2001-12-13-3] [2001-12-02] [2001-12-08-2](�ʤ�)
+	これにともない、okikae() 中の「日付で参照リンク」を修正。
+	- item anchor への参照リンクの記述方法の例: [2003-06-21-1]。
+	- もちろん今までの [2003-06-21] というのも使える。
+	- テスト: [2001-12-13-3] [2001-12-02] [2001-12-08-2](ない)
 
 	* {chalow,cl.conf,sample/diary.css}: 
-	- �ǥե���Ȥ�����Ȥ��ơ���ڡ����ꥹ�ȡ����եꥹ�Ȥ� calendar ��
-	  �饹�� p �ǰϤࡣ
-	- ���ֲ��˽Ф� chalwo ������ p.footer �ˤ�����p.footer a �� bold 
-	  ���ǥե���ȡ�
-	- <p class="adminmenu">: �ڡ����ȥåפʤɤˤ��뼫ʬ�Υۡ���ڡ���
-	  �ؤΥ�󥯤ʤɡ�
-	- �ǥե���Ȥǡ��� item header ����Ƭ�� "*" �� panchor ���饹�ǰ�
-	  �� �� "div.day span.panchor"�� "*" �򥤥᡼���ˤ�Ǥ��롣
-	  $item_header_style ������ǡ�"* HOGE:" �� "* HOGE" �ˤ��Ƥ���ɬ
-	  �פ��ꡣ
+	- デフォルトの設定として、月ページリスト、日付リストを calendar ク
+	  ラスの p で囲む。
+	- 一番下に出る chalwo ロゴを p.footer にした。p.footer a で bold 
+	  がデフォルト。
+	- <p class="adminmenu">: ページトップなどにある自分のホームページ
+	  へのリンクなど。
+	- デフォルトで、各 item header の先頭の "*" を panchor クラスで囲
+	  む → "div.day span.panchor"。 "*" をイメージにもできる。
+	  $item_header_style の設定で、"* HOGE:" か "* HOGE" にしておく必
+	  要あり。
 	
 2003-06-20 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
@@ -1683,440 +1692,440 @@
 	mod
 
 	* chalow (parse_entry):
-	New. ChangeLog �����Υ����å����ѹ�������
-	main -> okikae() �Ȥ����ƤӽФ��ط�����
-	main -> parse_entry() -> okikae() �ˡ�
+	New. ChangeLog 処理のロジックを変更した。
+	main -> okikae() という呼び出し関係が、
+	main -> parse_entry() -> okikae() に。
 
 	* chalow:
-	CSS �ե�����򥳥ޥ�ɥ饤�󤫤����Ǥ���褦�ˤ�����
-	���������ʥơ��ޤ���ñ�˻�롣Ex: --css=hoge.css
+	CSS ファイルをコマンドラインから指定できるようにした。
+	いろいろなテーマが簡単に試せる。Ex: --css=hoge.css
 
 	* {sample/diary.css,cl.conf,chalow}: 
-	- tDiary �� CSS �ȶ��̤ˤ������: h1 �ϥڡ��������ȥ�äƤ����Τ�
-	  ����Ǥ��Ǥ��ɤ��Ȼפ�����h2 �������γ����դΥ����ȥ�ȷ���Ǥ�
-	  ����Ƥ����ΤǤ���äȺ��ä����ǡ��������Ȥˤ��롣������
-	- ����¾��������
+	- tDiary の CSS と共通にする作戦: h1 はページタイトルっていうのは
+	  決め打ちでも良いと思うが、h2 を日記の各日付のタイトルと決め打ち
+	  されていたのでちょっと困った。で、従うことにする。修正。
+	- その他いろいろ
 	
 	* {chalow,cl.conf}:
-	������������ܤ��ɲ�
-	> # ɽ������Ȥ����ѵ��� ('>' or '|') ��ä��� (1:YES, 0:NO)
+	新たな設定項目を追加
+	> # 表示するとき引用記号 ('>' or '|') を消すか (1:YES, 0:NO)
 	> my $remove_quote_mark = 0;
-	> # item header �� h3 ������­���� (1:YES, 0:NO) - tDiary �Ȥθߴ����Τ���
+	> # item header に h3 タグを足すか (1:YES, 0:NO) - tDiary との互換性のため
 	> my $use_h3_for_item_header = 0;
 
 	change var name: $old_style_item_header --> $item_header_style
 
 	* chalow (okikae): 
-	- ���Ѥ� blockquote �ˤ���褦�ˤ����� "div.body blockquote" �ǻ�
-	  �ꡣ
+	- 引用を blockquote にするようにした。 "div.body blockquote" で指
+	  定。
 
 2003-06-19 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* chalow:
-	�桼������ե�������ɤ߹��߻��Υ��顼����Ϥ���褦�ˤ�����(use $@)
+	ユーザ設定ファイルの読み込み時のエラーを出力するようにした。(use $@)
 
 	* clsearch.cgi:
-	- div �Ϥ� entry ���б���
-	- clsearch.cgi �θ�����̤� "����" �� "����" ��ɽ������褦�ˤ�����
+	- div 囲み entry に対応。
+	- clsearch.cgi の検索結果に "前へ" と "次へ" も表示するようにした。
 
 	* chalow: 
-	��ƣ���󤫤�Υե����ɥХå� (030218) �򻲹ͤˡ�������HTML �����
-	����褦�ˤ��褦! ... �Ȼפä�������Ǻ��ޡ�
-	- <div align="right"> �� <div style="text-align:right">
+	佐藤さんからのフィードバック (030218) を参考に、正しいHTML を出力
+	するようにしよう! ... と思ったが途中で挫折。
+	- <div align="right"> → <div style="text-align:right">
 	- <b> -> <strong>
-	- ���Τ� div �ǰϤ�
+	- 全体を div で囲む
 
 	* chalow: 
-	- tDiary �� CSS �ȶ��̤ˤ������
-	  - �� entry �� <div class="day"></div> �ǰϤ�褦�ˤ�����
-	  - �� item �� <div class="sectoin"></div> �ǰϤ�褦�ˤ�����
-	  - 1 entry ���ʣ���� item �� <div class="body"></div> �ǰϤ�褦
-	    �ˤ�����
-	- ���Τ� pre �ǰϤ�Τ����
+	- tDiary の CSS と共通にする作戦
+	  - 各 entry を <div class="day"></div> で囲むようにした。
+	  - 各 item を <div class="sectoin"></div> で囲むようにした。
+	  - 1 entry 内の複数の item を <div class="body"></div> で囲むよう
+	    にした。
+	- 全体を pre で囲むのをやめる
 	
 	* sample/diary.css:
 	add new classes
 
 	* {chalow,cl.conf}: 
-	������������ܤ��ɲ�
-	> # ���֤ˤ�륤��ǥ�Ȥ�ʤ����� (1:�ʤ��� or 0:���Τޤ�)
+	新たな設定項目を追加
+	> # タブによるインデントをなくすか (1:なくす or 0:そのまま)
 	> my $no_indent = 0;
-	> # �����ƥ�إå����Υե����ޥåȤ�ɤ����뤫 (0:"* HOGE:", 1:"HOGE:",2:"HOGE")
+	> # アイテムヘッダーのフォーマットをどうするか (0:"* HOGE:", 1:"HOGE:",2:"HOGE")
 	> my $old_style_item_header = 1;
-	> # ����ǥå����ڡ����� HTML �إå����ɲä�������� (favicon.ico �ʤ�)
+	> # インデックスページの HTML ヘッダに追加したいもの (favicon.ico など)
 	> my $index_page_head_plus = "";
-	> # ��ڡ����� HTML �إå����ɲä��������
+	> # 月ページの HTML ヘッダに追加したいもの
 	> my $month_page_head_plus = "";
 
 	* chalow (okikae):
-	- ���դ� h3 ������ date ���饹�� span �ǰϤ�褦�ˤ�����CSS �Ǥ���
-	  ��䤹�����뤿�ᡣ
-	- �����ƥ�إå����� <span class="clitemheader"></span> �ǰϤ�褦
-	  �ˤ�����
-	- URL �Ѵ��ǡ�ftp:// ���Ѵ�����褦�ˤ�����(ishii-k ���󤫤�Υե���
-	  �ɥХå� (030616))
+	- 日付を h3 タグと date クラスの span で囲むようにした。CSS でいじ
+	  りやすくするため。
+	- アイテムヘッダーを <span class="clitemheader"></span> で囲むよう
+	  にした。
+	- URL 変換で、ftp:// も変換するようにした。(ishii-k さんからのフィー
+	  ドバック (030616))
 
 2003-06-14  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.14[��꡼��]: ����
+	* version 0.14[リリース]: 公開
 
 	* README: mod
 
 2003-06-12  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* clsearch.cgi: 
-	������̤ǡ���ڡ����ǥȥåפ�ɽ������륨��ȥ�����դ�ɽ�������
-	���Х�������(ad hoc. ����Ū�˼������ʤ���ɬ�פ����뤫��)
+	検索結果で、月ページでトップに表示されるエントリの日付が表示されな
+	いバグを修正。(ad hoc. 全体的に手を入れなおす必要があるかも)
 
 2003-06-11  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* clsearch.cgi: "nkf -e" --> "nkf -ed" (\r\n ����)
+	* clsearch.cgi: "nkf -e" --> "nkf -ed" (\r\n 問題)
 
 2003-06-09  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow (make_month_page_list): �����ƤӽФ���Ƥ��Ψ�˱ƶ���
-	���褦�� cache ����褦�ˤ�����
-	(write_month_page): MONTHPAGELIST ���ڡ����Υƥ�ץ졼�ȤǤ�Ȥ�
-	��褦�ˤ�����
+	* chalow (make_month_page_list): 何回も呼び出されても効率に影響な
+	いように cache するようにした。
+	(write_month_page): MONTHPAGELIST を月ページのテンプレートでも使え
+	るようにした。
 
-	* test-add-extent.html: add-extent.pl �Υƥ����� HTML �ե����롣
+	* test-add-extent.html: add-extent.pl のテスト用 HTML ファイル。
 
-	* chalow: ���ä����äƤ� expert-mode ������
+	* chalow: こっそり作ってた expert-mode を削除。
 
-	* add-extent.pl: New. HTML �� img ������ width �� height ��­����
-	����ץȡ�����ˤ�ꡢƱ�����Ȥ�Ԥ���̩�� expert-mode �����פˤʤ�
-	����
+	* add-extent.pl: New. HTML の img タグに width と height を足すス
+	クリプト。これにより、同じことを行う秘密の expert-mode が不要になっ
+	た。
 
 2003-05-31  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow: "nkf -e" --> "nkf -ed" (ǰ�Τ���)
+	* chalow: "nkf -e" --> "nkf -ed" (念のため)
 
 2003-05-30 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* {cl.conf,chalow}: �桼�������Ѥ��ѿ� $index_page_header,
-	$index_page_footer, $month_page_header, $month_page_footer ������
-	����� $index_page_template, $monthd_page_template ���ɲá�
+	* {cl.conf,chalow}: ユーザ設定用の変数 $index_page_header,
+	$index_page_footer, $month_page_header, $month_page_footer を削除。
+	代わりに $index_page_template, $monthd_page_template を追加。
 
 	### obsolete
-	my $index_page_header;		# ����ǥå����ڡ����Υإå�
-	my $index_page_footer;		# ����ǥå����ڡ����Υեå�
-	my $month_page_header;		# ��ڡ����Υإå�
-	my $month_page_footer;		# ��ڡ����Υեå�
+	my $index_page_header;		# インデックスページのヘッダ
+	my $index_page_footer;		# インデックスページのフッタ
+	my $month_page_header;		# 月ページのヘッダ
+	my $month_page_footer;		# 月ページのフッタ
 
-	* �ƥ�ץ졼�������Ȥ�[���]:
-	$index_page_template, $monthd_page_template �� body ���������Ƥ�
-	�������֤�����ʸ����פʤɤ��Ѥ���ɽ������������
-	�������ޥ��� (�쥤������) �μ�ͳ�٤���뤿��˺��ѡ�
+	* テンプレート方式とは[メモ]:
+	$index_page_template, $monthd_page_template に body 内部の内容を
+	「内部置き換え文字列」などを用いて表現する方式。
+	カスタマイズ (レイアウト) の自由度を高めるために採用。
 
 	* chalow (make_month_page_list): 
 	- change name from write_month_page_list().
 	- print --> $rv .= "..."
-	(write_month_page): �ƥ�ץ졼�������ˤ��롣
-	(write_index_page): �ƥ�ץ졼�������ˤ��롣
+	(write_month_page): テンプレート方式にする。
+	(write_index_page): テンプレート方式にする。
 
-	* �����֤�����ʸ����: update 030619. �ǿ������ cl.conf �򸫤�!
-	- ��ڡ�����
-	  CLNAVI: ������ڡ����ؤΥ��
+	* 内部置き換え文字列: update 030619. 最新情報は cl.conf を見て!
+	- 月ページ用
+	  CLNAVI: 先月来月ページへのリンク
 	  YEARMONTH: YYYY-MM
-	  DAYLIST: ���եꥹ��
-	  DAYSINTHEMONTH: ���η��������ȥ�
+	  DAYLIST: 日付リスト
+	  DAYSINTHEMONTH: その月の全エントリ
 
-	- ����ǥå����ڡ�����
-	  MONTHPAGELIST: ���̰���
-	  LATESTDAYS: �Ƕ� N ��ʬ�Υ���ȥ�
-	  NDAYS: �ֺǶ� N ��ʬ�פ� N
-	  CLLASTUPDATE: �ǽ���������
+	- インデックスページ用
+	  MONTHPAGELIST: 月別一覧
+	  LATESTDAYS: 最近 N 日分のエントリ
+	  NDAYS: 「最近 N 日分」の N
+	  CLLASTUPDATE: 最終更新時間
 
 2003-05-29  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow (okikae): ���� (citation)��
-	���֤θ�� "|" �� ">" �����Ԥϰ��ѤȤߤʤ���CSS �� clquote ����
-	���� span �ǰϤࡣ
+	* chalow (okikae): 引用 (citation)。
+	タブの後に "|" か ">" が来る行は引用とみなし、CSS の clquote クラ
+	スな span で囲む。
 	<span class="clquote">| ...</span>
 
-	> ����
-	> ����
-	> ����
-		> ����ϰ��ѤǤϤʤ�
+	> 引用
+	> 引用
+	> 引用
+		> これは引用ではない
 
-	| ����
-	| ����
-	 | ����ϰ��ѤǤϤʤ�
+	| 引用
+	| 引用
+	 | これは引用ではない
 
-	(��[2003-06-20]) <blockquote> ���ѹ� "div.body blockquote" �ǻ���
+	(→[2003-06-20]) <blockquote> に変更 "div.body blockquote" で指定
 
 2003-03-31  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow: �����ץ���󡣽���������� ($stop_date)���������դޤǽ�
-	�����롣
-	��: --stop-date "2002-01-01"
-	̤����ʤ�Ǹ�ޤǽ�������
+	* chalow: 新オプション。処理停止日付 ($stop_date)。この日付まで処
+	理する。
+	例: --stop-date "2002-01-01"
+	未指定なら最後まで処理する
 
 2003-03-13  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* clsearch.cgi: ʸ�������к��� HTTP header
+	* clsearch.cgi: 文字化け対策。 HTTP header
 	ref. <http://chalow.net/2002-08-06.html>
 
 2003-01-18 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.13[��꡼��]: ����
+	* version 0.13[リリース]: 公開
 
-	* README (usage): clweek.pl �ˤĤ��Ƥε��Ҥ��ɲ�
+	* README (usage): clweek.pl についての記述を追加
 
-	* clweek.pl: New.  ���եե����ޥåȤ���������Τ��Ѵ�����ե��륿��
+	* clweek.pl: New.  日付フォーマットを曜日入りのに変換するフィルタ。
 	ref.
 	<http://namazu.org/~satoru/diary/?200301b&to=200301151S2#200301151S2>
 	
-	* chalow: �����������եե����ޥåȤ��б���
-	��: 2000-06-12 (Mon)  YAM Tat  <yto@example.com>
+	* chalow: 曜日入り日付フォーマットに対応。
+	例: 2000-06-12 (Mon)  YAM Tat  <yto@example.com>
 	ref. <http://namazu.org/~satoru/diary/?200301b&to=200301151#200301151>
 
 2003-01-05 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.12[��꡼��]: ����
+	* version 0.12[リリース]: 公開
 
-	* README: ����
+	* README: 更新
 
-	* chalow (okikae): ������ɤζ�Ĵ[2002-12-28]���ѻߡ�
+	* chalow (okikae): キーワードの強調[2002-12-28]の廃止。
 
 	* cl-simple.conf: delete. use "cl.conf"
 
-	* chalow: ChangeLog ��ѡ�������롼�פ�񤭴����롣������䤹����
-	����
-	(get_last_day_of_month): New. ǯ������ϤȤ����η�κǽ�������Ϥ�
-	��ؿ���
-	(write_month_page): ��ڡ����ˡ����ؤΥ�� (���հ���) ��Ф����
-	���ˤ�����
-	(write_month_page): ��ڡ����ˡ�ɽ���������դν��֤�Ĵ���Ǥ���褦
-	�ˤ������߽� or ���硣���ޤǤϡ��߽�������ä���
-	- ��ڡ����ǡ����դ�߽� (���������դ���) ��ɽ�����뤫 (1:yes or 0:no)
+	* chalow: ChangeLog をパーズするループを書き換える。いじりやすくし
+	た。
+	(get_last_day_of_month): New. 年月を入力としその月の最終日を出力す
+	る関数。
+	(write_month_page): 月ページに、日へのリンク (日付一覧) を出せるよ
+	うにした。
+	(write_month_page): 月ページに、表示する日付の順番を調整できるよう
+	にした。降順 or 昇順。今までは、降順だけだった。
+	- 月ページで、日付を降順 (新しい日付が上) で表示するか (1:yes or 0:no)
 	  $reverse_order_days = 1;
 
 2002-12-28 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow (okikae): (030105: ��ǽ�ѻߡ��ּ�ưʸ�����ִ��פǤ�äƤ�
-	�餦���ˤˤ�����[[README �˲���]]��񤤤����ʲ��ε��Ҥ� obsolete)
+	* chalow (okikae): (030105: 機能廃止。「自動文字列置換」でやっても
+	らう方針にした。[[README に解説]]を書いた。以下の記述は obsolete)
 
-	����ޤ굡ǽ���ɲä���ΤϷ��ʤ�����ɡ�*������ɤζ�Ĵ*��Ǥ���
-	�褦�ˤ��������Τ����ѹ����뤫�⡣
+	あんまり機能を追加するのは嫌なんだけど、*キーワードの強調*をできる
+	ようにした。そのうち変更するかも。
 
-	��Ĵ������ʸ����� * �ǰϤࡣ��¦�Τ����֤˥��ڡ����䵭�椬���ä�
-	�ϥ��ᡣ
-	- ������: ����ˤ��� * �ۤ��ԡ� * �Ǥ�! ������ *�������!*
+	強調したい文字列を * で囲む。内側のすき間にスペースや記号が入って
+	はダメ。
+	- 悪い例: こんにちは * ほげぴー * です! いわゆる *よろしく!*
 
-	�ޤ���"<" ���Ѵ���������ɽ����񤭴��������Ĥ����������򥫥����ޥ�
-	�����䤹���ʤä����ʡ��ܤ����ϥ�������
+	また、"<" を変換する正規表現を書き換えた。残したいタグをカスタマイ
+	ズしやすくなったかな。詳しくはソースを。
 
 2002-12-27 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.11[��꡼��]: ����
+	* version 0.11[リリース]: 公開
 
-	* chalow (write_month_page_list): ���̰���ɽ�����¤�����Ҥ�̵����
-	�������ɽ������褦�ˤ�����
+	* chalow (write_month_page_list): 月別一覧表示を改造。記述の無い月
+	も一覧に表示するようにした。
 
-	- ��¤�Τ��ä����� 12/17 �ι�פ��󤫤�ΥХ����᡼�롣12 ��ε�
-	  �Ҥ��ʤ��ȼ���ǯ�����Ԥ��줺�ˤĤŤ��Ȥ����Х���
+	- 改造のきっかけは 12/17 の高久さんからのバグ報告メール。12 月の記
+	  述がないと次の年が改行されずにつづくというバグ。
 
 2002-11-24 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* sample/diary.css: ����äȽ������Դ֤򤢤����ꡣ
+	* sample/diary.css: ちょっと修正。行間をあけたり。
 
 2002-10-29 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
 	* README: 
-	URL ���ԤˤĤ��Ƥβ�����˺��Ƥ����Τǽ񤯡�
+	URL 改行についての解説を書き忘れていたので書く。
 
 2002-10-26 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.10[��꡼��]: ����
+	* version 0.10[リリース]: 公開
 
 2002-10-25 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow (okikae): �Хå�����å�����Ѥ���URL��Ǥβ��Ԥ��б���
-	��:
+	* chalow (okikae): バックスラッシュを用いたURL中での改行に対応。
+	例:
 	<http://www.city.kiryu.gunma.jp/web/home.nsf/42fed222e9b38157492\
 	568fd002b273a/85a282c6b8dd8ea349256a22002b079b?OpenDocument>
 
-	URL ������ɽ���⽤����
+	URL 用正規表現も修正。
 
 2002-10-19 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.9[��꡼��]: ����
+	* version 0.9[リリース]: 公開
 
 2002-10-18 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow (okikae): "&" �� "&amp;amp;" ���֤�������褦�ˤ�����
-	IE�ǡ�&amp;region�פ���(R)ion�פˤʤäƤ��ޤä����顣
+	* chalow (okikae): "&" を "&amp;amp;" に置き換えるようにした。
+	IEで「&amp;region」が「(R)ion」になってしまったから。
 
-	���Ǥ⡢��äѤ�᤿����;�פ�ʤ��Τ˥���ƥ��ƥ��Ѵ������㤦�Τ�
-	�ޤ��б�����Τ��ϼ��餷�����ϡ��Ȥ�Ф������Ȥ��Ρ�&amp;hearts;��
-	�Ȥ���Ȥ��ʤ��ʤä��㤦�����Ѥˤʤä��餽�����١�&amp;amp;region��
-	�ߤ����ˤ��Ʋ�������
+	→でも、やっぱやめた。「;」もないのにエンティティ変換しちゃうのに
+	まで対応するのは馬鹿らしい。ハートを出したいときの「&amp;hearts;」
+	とかも使えなくなっちゃうし。変になったらその都度「&amp;amp;region」
+	みたいにして下さい。
 
 2002-10-01 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* README: ��ڡ����Υإå��ȥեå��ˤĤ��Ƥε��Ҥ��ɲá�
+	* README: 月ページのヘッダとフッタについての記述を追加。
 
 	* cl.conf, sample/cl-sample.conf:
-	- ���դθ������(Mon, Tue, ...)��ɽ�����뤫 (1:yes or 0:no)�� 
+	- 日付の後に曜日(Mon, Tue, ...)を表示するか (1:yes or 0:no)。 
 	  $show_day_of_week = 1;
-	- ��ڡ����Υإå����եå��Υǥե�����ѹ�
+	- 月ページのヘッダ、フッタのデフォルト変更
 
-	* chalow (write_month_page): ��ڡ�����ư�ʥ� (����η�ڡ����ؤ�
-	���) ��ɽ���Ǥ���褦�ˤ�����
+	* chalow (write_month_page): 月ページ移動ナビ (前後の月ページへの
+	リンク) を表示できるようにした。
 
-	* chalow: ����ʸ����θ������(Mon, Tue, ...)���ɲä���褦�ˤ�����
-	�ޤ������դθ������(Mon, Tue, ...)��ɽ�����뤫�ݤ����ڤ��ؤ��λ�
-	�Ȥߤ��ɲ� (�ǥե���Ȥ�ɽ������)��
+	* chalow: 日付文字列の後に曜日(Mon, Tue, ...)を追加するようにした。
+	また、日付の後に曜日(Mon, Tue, ...)を表示するか否かの切り替えの仕
+	組みを追加 (デフォルトは表示する)。
 
-	* chalow (get_day_of_week): New. ǯ���������ϤȤ���������Ϥ����
-	��
+	* chalow (get_day_of_week): New. 年月日を入力とし曜日を出力する関
+	数
 
 2002-08-09 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* README: �Ϥ��������ְ㤤�򤳤ä��꽤��������¾�ɲá�
+	* README: はずかしい間違いをこっそり修正。その他追加。
 
 2002-06-29 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.8[��꡼��]: ����
+	* version 0.8[リリース]: 公開
 
-	* clsearch.cgi: new. �ѥå��������ɲä��Ƥߤ���
+	* clsearch.cgi: new. パッケージに追加してみた。
 
-	* chalow (okikae): URL ������ɽ��������
-	s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+ ��
+	* chalow (okikae): URL 用正規表現を修正。
+	s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+ →
 	s?https?://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#,]+
 
-	����� URL ������������顣
+	こんな URL があるもんだから。
 	http://k-tai.impress.co.jp/cda/article/todays_goods/0,,9722,00.html
 
 2002-06-28 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow (get_img_str): add alt. ¾�ˤ⤤��������ǽ������
+	* chalow (get_img_str): add alt. 他にもいろいろ機能ダウン。
 
 2002-06-24 (Mon)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow (okikae): "<http://www.example.com/>" �Ȥ��ä� "<", ">" 
-	�Ǥ����ä� URL ɽ�����б��������μ��: 
-	(1) "<" �� ">" �򥨥������פ��Ƥ����Τ� "<" �����ˤ��롣
-	(2) URL �˥ޥå���������ɽ�����ѹ���
+	* chalow (okikae): "<http://www.example.com/>" といった "<", ">" 
+	でくくった URL 表記に対応。修正の手順: 
+	(1) "<" と ">" をエスケープしていたのを、 "<" だけにする。
+	(2) URL にマッチする正規表現を変更。
 
 2002-06-23 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.7[��꡼��]: ����
+	* version 0.7[リリース]: 公開
 
-	* chalow (write_month_page): $month_page_header ��� YEARMONTH ��
-	����ʸ�����"ǯ-��" ʸ���� (�㤨�С�"2002-06") ���֤�������褦
-	�ˤ�����ad hoc �Ƿ��ʤ�����ɡ��ɤ���ˡ���פ��Ĥ��ʤ�...��
+	* chalow (write_month_page): $month_page_header 中の YEARMONTH と
+	いう文字列を、"年-月" 文字列 (例えば、"2002-06") に置き換えるよう
+	にした。ad hoc で嫌なんだけど、良い方法が思いつかない...。
 
 2002-06-22 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* diary.css: New. ����ץ롣taku-ku �Τ�ѥ��롣
+	* diary.css: New. サンプル。taku-ku のをパクる。
 
-	* chalow: chalow ��ڤΤ��� HTML �ΰ��ֲ��� chalow home page �ؤ�
-	���ɽ������褦�ˤ������ǽ餫���äƤ����Ф褫�ä�...
+	* chalow: chalow 普及のため HTML の一番下に chalow home page への
+	リンク表示するようにした。最初からやっておけばよかった...
 
-	* README: ����
+	* README: 改定
 
-	* chalow: CSS ���б��� $css_file �ǥ������륷���ȥե��������ꤹ
-	�롣
+	* chalow: CSS に対応。 $css_file でスタイルシートファイルを指定す
+	る。
 
-	* cvs: CVS �ˤ��������ϡ�
+	* cvs: CVS による管理開始。
 
 2001-12-16 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.6[��꡼��]: ����
+	* version 0.6[リリース]: 公開
 
 	* chalow:
-	[2001-12-13] �ˤ�ä��ָ��Ф��˥ޥå���������ɽ���פ�Ĵ����³����
-	��s!\t\* ([^:\n]+): !\...�פ��s!\t\* ([^:\n]+):(\s)!\...�פ��ѹ���
+	[2001-12-13] にやった「見出しにマッチする正規表現」の調整の続き。
+	「s!\t\* ([^:\n]+): !\...」を「s!\t\* ([^:\n]+):(\s)!\...」に変更。
 	
-	masata-y ��ΰո��˽��äơ���#!/usr/local/bin/perl�פ�
-	��#!/usr/bin/env perl�פ��ѹ� (����!)��
+	masata-y 氏の意見に従って、「#!/usr/local/bin/perl」を
+	「#!/usr/bin/env perl」に変更 (感謝!)。
 
 2001-12-13 (Thu)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.5[��꡼��]: ����
+	* version 0.5[リリース]: 公開
 
-	* README: ��ľ����
+	* README: 手直し。
 
-	* chalow: ����夤�ƹͤ����顢�桼������ե����뤬�ʤ��ȻȤ��ʤ�
-	[2001-12-04]�äƤΤϡ�����ޤ�ʤΤǡ��������˥ǥե������������
-	��������桼������ե��������ʤ����ȶˤ�ƥ���ץ�� Web �ڡ���
-	���Ѵ������ (�ޡ����⤽�⥷��ץ�����ɤ�)��
+	* chalow: 落ち着いて考えたら、ユーザ設定ファイルがないと使えない
+	[2001-12-04]ってのは、あんまりなので、ソースにデフォルト設定を埋め
+	込んだ。ユーザ設定ファイル指定なしだと極めてシンプルな Web ページ
+	に変換される (ま、そもそもシンプルだけどね)。
 
-	* chalow (okikae): ���ܤθ��Ф��˿��Ť����������ä��ѹ������Ф�
-	�˥ޥå���������ɽ�����s!\t\* ([^:\n]+):!\...�פ���
-	��s!\t\* ([^:\n]+): !\...�פ��ѹ� (�������˥��ڡ������ɲ�)������
-	�ǡ����Ф��Τʤ����ܤ�¿���
+	* chalow (okikae): 項目の見出しに色づけ処理をちょっと変更。見出し
+	にマッチする正規表現を「s!\t\* ([^:\n]+):!\...」から
+	「s!\t\* ([^:\n]+): !\...」に変更 (コロン後にスペースを追加)。これ
+	で、見出しのない項目も安心。
 
 2001-12-09 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.4[��꡼��]: ����
+	* version 0.4[リリース]: 公開
 
 2001-12-08 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow: New option '-e'. expert-mode. ���������ƽ������Ƥ�ʬ����
-	�͸����⡼�ɡ�[2001-12-07]�� identify ����ߤν����ʤɡ�README ��
-	�Ϻܤ��ʤ��Ĥ�ꡣ
+	* chalow: New option '-e'. expert-mode. ソース見て処理内容が分かる
+	人向けモード。[2001-12-07]の identify がらみの処理など。README に
+	は載せないつもり。
 	(write_month_page): Add <meta> in <head>
 	(write_index_page): Add <meta> in <head>
 
 2001-12-07 (Fri)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow (get_img_str): ��ʬ�Ѥˡ�ImageMagick �� identify �ǡ�
-	������ extent ������������դ��ä�����identify ���ʤ���в��⤷��
-	����
+	* chalow (get_img_str): 自分用に、ImageMagick の identify で、
+	画像の extent を得る処理を付け加えた。identify がなければ何もしな
+	い。
 
-	extent ��ɬ�פ���ͳ: IE �����ջ��ȥ�󥯤򥯥�å�����ȡ��������
-	�������դΤȤ������֡������������Ф餯���Ʋ����������ɤ߹��ޤ�ƥ�
-	�������Ȥ��ʤ������ȡ��������꤬������㤦����̤Ȥ��ơ�������
-	���դإ����פǤ��ʤ����Ȥ�����櫓��
+	extent が必要な理由: IE で日付参照リンクをクリックすると、きちんと
+	その日付のとこに飛ぶ。しかし、しばらくして画像が全部読み込まれてレ
+	イアウトしなおされると、飛んだ場所がずれちゃう。結果として、正しい
+	日付へジャンプできないことがあるわけ。
 
-	������: �Ѵ��������٤��ʤ롣�ޤ������礦���ʤ�����������󤸤�ʤ�
-	���餤�����ʡ�
+	問題点: 変換処理が遅くなる。まあ、しょうがない。いそぐもんじゃない
+	からいいかな。
 
 2001-12-04 (Tue)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* chalow: �桼������ե�����̾��¸�ߤ��ʤ��Ȥ����顼����ߤ���褦
-	�ˤ�����
+	* chalow: ユーザ設定ファイル名が存在しないときエラーで中止するよう
+	にした。
 
 2001-12-02 (Sun)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.3[��꡼��]: ����
+	* version 0.3[リリース]: 公開
 
-	* README: ��ľ����
+	* README: 手直し。
 
-	* chalow: New option '-q'. quiet mode. ɸ����Ϥ˿�Ľ�����Ф���
-	�Ȥˤ����Τǡ�quiet mode ���ä���
+	* chalow: New option '-q'. quiet mode. 標準出力に進捗情報を出すこ
+	とにしたので、quiet mode も作った。
 
-	* �ե������ư: ChangeLog-sample �� sample/ChangeLog, 
-	cl-simple.conf �� sample/cl-simple.conf
+	* ファイル移動: ChangeLog-sample → sample/ChangeLog, 
+	cl-simple.conf → sample/cl-simple.conf
 	(thanks to satoru-t)
 
-	* version 0.2[��꡼��]: �������Ƥߤ롣
+	* version 0.2[リリース]: 公開してみる。
 
-	* cl-simple.conf: �ѥå��������ɲá�README �μ¹���ǻ��ѡ�
+	* cl-simple.conf: パッケージに追加。README の実行例で使用。
 
 	* chalow:
-	- �桼������ե��������ꤹ�뿷���ץ���� -c,
-	  --configure-file=FILE ���ɲá�
-	- �ǽ�˥ե�������ɤ߹���Ȥ��� EUC ���Ѵ�����Τ�˺��Ƥ��Τǽ�
-	  ����(version 0.1 �Ǥϡ�JIS �ե�������Ȥ��������ʤ�)
+	- ユーザ設定ファイルを指定する新オプション -c,
+	  --configure-file=FILE を追加。
+	- 最初にファイルを読み込むときに EUC に変換するのを忘れてたので修
+	  正。(version 0.1 では、JIS ファイルだとおかしくなる)
 
-	* README: ����������
+	* README: 誤り訂正。
 
 2001-12-01 (Sat)  YAMASHITA Tatsuo  <yto at nais.to>
 
-	* version 0.1[��꡼��]: 
-	�������Ƥߤ롣Web �ڡ������롣
+	* version 0.1[リリース]: 
+	公開してみる。Web ページも作る。
 	==http://nais.to/~yto/tools/chalow/==
 	http://chalow.net/
 
-	* chalow: �ڤ������졣
+	* chalow: 軽く手入れ。
 
-	* README: �����ˤ��ʤ��� README ��񤭻Ϥ�롣
+	* README: 公開にそなえて README を書き始める。
 
 __DATA__
-������
-������
+あああ
+いいい
 	

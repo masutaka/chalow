@@ -1,30 +1,28 @@
 #!/usr/bin/env perl
 # $Id: clkeitai.cgi,v 1.4 2004/06/04 13:08:30 yto Exp $
-# clkeitai.cgi - chalow ¤Ë¤è¤ê HTML ²½¤µ¤ì¤¿¥Ú¡¼¥¸¤ò¥±¡¼¥¿¥¤¤Ç¸«¤ë
+# clkeitai.cgi - chalow ã«ã‚ˆã‚Š HTML åŒ–ã•ã‚ŒãŸãƒšãƒ¼ã‚¸ã‚’ã‚±ãƒ¼ã‚¿ã‚¤ã§è¦‹ã‚‹
 
-# ¥¢¥¤¥Æ¥à°ìÍ÷É½¼¨ - ¥¢¥ó¥«¡¼¤Ê¤É¤Ï¤Ê¤·¡£¥¢¥¤¥Æ¥àÊÌÉ½¼¨¤Ø¤Î¥¸¥ã¥ó¥×ÍÑ¡£
-# ¥¢¥¤¥Æ¥àÊÌÉ½¼¨ - ¥¢¥ó¥«¡¼¤¢¤ê
+# ã‚¢ã‚¤ãƒ†ãƒ ä¸€è¦§è¡¨ç¤º - ã‚¢ãƒ³ã‚«ãƒ¼ãªã©ã¯ãªã—ã€‚ã‚¢ã‚¤ãƒ†ãƒ åˆ¥è¡¨ç¤ºã¸ã®ã‚¸ãƒ£ãƒ³ãƒ—ç”¨ã€‚
+# ã‚¢ã‚¤ãƒ†ãƒ åˆ¥è¡¨ç¤º - ã‚¢ãƒ³ã‚«ãƒ¼ã‚ã‚Š
 
 use strict;
-
-use Jcode;
 
 use CGI;
 my $q = new CGI;
 
-# ·ÈÂÓÅÅÏÃ¤ÇÉ½¼¨¤Ç¤­¤ëºÇÂç¥Ğ¥¤¥È
-# ¤¿¤Ö¤ó¡¢3k ¤À¤È»×¤¦¤¬¡¢¤¤¤í¤¤¤í¤¢¤ë¤Î¤ÇÍ¾Íµ¤ò¸«¤ë¤Î¤¬¤è¤¤¤«¤È¡£
+# æºå¸¯é›»è©±ã§è¡¨ç¤ºã§ãã‚‹æœ€å¤§ãƒã‚¤ãƒˆ
+# ãŸã¶ã‚“ã€3k ã ã¨æ€ã†ãŒã€ã„ã‚ã„ã‚ã‚ã‚‹ã®ã§ä½™è£•ã‚’è¦‹ã‚‹ã®ãŒã‚ˆã„ã‹ã¨ã€‚
 my $page_size_max = 2500;	
 
 
-print "Content-type: text/html; charset=Shift_JIS\n\n";
+print "Content-type: text/html; charset=UTF-8\n\n";
 print qq(<html><head><title>CHALOW Keitai</title>
-<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS"></head>);
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>);
 
 if (defined $q->param('date')) {
     my $date = $q->param('date');
     if ($date =~ /^\d{4}-\d\d-\d\d$/) {
-	# ¥¢¥¤¥Æ¥à¤¸¤ã¤Ê¤¯¤Æ¥¨¥ó¥È¥ê¤ò»ØÄê¤·¤Æ¤­¤¿¤È¤­¤ËÂĞ½è
+	# ã‚¢ã‚¤ãƒ†ãƒ ã˜ã‚ƒãªãã¦ã‚¨ãƒ³ãƒˆãƒªã‚’æŒ‡å®šã—ã¦ããŸã¨ãã«å¯¾å‡¦
 	print "<body>Candidates: \n";
 	for (my $i = 1; $i < 10; $i++) {
 	    print qq(<a href="clkeitai.cgi?date=$date-$i">$date-$i</a>, );
@@ -39,7 +37,7 @@ if (defined $q->param('date')) {
     output_simple_list($from);
 }
 
-### ¥¢¥¤¥Æ¥àÊÌÉ½¼¨
+### ã‚¢ã‚¤ãƒ†ãƒ åˆ¥è¡¨ç¤º
 sub output_an_item {
     my ($ymdi) = @_;
     my ($ymd, $ym) = ($ymdi =~ /^((\d{4}-\d\d)-\d\d)/);
@@ -63,15 +61,15 @@ sub output_an_item {
 	my $new = $1;
 	$new =~ s|<!--.+?-->||gsm;
 
-	$new =~ s|<div class="itemauthor">.*?</div>||gsm; # µ­½Ò¼ÔÌ¾½üµî
+	$new =~ s|<div class="itemauthor">.*?</div>||gsm; # è¨˜è¿°è€…åé™¤å»
 	$new =~ s|</?p>||gsm;
 	$new =~ s|</?pre.*?>||gsm;
 	$new =~ s|</?div.*?>||gsm;
 	$new =~ s|</?span.*?>||gsm;
-	$new =~ s|<a name="$ymdi".+?>(.+?)</a>|$1|g; # ¥Ø¥Ã¥À¤Î¤ò½üµî
-	$new =~ s|\[<a href="cat.+?">(.+?)</a>\]|[$1]|g; # ¥«¥Æ¥´¥ê¤Î¤ò½üµî
+	$new =~ s|<a name="$ymdi".+?>(.+?)</a>|$1|g; # ãƒ˜ãƒƒãƒ€ã®ã‚’é™¤å»
+	$new =~ s|\[<a href="cat.+?">(.+?)</a>\]|[$1]|g; # ã‚«ãƒ†ã‚´ãƒªã®ã‚’é™¤å»
 
-	# img ¤Î½èÍı
+	# img ã®å‡¦ç†
 	$new =~ s|(<a.+>)(<img.+>)(</a>)|$1&lt;>$3 $2 |gsm;
 	$new =~ s|<img\s*src="(.+?\.([^\.]+?))"\s*alt="(.+?)".*?>|
 	    qq(<a href="$1">[$3($2)]</a>)|exg;
@@ -80,7 +78,7 @@ sub output_an_item {
 	$new =~ s|<a\shref="[\d\-]+.html\#([\d\-]+)">|
 	    qq(<a href="clkeitai.cgi?date=$1">)|gxe;
 
-	$new =~ s!^(<.+?>|)\t!$1!gsm; # ¹ÔÆ¬¤Î¥¿¥Ö¤ÏÀäÂÎ½üµî
+	$new =~ s!^(<.+?>|)\t!$1!gsm; # è¡Œé ­ã®ã‚¿ãƒ–ã¯çµ¶ä½“é™¤å»
 
 	$outstr = $new;
 	last;
@@ -90,15 +88,14 @@ sub output_an_item {
 	$outstr = substr($outstr, 0, $page_size_max);
 	$outstr =~ s|<[^>]*$||;
 	$outstr =~ s|([\x00-\x7f]([\x80-\xff]{2})*)[\x80-\xff]$|$1|;
-	$outstr .= "\n\n[Ä¹¤¤¤Î¤Ç°Ê¹ß¾ÊÎ¬¤·¤Ş¤·¤¿]\n";
+	$outstr .= "\n\n[é•·ã„ã®ã§ä»¥é™çœç•¥ã—ã¾ã—ãŸ]\n";
     }
 
-    $outstr = jcode($outstr)->sjis;
     print "<body>$ymdi<p>$outstr</p></body></html>\n";
 }
 
-### ¥¢¥¤¥Æ¥à°ìÍ÷É½¼¨
-# anchor ¤È¤«¤Ê¤·¡£Ê¸»úÎó¤À¤±¡£¥¢¥¤¥Æ¥àÊÌÉ½¼¨¤Ø¤Î¥ê¥ó¥¯¤¢¤ê¡£
+### ã‚¢ã‚¤ãƒ†ãƒ ä¸€è¦§è¡¨ç¤º
+# anchor ã¨ã‹ãªã—ã€‚æ–‡å­—åˆ—ã ã‘ã€‚ã‚¢ã‚¤ãƒ†ãƒ åˆ¥è¡¨ç¤ºã¸ã®ãƒªãƒ³ã‚¯ã‚ã‚Šã€‚
 sub output_simple_list {
     my ($from) = @_;
     my $outstr = "";
@@ -125,7 +122,7 @@ sub output_simple_list {
 	    my $new = "$d<br>$c<hr>\n";
 
 	    if (length($new) > $page_size_max) { # a item > max
-		$new =~ s/<br>.*$/<br>(Âç¤­¤¹¤®¤Ê¤Î¤ÇÈóÉ½¼¨)<hr>\n/;
+		$new =~ s/<br>.*$/<br>(å¤§ãã™ããªã®ã§éè¡¨ç¤º)<hr>\n/;
 	    }
 
 	    if ($len + length($new) > $page_size_max) {
@@ -137,7 +134,6 @@ sub output_simple_list {
 	}
     }
     close(F);
-    $outstr = jcode($outstr)->sjis;
     print << "HTML"
 <body>
 $outstr

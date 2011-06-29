@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
 # $Id: add-extent.pl,v 1.3 2003/08/25 11:50:33 yto Exp $
-# HTML ¤Î img ¥¿¥°¤Ë width ¤È height ¤òÂ­¤¹
+# HTML ã® img ã‚¿ã‚°ã« width ã¨ height ã‚’è¶³ã™
 
 use strict;
 use File::Copy;
 
-# identify ¼«Æ°ÀßÄê
+# identify è‡ªå‹•è¨­å®š
 my $IDENTIFY = `which identify`;
 die "NO identify!" unless ($IDENTIFY =~ /identify$/);
 chomp $IDENTIFY;
@@ -19,14 +19,14 @@ USAGE
 
     for my $fname (@ARGV) {
 
-	# HTML ¥Õ¥¡¥¤¥ë¤ò°ìµ¤¤ËÆÉ¤ß¹ş¤à
+	# HTML ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä¸€æ°—ã«èª­ã¿è¾¼ã‚€
 	open(IN, $fname) or die;
 	my $all = join('', <IN>);
 	close(IN);
 
-	# cache ¥Õ¥¡¥¤¥ë
+	# cache ãƒ•ã‚¡ã‚¤ãƒ«
 	my $cfn = $fname;
-	$cfn =~ s!/[^/]*$!!;	# ¥Ñ¥¹
+	$cfn =~ s!/[^/]*$!!;	# ãƒ‘ã‚¹
 	$cfn .= "/cache_extent-info";
 	my %file_info;
 	my $file_info_update_flag = 0;
@@ -41,10 +41,10 @@ USAGE
 	    close(F);
 	}
 
-	# img ¥¿¥°¤ÎÉôÊ¬¤ò¼è¤ê¤À¤¹¡£
+	# img ã‚¿ã‚°ã®éƒ¨åˆ†ã‚’å–ã‚Šã ã™ã€‚
 	my @con = split(/(<img.+?>)/ims, $all);
 
-	next if (scalar(@con) == 1); # img ¥¿¥°¤¬Ìµ¤¤¥Õ¥¡¥¤¥ë¤Ï²¿¤â¤·¤Ê¤¤
+	next if (scalar(@con) == 1); # img ã‚¿ã‚°ãŒç„¡ã„ãƒ•ã‚¡ã‚¤ãƒ«ã¯ä½•ã‚‚ã—ãªã„
 
 	my $num = 0;
 	for (my $i = 0; $i < @con; $i++) {
@@ -52,17 +52,17 @@ USAGE
 	    if ($con[$i] =~ /^(<img.+?>)/ims) {
 		my $in = $1;
 
-		# width ¤È height ¤ÎÎ¾Êı¤¬ÀßÄê¤µ¤ì¤Æ¤¤¤ë¾ì¹ç¤Ï²¿¤â¤·¤Ê¤¤
+		# width ã¨ height ã®ä¸¡æ–¹ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ä½•ã‚‚ã—ãªã„
 		next if ($in =~ /\W((width|height)\W.+?\W){2}/i); # ad hoc
 
-		# width or height ¤ò¾Ã¤¹
+		# width or height ã‚’æ¶ˆã™
 		$con[$i] =~ s/\s+(width|height)=[^\s]+//gims;
 
-		# ²èÁü¥Õ¥¡¥¤¥ëÌ¾¤ò¼è¤ê½Ğ¤¹
+		# ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–ã‚Šå‡ºã™
 		die unless ($in =~ /\ssrc="?(\S+?)"?[\s>]/i);
 		my $imgfn = $1;
 
-		# identify ¤Ç width ¤È height ¤ò¼èÆÀ
+		# identify ã§ width ã¨ height ã‚’å–å¾—
 		next unless (-e $imgfn);
 		my ($w, $h);
 		if (defined $file_info{$imgfn}) {
@@ -75,12 +75,12 @@ USAGE
 		}
 		die if $?;
 
-		# img ¥¿¥°Æâ¤Ë width ¤È height ¤òÄÉ²Ã
+		# img ã‚¿ã‚°å†…ã« width ã¨ height ã‚’è¿½åŠ 
 		$con[$i] =~ s|>$| width="$w" height="$h">|ims;
 		$num++;
 	    }
 
-	    # cache ¥Õ¥¡¥¤¥ë¤Î½ñ¤­¹ş¤ß
+	    # cache ãƒ•ã‚¡ã‚¤ãƒ«ã®æ›¸ãè¾¼ã¿
 	    if ($file_info_update_flag and open(F, "> $cfn")) {
 		foreach my $f (sort keys %file_info) {
 		    print F "$f @{$file_info{$f}}\n";
@@ -89,9 +89,9 @@ USAGE
 	    }
 	}
 
-	next if ($num == 0);	# ÊÑ¹¹²Õ½ê¤Ê¤·
+	next if ($num == 0);	# å¤‰æ›´ç®‡æ‰€ãªã—
 
-	# ÊÑ¹¹²Õ½ê¤¬¤¢¤Ã¤¿¤é¡¢¸µ¤Î¥Õ¥¡¥¤¥ë¤òÂàÈò¤·¤Æ¤«¤é¡¢¾å½ñ¤­¤¹¤ë
+	# å¤‰æ›´ç®‡æ‰€ãŒã‚ã£ãŸã‚‰ã€å…ƒã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é€€é¿ã—ã¦ã‹ã‚‰ã€ä¸Šæ›¸ãã™ã‚‹
 	copy($fname, "$fname.bak") or die;
 	open(OUT, "> $fname") or die;
 	print OUT join("", @con);
