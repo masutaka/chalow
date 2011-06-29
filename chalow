@@ -323,7 +323,7 @@ my $readmore_tag = "====";
 
 ### chalow 普及のため HTML の一番下にリンクを表示する。できれば消さないで。
 my $signature = qq(<p class="footer">Powered by 
-<a href="http://chalow.org/">chalow</a></p>);
+<a href="http://chalow.org/">chalow</a> version $version</p>);
 
 ### コマンドライン引数
 Getopt::Long::Configure('bundling');

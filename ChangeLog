@@ -1,5 +1,7 @@
 2011-06-30  Takashi Masuda  <masutaka@nifty.com>
 
+	* chalow: $signature に $version を追加。
+
 	* 生成される HTML コードを W3C に準拠させた
 
 	The W3C Markup Validation Service http://validator.w3.org/ でエラーにな
