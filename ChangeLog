@@ -1,5 +1,15 @@
 2011-06-30  Takashi Masuda  <masutaka@nifty.com>
 
+	* cl.conf: デフォルト値を変更
+
+	$page_mode = 1;
+	↓
+	$page_mode = 2;
+
+	$output_cat_pages = 0;
+	↓
+	$output_cat_pages = 1;
+
 	* chalow: $signature に $version を追加。
 
 	* 生成される HTML コードを W3C に準拠させた
