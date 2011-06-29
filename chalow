@@ -660,6 +660,10 @@ sub write_category_page {
         my $n = $cat_page_entry_max;
         my $num_of_old_pages = int(@ents / $n);
 
+        if (int(@ents % $n) == 0) {
+            $num_of_old_pages -= 1;
+        }
+
         my @fnames;
         for (my $i = 0; $i <= $num_of_old_pages; $i++) {
             $fnames[$i] = get_category_filename($catname);

@@ -1,5 +1,9 @@
 2011-06-30  Takashi Masuda  <masutaka@nifty.com>
 
+	* chalow: $output_cat_pages = 1 のとき、カテゴリに含まれる記事の数
+	が$cat_page_entry_max の倍数だと、「次ページ」を 1 つ多く作っていた
+	件の修正。
+
 	* chalow: $version を 1.0 から 1.0.50 に変更。
 
 	* cl.conf: デフォルト値を変更
