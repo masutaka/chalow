@@ -1,5 +1,7 @@
 2011-06-30  Takashi Masuda  <masutaka@nifty.com>
 
+	* chalow: $version を 1.0 から 1.0.50 に変更。
+
 	* cl.conf: デフォルト値を変更
 
 	$page_mode = 1;

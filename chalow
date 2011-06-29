@@ -14,7 +14,7 @@ use Time::Local;		# for 曜日
 use HTML::Template;
 use ChangeLogReader;
 
-my $version = '1.0';
+my $version = '1.0.50';
 
 # 現在時刻の獲得
 my $what_time_is_it_now = strftime "%Y-%m-%d %H:%M", localtime;
