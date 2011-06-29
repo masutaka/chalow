@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # $Id: chalow,v 1.1 2007-10-19 22:07:25+09 tatsuoyamashita Exp tatsuoyamashita $
 #
 # chalow - CHAngeLog On the Web - convert ChangeLog to HTML files

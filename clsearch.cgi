@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # $Id: clsearch.cgi,v 1.1 2007-10-19 22:08:03+09 tatsuoyamashita Exp tatsuoyamashita $
 # clsearch.cgi - chalow により HTML 化された ChangeLog を検索する CGI
 use strict;
