@@ -1,5 +1,9 @@
 2011-07-06  Takashi Masuda  <masutaka@nifty.com>
 
+	* chalow, cl.conf: $descending_order_items を新設。
+	0 の時、日ページ、月ページ、カテゴリページで、アイテムを降順 (新し
+	いアイテムが上) で表示する。デフォルトは 1 (今までと同じ動作)
+
 	* chalow, cl.conf: $ignore_case_sorting_by_cat_in_sidemenu を新設。
 	1 の時、サイドメニューのカテゴリを大文字小文字無視でソートする。
 	デフォルトは 0 (今までと同じ動作)

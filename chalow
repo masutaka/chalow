@@ -50,6 +50,9 @@ my $opt_topn = 5;
 my $show_day_of_week = 1;
 # 月ページで、日付を降順 (新しい日付が上) で表示するか (1:yes or 0:no)
 my $reverse_order_days = 0;
+# 日ページ、月ページ、カテゴリページで、アイテムを降順 (新しいアイテム
+# が上) で表示するか (1:yes or 0:no)
+my $descending_order_items = 1;
 
 # インデックスページのテンプレート
 my $index_page_template = << "___INDEX_PAGE_TEMPLATE"
@@ -391,6 +394,7 @@ $clog_url_pref .= "/" unless ($clog_url_pref =~ m!/$!);
 # http://chalow.net            -> http://chalow.net/
 
 my %month_page;			# 月別のページ
+my %month_page_for_index;	# 月別のページ for index.html
 my %category_item;		# カテゴリ別ページ用 item
 my %inside_ref;			# 日付リンクによるリファラー
 
@@ -442,8 +446,13 @@ foreach my $ymd (sort keys %{$cl->{all}}) {
 	next if ($i !~ /^\d/);
 	push @items, make_item_html($e, $ymd, $i);
     }
+    my @items_for_index = @items;
+    unless ($descending_order_items) {
+	@items = reverse @items; # 昇順: 古いアイテムが上
+    }
     my ($y, $m, $d) = ($ymd =~ /^(\d{4})-(\d\d)-(\d\d)$/);
     $month_page{"$y-$m"}{$ymd}{str} = make_entry_html($e, $ymd, \@items);
+    $month_page_for_index{"$y-$m"}{$ymd}{str} = make_entry_html($e, $ymd, \@items_for_index);
 }
 
 ### 生成(2) HTML ファイルの出力
@@ -662,7 +671,12 @@ sub write_category_page {
 
     foreach my $catname (@cat_list) {
 
-        my @ents = sort {$b->{eh} cmp $a->{eh}} @{$category_item{$catname}};
+	my @ents;
+	if ($descending_order_items) {	# 降順: 新しいアイテムが上
+	    @ents = sort {$b->{eh} cmp $a->{eh}} @{$category_item{$catname}};
+	} else {			# 昇順: 古いアイテムが上
+	    @ents = reverse sort {$b->{eh} cmp $a->{eh}} @{$category_item{$catname}};
+	}
 
         my $n = $cat_page_entry_max;
         my $num_of_old_pages = int(@ents / $n);
@@ -914,7 +928,7 @@ sub write_index_page {
 	my $ymd = $recent[$i];
 	my ($ym, $d) = ($ymd =~ /^(\d{4}-\d\d)-(\d\d)$/);
 #	$top_n_str .= $month_page{$ym}{$ymd}{str};
-	push @top_n_entries, {content => $month_page{$ym}{$ymd}{str}};
+	push @top_n_entries, {content => $month_page_for_index{$ym}{$ymd}{str}};
     }
     my ($ymd, $ym, $d) = ($recent[0] =~ /^((\d{4}-\d\d)-(\d\d))$/);
 
