@@ -297,6 +297,8 @@ my $clog_url = "./";
 my $output_itemlist = 1;
 # 見出し一覧 (JavaScript ファイル) で出力する日数
 my $latest_titles_num = 10;
+# 最近追記された記事(追記YYYYMMDD:)一覧 (JavaScript ファイル) で出力する日数
+my $latest_tuiki_num = 5;
 
 # 日ごとにページを作るか (0:NO, 1:YES) --- obsolete
 my $day_page_mode = 0;
@@ -374,6 +376,7 @@ $css_file = $opt_css_file if (defined $opt_css_file);
 $stop_date =~ s/-//g;
 
 my $latest_item_list;
+my $latest_tuiki_list;
 my $category_list;
 
 my $clog_url_pref = $clog_url;
@@ -425,6 +428,7 @@ my $current_day_list = make_day_list_str($current_ym);
 write_rss_file() if ($output_rss); # RSS ファイルを作る
 write_itemlist_file() if ($output_itemlist); # 検索用ファイル(itemlist)を作る 
 write_latest_item_list_file();	# 最近の話題一覧を作る
+write_latest_tuiki_list_file();	# 最近の追記一覧を作る。
 write_category_list_file();	# カテゴリ一覧を作る
 
 ### HTML 生成のためのループ
@@ -686,6 +690,7 @@ sub write_category_page {
             $t->param(ym => $current_ym);
             $t->param(day_list => $current_day_list);
             $t->param(latest_item_list => $latest_item_list);
+            $t->param(latest_tuiki_list => $latest_tuiki_list);
             $t->param(category_list => $category_list);
 	    $t->param(rss_file => $rss_filename); # 050821
             $t->param(entries => [grep /^.+$/, @ents[$i*$n...($i+1)*$n-1]]);
@@ -772,6 +777,7 @@ sub write_item_page {
 
 	    $t->param(month_page_list => $month_page_list);
 	    $t->param(latest_item_list => $latest_item_list);
+	    $t->param(latest_tuiki_list => $latest_tuiki_list);
 	    $t->param(category_list => $category_list);
 	    $t->param(back => $ymdi_before);
 	    $t->param(next => $ymdi_after);
@@ -828,6 +834,7 @@ sub write_day_page {
 	$t->param(day_list => $day_list);
 	$t->param(month_page_list => $month_page_list);
 	$t->param(latest_item_list => $latest_item_list);
+	$t->param(latest_tuiki_list => $latest_tuiki_list);
 	$t->param(category_list => $category_list);
 	$t->param(rss_file => $rss_filename); # 050821
 	$t->param(back => $day_before);
@@ -879,6 +886,7 @@ sub write_month_page {
 	$t->param(day_list => $day_list);
 	$t->param(month_page_list => $month_page_list);
 	$t->param(latest_item_list => $latest_item_list);
+	$t->param(latest_tuiki_list => $latest_tuiki_list);
 	$t->param(category_list => $category_list);
 	$t->param(rss_file => $rss_filename); # 050821
 	$t->param(back => $m_before);
@@ -925,6 +933,7 @@ sub write_index_page {
     $t->param(day_list => $day_list);
     $t->param(month_page_list => $month_page_list);
     $t->param(latest_item_list => $latest_item_list);
+    $t->param(latest_tuiki_list => $latest_tuiki_list);
     $t->param(category_list => $category_list);
     $t->param(rss_file => $rss_filename); # 050821
     $t->param(entries => \@top_n_entries);
@@ -1167,6 +1176,61 @@ sub write_latest_item_list_file {
 
     $latest_item_list = join("\n", @lines);
 
+}
+
+
+### JavaScript feed ファイルを出力する
+sub write_latest_tuiki_list_file {
+
+    ### 最近追記された記事
+    my @line_list;
+    my $now_s = time;
+    foreach my $ymd (sort {$b cmp $a} keys %{$cl->{all}}) {
+	my $e = $cl->{all}->{$ymd};
+	foreach my $i (sort {$b <=> $a} keys %$e) {
+	    next if ($i !~ /^\d/);
+
+	    ### 追記YYYYMMDD:
+	    while ($e->{$i}{co} =~ /追記(\d{4})(\d{2})(\d{2}):/g) {
+		my $t_y = $1;
+		my $t_m = $2;
+		my $t_d = $3;
+		my $tuiki_day = $t_y.$t_m.$t_d;
+		my $tuiki_day_s = timelocal(0, 0, 0, $t_d, $t_m - 1, $t_y - 1900);
+		my $before = int(($now_s - $tuiki_day_s) / 86400);
+		push @line_list, "- <a href=\"".
+		    datestr2url("$ymd-$i")."\">$ymd-$i</a> ($before日前)<br>";
+	    }
+	}
+    }
+
+    my @lines;
+    my $ctr = $latest_tuiki_num;
+    foreach my $line ( sort compare_for_latest_tuiki_list @line_list ) {
+#	print "$line\n";
+	push @lines, $line;
+	$ctr--;
+	last if ($ctr <= 0);
+    }
+
+    my $ostr = join("\n", map {s/\'/&\#x27;/g; "document.writeln('".$_."');"}
+    		    @lines);
+    output_to_file("$outputdir/tuiki.js", \$ostr);
+
+    $latest_tuiki_list = join("\n", @lines);
+
+}
+
+sub compare_for_latest_tuiki_list {
+    my $a2 = $a;
+    $a2 =~ s/.+\(//;
+    $a2 =~ s/日前\).+//;
+
+    my $b2 = $b;
+    $b2 =~ s/.+\(//;
+    $b2 =~ s/日前\).+//;
+
+    $a2 <=> $b2;
 }
 
 
