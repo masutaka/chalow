@@ -1161,6 +1161,10 @@ sub write_latest_item_list_file {
 	}
     }
 
+    my $ostr = join("\n", map {s/\'/&\#x27;/g; "document.writeln('".$_."');"}
+		    @lines);
+    output_to_file("$outputdir/cl.js", \$ostr);
+
     $latest_item_list = join("\n", @lines);
 
 }
@@ -1186,7 +1190,13 @@ sub write_category_list_file {
 	push @lines, "- <a href=\"$url\">$cat</a> ($n)<br>";
     }
 
+    my $ostr = join("\n", map {s/\'/&\#x27;/g; "document.writeln('".$_."');"}
+		 @lines);
+
     $category_list = join("\n", @lines);
+    if ($output_cat_pages == 1) {
+	output_to_file("$outputdir/cl-cat.js", \$ostr);
+    }
 }
 
 
