@@ -314,6 +314,9 @@ my $cat_page_entry_max = 10;
 # ($output_cat_pages = 0 のときのみ有効)
 my $cat_page_cgi = "clsearch.cgi?cat=%%CAT%%";
 #my $cat_page_cgi = "";
+# サイドメニューのカテゴリを大文字小文字無視でソートする (0:NO, 1:YES)
+# ($output_cat_pages = 1 のときのみ有効)
+my $ignore_case_sorting_by_cat_in_sidemenu = 0;
 
 # ファイルの最初に出てくる「<!-- ReplaceOnce -->」を置き換える文字列
 my $replace_once = "";
@@ -1240,7 +1243,16 @@ sub write_category_list_file {
 #    return if ($output_cat_pages == 0);
 
     my @lines = ();
-    foreach my $cat (sort keys %{$cl->{CAT}}) {
+
+    my @sorted_cat;
+    if ($ignore_case_sorting_by_cat_in_sidemenu == 1) {
+	@sorted_cat = sort { lc $a cmp lc $b } keys %{$cl->{CAT}};
+    }
+    else {
+	@sorted_cat = sort keys %{$cl->{CAT}};
+    }
+
+    foreach my $cat (@sorted_cat) {
 	my $n = $cl->{CAT}->{$cat};
 	my $url;
 	if ($output_cat_pages) {

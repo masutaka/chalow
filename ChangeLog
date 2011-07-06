@@ -1,5 +1,9 @@
 2011-07-06  Takashi Masuda  <masutaka@nifty.com>
 
+	* chalow, cl.conf: $ignore_case_sorting_by_cat_in_sidemenu を新設。
+	1 の時、サイドメニューのカテゴリを大文字小文字無視でソートする。
+	デフォルトは 0 (今までと同じ動作)
+
 	* chalow, cl.conf: '追記YYYYMMDD:' というフォーマットを付けて追記す
 	ると、サイドメニューの「最近追記された記事」に表示されるようにした。
 
