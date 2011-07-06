@@ -278,6 +278,12 @@ ChangeLog の特殊な記法
 	<span style="font-size:small">♪ Jeith Jarrett / La Scala</span>
 
 
+- 追記機能
+
+  '追記YYYYMMDD:' というフォーマットを付けて追記すると、サイドメニュー
+  の「最近追記された記事」に表示されます。
+
+
 - エスケープ
   以下の記法でHTMLを直書きすることができます。
 	[literal]...[/literal], [sic]...[/sic], [esc]...[/esc]

@@ -1,5 +1,8 @@
 2011-07-06  Takashi Masuda  <masutaka@nifty.com>
 
+	* README, chalow: README に「追記機能」の説明を追加。
+	追記のコードをちょっと整理。
+
 	* chalow, cl.conf: $descending_order_items を新設。
 	0 の時、日ページ、月ページ、カテゴリページで、アイテムを降順 (新し
 	いアイテムが上) で表示する。デフォルトは 1 (今までと同じ動作)
