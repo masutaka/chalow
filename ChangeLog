@@ -1,3 +1,8 @@
+2011-07-06  Takashi Masuda  <masutaka@nifty.com>
+
+	* cl.conf: サイドメニューの「カテゴリ」と「最近の話題」はベタに展開
+	するのではなく、js ファイルを参照するようにした。
+
 2011-06-30  Takashi Masuda  <masutaka@nifty.com>
 
 	* chalow: $output_cat_pages = 1 のとき、カテゴリに含まれる記事の数
