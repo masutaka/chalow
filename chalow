@@ -506,6 +506,9 @@ sub okikae {
     ### Read More ###
     s!^$readmore_tag$(.*)$!<div class="readmore">$1</div>!sm;
 
+    ### 追記(YYYY-MM-DD):
+    s!(追記\(\d{4}-\d{2}-\d{2}\):)!<div class="tuiki">$1</div>!gms;
+
     ### 文字修飾と水平線。Hiki の記法を採用。
     s!'''(.+?)'''!<strong>$1</strong>!gms;
     s!''(.+?)''!<em>$1</em>!gms;
@@ -1207,11 +1210,8 @@ sub write_latest_tuiki_list_file {
 	foreach my $i (sort {$b <=> $a} keys %$e) {
 	    next if ($i !~ /^\d/);
 
-	    my $tuiki_s = "追記";
-	    my $nichimae_s = "日前";
-
-	    ### 追記YYYYMMDD:
-	    while ($e->{$i}{co} =~ /$tuiki_s(\d{4})(\d{2})(\d{2}):/g) {
+	    ### 追記(YYYY-MM-DD):
+	    while ($e->{$i}{co} =~ /追記\((\d{4})-(\d{2})-(\d{2})\):/g) {
 		my $t_y = $1;
 		my $t_m = $2;
 		my $t_d = $3;
@@ -1219,7 +1219,7 @@ sub write_latest_tuiki_list_file {
 		my $tuiki_day_s = timelocal(0, 0, 0, $t_d, $t_m - 1, $t_y - 1900);
 		my $before = int(($now_s - $tuiki_day_s) / 86400);
 		push @line_list, "- <a href=\"".
-		    datestr2url("$ymd-$i")."\">$ymd-$i</a> ($before$nichimae_s)<br>";
+		    datestr2url("$ymd-$i")."\">$ymd-$i</a> ($before日前)<br>";
 	    }
 	}
     }

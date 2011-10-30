@@ -1,3 +1,9 @@
+2011-10-30  Takashi Masuda  <masutaka@nifty.com>
+
+	* README, chalow, sample/diary.css: 追記のフォーマットを変更。
+	「追記YYYYMMDD:」→「追記(YYYY-MM-DD):」
+	さらに class="tuiki" 属性を付け、css で bold を指定するようにした。
+
 2011-07-06  Takashi Masuda  <masutaka@nifty.com>
 
 	* README, chalow: README に「追記機能」の説明を追加。

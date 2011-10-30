@@ -305,3 +305,7 @@ div .itemauthor span {
 
 .section table {border-collapse: collapse;}
 .section td {border: solid 1px gray; padding: 3px;}
+
+.tuiki {
+    font-weight: bold;
+}
