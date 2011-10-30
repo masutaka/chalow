@@ -121,6 +121,21 @@ div.section {
 }
 
 /*
+item 中の ##hoge## の設定
+*/
+h4 {
+        margin: 3px 0px 3px 0px;
+        font-weight: bold;
+}
+
+/*
+item 中の ###hoge### の設定
+*/
+h5 {
+        margin: 3px 0px 3px 0px;
+}
+
+/*
 item 中の引用の設定
 */
 div.body blockquote { 
