@@ -507,7 +507,7 @@ sub okikae {
     s!^$readmore_tag$(.*)$!<div class="readmore">$1</div>!sm;
 
     ### 追記(YYYY-MM-DD):
-    s!(追記\(\d{4}-\d{2}-\d{2}\):)!<div class="tuiki">$1</div>!gms;
+    s!(追記\(\d{4}-\d{2}-\d{2}\):)!<span class="tuiki">$1</span>!gms;
 
     ### マークアップ。
     s!###(.+?)###!</p><h5>$1</h5><p>!gms;
