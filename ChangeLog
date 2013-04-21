@@ -1,4 +1,4 @@
-2011-10-30  Takashi Masuda  <masutaka@nifty.com>
+2011-10-30  Takashi Masuda  <masutaka.net@gmail.com>
 
 	* README, chalow, sample/diary.css: <h4> と <h5> を使えるようにした。
 	それぞれ ## と ### で括るとマークアップされる。
@@ -8,7 +8,7 @@
 	「追記YYYYMMDD:」→「追記(YYYY-MM-DD):」
 	さらに class="tuiki" 属性を付け、css で bold を指定するようにした。
 
-2011-07-06  Takashi Masuda  <masutaka@nifty.com>
+2011-07-06  Takashi Masuda  <masutaka.net@gmail.com>
 
 	* README, chalow: README に「追記機能」の説明を追加。
 	追記のコードをちょっと整理。
@@ -27,7 +27,7 @@
 	* cl.conf: サイドメニューの「カテゴリ」と「最近の話題」はベタに展開
 	するのではなく、js ファイルを参照するようにした。
 
-2011-06-30  Takashi Masuda  <masutaka@nifty.com>
+2011-06-30  Takashi Masuda  <masutaka.net@gmail.com>
 
 	* chalow: $output_cat_pages = 1 のとき、カテゴリに含まれる記事の数
 	が$cat_page_entry_max の倍数だと、「次ページ」を 1 つ多く作っていた
